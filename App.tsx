@@ -15,6 +15,7 @@ import {
   Text,
   useColorScheme,
   View,
+  Dimensions
 } from 'react-native';
 
 import {
@@ -24,6 +25,8 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+
+import MapView, {PROVIDER_GOOGLE} from 'react-native-maps';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -87,9 +90,23 @@ function App(): JSX.Element {
       </ScrollView>
     );
   } else {
+    const { width, height } = Dimensions.get("window");
     return (
       <ScrollView>
         <Section title="Sahil">{data[0].title}</Section>
+        <MapView
+          provider={PROVIDER_GOOGLE}
+          initialRegion={{
+            latitude: 53.3498,
+            longitude: -6.2603,
+            latitudeDelta: 0.0922,
+            longitudeDelta: 0.0421,
+          }}
+          style={{
+            width,
+            height,
+          }}
+        />
       </ScrollView>
     );
   }
