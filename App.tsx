@@ -5,7 +5,7 @@
  * @format
  */
 
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
   SafeAreaView,
@@ -57,16 +57,42 @@ function Section({children, title}: SectionProps): JSX.Element {
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState<Movie[]>([]);
 
+  // get data at app start
+  const getMovies = async () => {
+    try {
+      const response = await fetch('https://reactnative.dev/movies.json');
+      const json = await response.json();
+      setData(json.movies);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
-  return (
-    <ScrollView>
-      <Section title="Starting up">Hello World</Section>
-    </ScrollView>
-  );
+  useEffect(() => {
+    getMovies();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <ScrollView>
+        <Section title="Getting Movies">Loading...</Section>
+      </ScrollView>
+    );
+  } else {
+    return (
+      <ScrollView>
+        <Section title="Sahil">{data[0].title}</Section>
+      </ScrollView>
+    );
+  }
 }
 
 const styles = StyleSheet.create({
