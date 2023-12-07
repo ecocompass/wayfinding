@@ -31,6 +31,8 @@ import {
 } from 'react-native/Libraries/NewAppScreen';
 
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
+import { RootSiblingParent } from 'react-native-root-siblings';
+import Toast from 'react-native-root-toast';
 
 // type SectionProps = PropsWithChildren<{
 //   title: string;
@@ -153,8 +155,10 @@ const App = () => {
         `http://ecocompass.anupal.me/test-core?latitude=${encodeURIComponent(data.latitude)}&longitude=${encodeURIComponent(data.longitude)}`, { method: "GET"})
 
       const json = await response.json();
-      // setData(json.movies);
-      console.log(json);
+      Toast.show(json.message, {
+        duration: 10000
+      })
+      console.log(json)
     } catch (error) {
       console.error(error);
     } finally {
@@ -167,7 +171,6 @@ const App = () => {
       if (res) {
         Geolocation.getCurrentPosition(
           position => {
-            console.log(position);
             setLocation({
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
@@ -183,19 +186,20 @@ const App = () => {
         );
       }
     });
-    console.log(location);
   };
   if (!location.latitude) {
     return (
-      <View style={styles.container}>
-        <Text>Welcome!</Text>
-        <View
-          style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
-          <Button title="Get Location" onPress={getLocation} />
+      <RootSiblingParent>
+        <View style={styles.container}>
+          <Text>Welcome!</Text>
+          <View
+            style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
+            <Button title="Get Location" onPress={getLocation} />
+          </View>
+          <Text>Latitude: {location.latitude}</Text>
+          <Text>Longitude: {location.longitude}</Text>
         </View>
-        <Text>Latitude: {location.latitude}</Text>
-        <Text>Longitude: {location.longitude}</Text>
-      </View>
+      </RootSiblingParent>
     );
   } else {
     const { width, height } = Dimensions.get("window");
@@ -207,17 +211,19 @@ const App = () => {
     };
 
     return (
-      <ScrollView>
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          initialRegion={userRegion}
-          style={{
-            width,
-            height,
-          }}>
-          <Marker coordinate={userRegion} />
-        </MapView>
-      </ScrollView>
+      <RootSiblingParent>
+        <ScrollView>
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            initialRegion={userRegion}
+            style={{
+              width,
+              height,
+            }}>
+            <Marker coordinate={userRegion} />
+          </MapView>
+        </ScrollView>
+      </RootSiblingParent>
     );
   }
 };
@@ -230,24 +236,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-
-// const styles = StyleSheet.create({
-//   sectionContainer: {
-//     marginTop: 32,
-//     paddingHorizontal: 24,
-//   },
-//   sectionTitle: {
-//     fontSize: 24,
-//     fontWeight: '600',
-//   },
-//   sectionDescription: {
-//     marginTop: 8,
-//     fontSize: 18,
-//     fontWeight: '400',
-//   },
-//   highlight: {
-//     fontWeight: '700',
-//   },
-// });
-
 export default App;
