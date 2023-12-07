@@ -208,6 +208,11 @@ const App = () => {
       longitudeDelta: 0.0421,
     };
 
+    const getUserClickLoc = function(loc) {
+      let locObj = loc.nativeEvent.coordinate;
+      getLocationData({latitude: locObj.latitude, longitude: locObj.longitude});
+    }
+
     return (
       <RootSiblingParent>
         <ScrollView>
@@ -217,7 +222,8 @@ const App = () => {
             style={{
               width,
               height,
-            }}>
+            }}
+            onPress={getUserClickLoc}>
             <Marker coordinate={userRegion} />
           </MapView>
         </ScrollView>
