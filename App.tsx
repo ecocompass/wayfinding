@@ -196,8 +196,6 @@ const App = () => {
             style={{marginTop: 10, padding: 10, borderRadius: 10, width: '40%'}}>
             <Button title="Get Location" onPress={getLocation} />
           </View>
-          <Text>Latitude: {location.latitude}</Text>
-          <Text>Longitude: {location.longitude}</Text>
         </View>
       </RootSiblingParent>
     );
