@@ -18,6 +18,7 @@ import {
   Dimensions,
   Button,
   PermissionsAndroid,
+  Platform,
 } from 'react-native';
 
 import Geolocation from 'react-native-geolocation-service';
@@ -45,8 +46,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    height: 300,
-    width: 300,
+    height: 900,
+    width: 720,
   },
   map: {
     flex: 1
@@ -164,6 +165,32 @@ const requestLocationPermission = async () => {
 
 const App = () => {
   const [location, setLocation] = useState({latitude: 0, longitude: 0});
+  const [currentLocation, setCurrentLocation] = useState([0, 0]); // Longitude, Latitude
+
+  useEffect(() => {
+    if (Platform.OS === 'android') {
+      PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+      ).then(granted => {
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          getCurrentLocation();
+        }
+      });
+    } else {
+      getCurrentLocation();
+    }
+  }, []);
+
+  const getCurrentLocation = () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        setCurrentLocation([position.coords.longitude, position.coords.latitude]);
+        console.log("Pos:",position)
+      },
+      error => console.log(error),
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  };
 
   const getLocationData = async (data: any) => {
     try {
@@ -194,7 +221,10 @@ const App = () => {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
             });
-            // getLocationData({latitude: position.coords.latitude, longitude: position.coords.longitude});
+            console.log("Pos2",position);
+            console.log(currentLocation)
+            
+        //    getLocationData({latitude: position.coords.latitude, longitude: position.coords.longitude});
           },
           error => {
             // See error code charts below.
@@ -206,7 +236,7 @@ const App = () => {
       }
     });
   };
-  if (!location.latitude && false) {
+  if (!location.latitude) {
     return (
       <RootSiblingParent>
         <View style={styles.container}>
@@ -223,8 +253,8 @@ const App = () => {
     const userRegion = {
       latitude: location.latitude,
       longitude: location.longitude,
-      latitudeDelta: 0.0922,
-      longitudeDelta: 0.0421,
+      latitudeDelta: 90.0922,
+      longitudeDelta: 66.0421,
     };
 
     const getUserClickLoc = function(loc) {
@@ -249,7 +279,28 @@ const App = () => {
            <View style={styles.container}>
         
             {/* <Marker coordinate={userRegion} /> */}
-              <Mapbox.MapView style={styles.map} />
+              <Mapbox.MapView style={styles.map}>
+              <Mapbox.Camera
+          zoomLevel={10}
+          centerCoordinate={currentLocation}
+          animationMode={'flyTo'}
+          animationDuration={2000}
+         // centerCoordinate={[-74.0060, 40.7128]} // Long, Lat of New York City
+        />
+        <Mapbox.PointAnnotation
+           id="currentLocation"
+           coordinate={currentLocation}
+        >
+          <View style={{
+            height: 30,
+            width: 30,
+            backgroundColor: '#00ff00',
+            borderRadius: 15,
+            borderColor: '#fff',
+            borderWidth: 3,
+          }} />
+        </Mapbox.PointAnnotation>
+      </Mapbox.MapView>
             </View>
             </View>
       </RootSiblingParent>
