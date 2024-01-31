@@ -33,7 +33,25 @@ import {
 import MapView, {PROVIDER_GOOGLE, Marker} from 'react-native-maps';
 import { RootSiblingParent } from 'react-native-root-siblings';
 import Toast from 'react-native-root-toast';
+import Mapbox from '@rnmapbox/maps';
 
+Mapbox.setAccessToken('pk.eyJ1IjoiYWdyYXdhc2EiLCJhIjoiY2xyeXdtbGgyMHVhMTJxbnV4dWQyeXFiNCJ9.EBZDzXD0wMCa6hQNAn-4Xg');
+
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  container: {
+    height: 300,
+    width: 300,
+  },
+  map: {
+    flex: 1
+  }
+});
 // type SectionProps = PropsWithChildren<{
 //   title: string;
 // }>;
@@ -160,9 +178,10 @@ const App = () => {
       })
       console.log(json)
     } catch (error) {
-      console.error(error);
+      // console.error(error);
     } finally {
       // setLoading(false);
+
     }
   };
   const getLocation = () => {
@@ -175,7 +194,7 @@ const App = () => {
               latitude: position.coords.latitude,
               longitude: position.coords.longitude,
             });
-            getLocationData({latitude: position.coords.latitude, longitude: position.coords.longitude});
+            // getLocationData({latitude: position.coords.latitude, longitude: position.coords.longitude});
           },
           error => {
             // See error code charts below.
@@ -187,7 +206,7 @@ const App = () => {
       }
     });
   };
-  if (!location.latitude) {
+  if (!location.latitude && false) {
     return (
       <RootSiblingParent>
         <View style={styles.container}>
@@ -215,8 +234,8 @@ const App = () => {
 
     return (
       <RootSiblingParent>
-        <ScrollView>
-          <MapView
+        
+        {/*   <MapView
             provider={PROVIDER_GOOGLE}
             initialRegion={userRegion}
             style={{
@@ -225,14 +244,20 @@ const App = () => {
             }}
             onPress={getUserClickLoc}>
             <Marker coordinate={userRegion} />
-          </MapView>
-        </ScrollView>
+          </MapView> */}
+          <View style={styles.page}>
+           <View style={styles.container}>
+        
+            {/* <Marker coordinate={userRegion} /> */}
+              <Mapbox.MapView style={styles.map} />
+            </View>
+            </View>
       </RootSiblingParent>
     );
   }
 };
 
-const styles = StyleSheet.create({
+/* const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
@@ -240,4 +265,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 });
-export default App;
+*/
+export default App; 
