@@ -85,8 +85,7 @@ const requestLocationPermission = async () => {
 const App = () => {
   const [currentLocation, setCurrentLocation] = useState([0, 0]); // Longitude, Latitude
 
-  let startingPoint = [-6.2653554, 53.324153];
-  let destinationPoint = [-6.2650513, 53.3256942];
+  let destinationPoint = [-6.261334893161802, 53.339058776262846];
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -116,10 +115,9 @@ const App = () => {
     setCurrentLocation([0, 0]);
   };
 
+  // backend api
   const getLocationData = async (data: any) => {
     try {
-      // const response = await fetch('https://reactnative.dev/movies.json');
-
       const response = await fetch(
         `http://ecocompass.anupal.me/test-core?latitude=${encodeURIComponent(
           data.latitude
@@ -139,14 +137,6 @@ const App = () => {
     }
   };
 
-  const getUserClickLoc = function (loc) {
-    let locObj = loc.nativeEvent.coordinate;
-    getLocationData({
-      latitude: locObj.latitude,
-      longitude: locObj.longitude,
-    });
-  };
-
   const route: any = {
     type: "FeatureCollection",
     features: [
@@ -156,21 +146,22 @@ const App = () => {
         geometry: {
           type: "LineString",
           coordinates: [
-            [-6.2653554, 53.324153],
-            [-6.2653123, 53.3243724],
-            [-6.2651821, 53.325035],
-            [-6.2651734, 53.3250898],
-            [-6.2651149, 53.3253791],
-            [-6.2650513, 53.3256942],
+            [-6.253514221969283, 53.34197087957193],
+            [-6.254546411906972, 53.34218338120337],
+            [-6.255037591946149, 53.34133336832366],
+            [-6.255316230006258, 53.34081162120549],
+            [-6.25694831451014, 53.34111464795052],
+            [-6.2582200014513205, 53.341304780469216],
+            [-6.258598167373265, 53.34016396778034],
+            [-6.258777297322979, 53.339510363304754],
+            [-6.260190443661884, 53.33982528301698],
+            [-6.260688030400814, 53.33991441081503],
+            [-6.261334893161802, 53.339058776262846],
           ],
         },
       },
     ],
   };
-
-  // const route: any = [
-
-  // ];
 
   return (
     <RootSiblingParent>
@@ -179,13 +170,13 @@ const App = () => {
           <Mapbox.MapView style={styles.map}>
             <Mapbox.Camera
               zoomLevel={18}
-              centerCoordinate={startingPoint}
+              centerCoordinate={currentLocation}
               animationMode={"flyTo"}
               animationDuration={2000}
             />
             <Mapbox.PointAnnotation
               id="startingPoint"
-              coordinate={startingPoint}
+              coordinate={currentLocation}
             >
               <View
                 style={{
