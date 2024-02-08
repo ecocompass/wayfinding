@@ -144,7 +144,7 @@ const Map = ({ navigation }: any) => {
       <View style={styles.container}>
         <Mapbox.MapView style={styles.map}>
           <Mapbox.Camera
-            zoomLevel={18}
+            zoomLevel={14}
             centerCoordinate={currentLocation}
             animationMode={"flyTo"}
             animationDuration={2000}

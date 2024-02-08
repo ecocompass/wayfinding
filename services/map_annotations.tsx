@@ -15,7 +15,7 @@ export function getAnnotation(type: string, options: any) {
     case "POINT":
       return (
         <Mapbox.PointAnnotation
-          id={options.currentLocation}
+          id={options.id}
           coordinate={options.coordinates}
         >
           <View style={defaultPointStyle} />
