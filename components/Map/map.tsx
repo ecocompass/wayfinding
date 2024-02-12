@@ -5,6 +5,8 @@ import Geolocation from "react-native-geolocation-service";
 import Toast from "react-native-root-toast";
 import Mapbox from "@rnmapbox/maps";
 import { getAnnotation } from "../../services";
+import { Icon, Input, InputField, InputIcon, InputSlot, SearchIcon, Textarea, TextareaInput } from "@gluestack-ui/themed";
+import { SearchBar } from "react-native-screens";
 
 Mapbox.setAccessToken(
   "pk.eyJ1IjoiZWxlY3Rybzc1IiwiYSI6ImNscnRlcWJ1eDAxN2QycW82cXp5MWZsbXMifQ.ZlRWWO347Yae46luSV8BCA"
@@ -15,10 +17,11 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+    bottom: '25%'
   },
   container: {
-    height: 900,
-    width: 720,
+    height: '50%',
+    width: '100%',
   },
   map: {
     flex: 1,
@@ -50,7 +53,12 @@ const requestLocationPermission = async () => {
 
 const Map = ({ navigation }: any) => {
   const [currentLocation, setCurrentLocation] = useState([0, 0]); // Longitude, Latitude
+  const [searchQuery, setSearchQuery] = useState('');
 
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+    // Logic to handle search query with the map (e.g., filtering markers, searching locations) goes here
+  };
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
 
@@ -142,6 +150,7 @@ const Map = ({ navigation }: any) => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
+
         <Mapbox.MapView style={styles.map}>
           <Mapbox.Camera
             zoomLevel={14}
@@ -181,6 +190,18 @@ const Map = ({ navigation }: any) => {
             </Mapbox.ShapeSource>
           )}
         </Mapbox.MapView>
+        <Input
+          variant="rounded"
+          size="md"
+          isDisabled={false}
+          isInvalid={false}
+          isReadOnly={false}
+          m="$2"
+        ><InputSlot pl="$3">
+            <InputIcon as={SearchIcon} />
+          </InputSlot>
+          <InputField placeholder="Search here baby..." />
+        </Input>
       </View>
     </View>
   );
