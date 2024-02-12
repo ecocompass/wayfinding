@@ -15,6 +15,7 @@ export function getPointAnnotation(options: any) {
     <Mapbox.PointAnnotation
       id={options.id}
       coordinate={options.coordinates}
+      key={options.id}
     >
       <View style={defaultPointStyle} />
     </Mapbox.PointAnnotation>
