@@ -4,7 +4,7 @@ import { StyleSheet, View, PermissionsAndroid, Platform } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 import Toast from "react-native-root-toast";
 import Mapbox from "@rnmapbox/maps";
-import { getAnnotation } from "../../services";
+import { getPointAnnotation, getLineAnnotation } from "../../services";
 
 Mapbox.setAccessToken(
   "pk.eyJ1IjoiZWxlY3Rybzc1IiwiYSI6ImNscnRlcWJ1eDAxN2QycW82cXp5MWZsbXMifQ.ZlRWWO347Yae46luSV8BCA"
@@ -149,37 +149,11 @@ const Map = ({ navigation }: any) => {
             animationMode={"flyTo"}
             animationDuration={2000}
           />
-          {getAnnotation("POINT", {
+          {getPointAnnotation({
             coordinates: currentLocation,
             id: "currentLocation",
           })}
-          <Mapbox.PointAnnotation
-            id="destinationPointAnnotation"
-            coordinate={destinationPoint}
-          >
-            <View
-              style={{
-                height: 20,
-                width: 20,
-                backgroundColor: "#00cccc",
-                borderRadius: 15,
-                borderColor: "#fff",
-                borderWidth: 1,
-              }}
-            />
-          </Mapbox.PointAnnotation>
-          {route && (
-            <Mapbox.ShapeSource id="shapeSource" shape={route}>
-              <Mapbox.LineLayer
-                id="lineLayer"
-                style={{
-                  lineWidth: 3,
-                  lineJoin: "bevel",
-                  lineColor: "#0000ff",
-                }}
-              />
-            </Mapbox.ShapeSource>
-          )}
+          {route && getLineAnnotation({ route })}
         </Mapbox.MapView>
       </View>
     </View>

@@ -10,19 +10,28 @@ const defaultPointStyle = {
   borderWidth: 1,
 };
 
-export function getAnnotation(type: string, options: any) {
-  switch (type) {
-    case "POINT":
-      return (
-        <Mapbox.PointAnnotation
-          id={options.id}
-          coordinate={options.coordinates}
-        >
-          <View style={defaultPointStyle} />
-        </Mapbox.PointAnnotation>
-      );
+export function getPointAnnotation(options: any) {
+  return (
+    <Mapbox.PointAnnotation
+      id={options.id}
+      coordinate={options.coordinates}
+    >
+      <View style={defaultPointStyle} />
+    </Mapbox.PointAnnotation>
+  );
+}
 
-    default:
-      return;
-  }
+export function getLineAnnotation(options: any) {
+  return(
+    <Mapbox.ShapeSource id="shapeSource" shape={options.route}>
+      <Mapbox.LineLayer
+        id="lineLayer"
+        style={{
+          lineWidth: 3,
+          lineJoin: "bevel",
+          lineColor: "#0000ff",
+        }}
+      />
+    </Mapbox.ShapeSource>
+  )
 }
