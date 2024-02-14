@@ -1,12 +1,17 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable semi */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable quotes */
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, PermissionsAndroid, Platform } from "react-native";
 
 import Geolocation from "react-native-geolocation-service";
-import Toast from "react-native-root-toast";
+
 import Mapbox from "@rnmapbox/maps";
-import { getAnnotation } from "../../services";
 import { Icon, Input, InputField, InputIcon, InputSlot, SearchIcon, Textarea, TextareaInput } from "@gluestack-ui/themed";
 import { SearchBar } from "react-native-screens";
+import { getPointAnnotation, getLineAnnotation } from "../../services";
 
 Mapbox.setAccessToken(
   "pk.eyJ1IjoiZWxlY3Rybzc1IiwiYSI6ImNscnRlcWJ1eDAxN2QycW82cXp5MWZsbXMifQ.ZlRWWO347Yae46luSV8BCA"
@@ -55,12 +60,13 @@ const Map = ({ navigation }: any) => {
   const [currentLocation, setCurrentLocation] = useState([0, 0]); // Longitude, Latitude
   const [searchQuery, setSearchQuery] = useState('');
 
-  const handleSearch = (query) => {
+  const handleSearch = (query: any) => {
     setSearchQuery(query);
     // Logic to handle search query with the map (e.g., filtering markers, searching locations) goes here
   };
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
+  const [renderedPoints, setRenderedPoints] = useState<any>([])
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -90,37 +96,7 @@ const Map = ({ navigation }: any) => {
     setCurrentLocation([0, 0]);
   };
 
-  const getLocationData = async (data: any) => {
-    try {
-      // const response = await fetch('https://reactnative.dev/movies.json');
-
-      const response = await fetch(
-        `http://ecocompass.anupal.me/test-core?latitude=${encodeURIComponent(
-          data.latitude
-        )}&longitude=${encodeURIComponent(data.longitude)}`,
-        { method: "GET" }
-      );
-
-      const json = await response.json();
-      Toast.show(json.message, {
-        duration: 10000,
-      });
-      console.log(json);
-    } catch (error) {
-      // console.error(error);
-    } finally {
-      // setLoading(false);
-    }
-  };
-
-  const getUserClickLoc = function (loc) {
-    let locObj = loc.nativeEvent.coordinate;
-    getLocationData({
-      latitude: locObj.latitude,
-      longitude: locObj.longitude,
-    });
-  };
-
+  // sample route
   const route: any = {
     type: "FeatureCollection",
     features: [
@@ -147,48 +123,36 @@ const Map = ({ navigation }: any) => {
     ],
   };
 
+  const userLocationUpdate = (data: any) => {
+  };
+
+  const getClickedPoint = (feature: any) => {
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})])
+  }
+
+  const pointsArr = (coords: any, id: any) => {
+    getPointAnnotation({
+      coordinates: coords,
+      id: id,
+    })
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-
-        <Mapbox.MapView style={styles.map}>
+        <Mapbox.MapView
+          style={styles.map}
+          onPress={getClickedPoint}
+        >
           <Mapbox.Camera
             zoomLevel={14}
             centerCoordinate={currentLocation}
             animationMode={"flyTo"}
             animationDuration={2000}
           />
-          {getAnnotation("POINT", {
-            coordinates: currentLocation,
-            id: "currentLocation",
-          })}
-          <Mapbox.PointAnnotation
-            id="destinationPointAnnotation"
-            coordinate={destinationPoint}
-          >
-            <View
-              style={{
-                height: 20,
-                width: 20,
-                backgroundColor: "#00cccc",
-                borderRadius: 15,
-                borderColor: "#fff",
-                borderWidth: 1,
-              }}
-            />
-          </Mapbox.PointAnnotation>
-          {route && (
-            <Mapbox.ShapeSource id="shapeSource" shape={route}>
-              <Mapbox.LineLayer
-                id="lineLayer"
-                style={{
-                  lineWidth: 3,
-                  lineJoin: "bevel",
-                  lineColor: "#0000ff",
-                }}
-              />
-            </Mapbox.ShapeSource>
-          )}
+          {renderedPoints}
+          <Mapbox.UserLocation onUpdate={userLocationUpdate} />
+          {/* {route && getLineAnnotation({ route })} */}
         </Mapbox.MapView>
         <Input
           variant="rounded"
