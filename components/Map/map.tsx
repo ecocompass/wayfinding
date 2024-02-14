@@ -12,6 +12,7 @@ import Mapbox from "@rnmapbox/maps";
 import { Icon, Input, InputField, InputIcon, InputSlot, SearchIcon, Textarea, TextareaInput } from "@gluestack-ui/themed";
 import { SearchBar } from "react-native-screens";
 import { getPointAnnotation, getLineAnnotation } from "../../services";
+import { SearchBox } from "../Search/search";
 
 Mapbox.setAccessToken(
   "pk.eyJ1IjoiZWxlY3Rybzc1IiwiYSI6ImNscnRlcWJ1eDAxN2QycW82cXp5MWZsbXMifQ.ZlRWWO347Yae46luSV8BCA"
@@ -154,18 +155,7 @@ const Map = ({ navigation }: any) => {
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
           {/* {route && getLineAnnotation({ route })} */}
         </Mapbox.MapView>
-        <Input
-          variant="rounded"
-          size="md"
-          isDisabled={false}
-          isInvalid={false}
-          isReadOnly={false}
-          m="$2"
-        ><InputSlot pl="$3">
-            <InputIcon as={SearchIcon} />
-          </InputSlot>
-          <InputField placeholder="Search here baby..." />
-        </Input>
+        <SearchBox/>
       </View>
     </View>
   );
