@@ -1,3 +1,5 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable react/react-in-jsx-scope */
 import Mapbox from "@rnmapbox/maps";
 import { View } from "react-native";
 
@@ -23,7 +25,7 @@ export function getPointAnnotation(options: any) {
 }
 
 export function getLineAnnotation(options: any) {
-  return(
+  return (
     <Mapbox.ShapeSource id="shapeSource" shape={options.route}>
       <Mapbox.LineLayer
         id="lineLayer"
@@ -34,5 +36,5 @@ export function getLineAnnotation(options: any) {
         }}
       />
     </Mapbox.ShapeSource>
-  )
+  );
 }
