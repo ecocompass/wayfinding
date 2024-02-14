@@ -1,11 +1,10 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
+import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 
-const getLocationData = async (data: any) => {
+export const getLocationData = async (data: any) => {
     try {
-        // const response = await fetch('https://reactnative.dev/movies.json');
-
         const response = await fetch(
             `http://ecocompass.anupal.me/test-core?latitude=${encodeURIComponent(
                 data.latitude
@@ -29,4 +28,12 @@ const getUserClickLoc = function (loc: any) {
         latitude: locObj.latitude,
         longitude: locObj.longitude,
     });
+};
+
+export const geoCodeApi = function (text: string, proximity: string) {
+    return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${text}.json?` + new URLSearchParams({
+        access_token: MAPBOX_PUBLIC_TOKEN,
+        proximity,
+    })).then(response => response.json())
+        .catch(error => console.log(error));
 };

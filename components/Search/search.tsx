@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable react/react-in-jsx-scope */
 /* eslint-disable prettier/prettier */
@@ -20,12 +21,33 @@ import {
   ChevronsRightIcon,
   VStack,
 } from '@gluestack-ui/themed';
+import { useState, useCallback } from 'react';
+import {geoCodeApi} from '../../services/network.service'
+import * as React from "react";
+import { debounce } from 'lodash';
 
-export const SearchBox = () => {
-    const data = []
+export const SearchBox = (props: any) => {
+    const [searchText, setSearchText] = useState('');
+    const [searchResult, setSearchResult] = useState([])
+
+    async function fetchResult(searchTerm: string) {
+        if (searchTerm.length) {
+            const response = await geoCodeApi(searchTerm, props.userLocation.join(','));
+            setSearchResult(response.features.map((feature: any) => {
+                return {
+                    id: feature.id,
+                    properties: feature.properties,
+                    center: feature.center,
+                    name: feature.text,
+                    address: feature.place_name,
+                };
+            }));
+        }
+    }
+    const debounced = useCallback(debounce(fetchResult, 500), []);
     return (
         <><Input
-            variant="rounded"
+            variant="underlined"
             size="md"
             isDisabled={false}
             isInvalid={false}
@@ -35,11 +57,15 @@ export const SearchBox = () => {
             <InputSlot pl="$3">
                 <InputIcon as={SearchIcon} />
             </InputSlot>
-            <InputField placeholder="Take me somewhere" />
+            <InputField 
+                ml="$2" 
+                placeholder="Take me somewhere" 
+                onChangeText={(newText) => {setSearchText(newText); debounced(newText, 1000)}}
+                defaultValue={searchText}/>
         </Input>
         <Box py="$3">
             <FlatList
-                data={data}
+                data={searchResult}
                 renderItem={({ item }: any) => (
                     <Box
                         borderBottomWidth="$1"
@@ -57,7 +83,7 @@ export const SearchBox = () => {
                                     color="$coolGray800"
                                     $dark-color="$warmGray100"
                                 >
-                                    {item.fullName}
+                                    {item.name}
                                 </Text>
                             </VStack>
                         </HStack>

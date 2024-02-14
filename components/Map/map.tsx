@@ -13,9 +13,10 @@ import { Icon, Input, InputField, InputIcon, InputSlot, SearchIcon, Textarea, Te
 import { SearchBar } from "react-native-screens";
 import { getPointAnnotation, getLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
+import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 
 Mapbox.setAccessToken(
-  "pk.eyJ1IjoiZWxlY3Rybzc1IiwiYSI6ImNscnRlcWJ1eDAxN2QycW82cXp5MWZsbXMifQ.ZlRWWO347Yae46luSV8BCA"
+  MAPBOX_PUBLIC_TOKEN
 );
 
 const styles = StyleSheet.create({
@@ -58,7 +59,7 @@ const requestLocationPermission = async () => {
 };
 
 const Map = ({ navigation }: any) => {
-  const [currentLocation, setCurrentLocation] = useState([0, 0]); // Longitude, Latitude
+  const [userLocation, setUserLocation] = useState([0, 0]); // Longitude, Latitude
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleSearch = (query: any) => {
@@ -75,7 +76,7 @@ const Map = ({ navigation }: any) => {
         if (res) {
           Geolocation.getCurrentPosition(
             (position) => {
-              setCurrentLocation([
+              setUserLocation([
                 position.coords.longitude,
                 position.coords.latitude,
               ]);
@@ -94,7 +95,7 @@ const Map = ({ navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    setCurrentLocation([0, 0]);
+    setUserLocation([0, 0]);
   };
 
   // sample route
@@ -147,15 +148,15 @@ const Map = ({ navigation }: any) => {
         >
           <Mapbox.Camera
             zoomLevel={14}
-            centerCoordinate={currentLocation}
+            centerCoordinate={userLocation}
             animationMode={"flyTo"}
-            animationDuration={2000}
+            animationDuration={1000}
           />
           {renderedPoints}
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
           {/* {route && getLineAnnotation({ route })} */}
         </Mapbox.MapView>
-        <SearchBox/>
+        <SearchBox userLocation = {userLocation}/>
       </View>
     </View>
   );
