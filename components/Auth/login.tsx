@@ -53,7 +53,6 @@ const Auth = ({ navigation }: any) => {
               navigation.navigate("Map");
             }}
           >
-            
           </Button>
         </VStack>
       </FormControl>
