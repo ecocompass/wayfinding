@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     bottom: '25%'
   },
   container: {
-    height: '50%',
+    height: '70%',
     width: '100%',
   },
   map: {

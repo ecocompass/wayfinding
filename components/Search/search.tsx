@@ -19,6 +19,7 @@ import {
   Textarea,
   TextareaInput,
   ChevronsRightIcon,
+  CloseCircleIcon,
   VStack,
 } from '@gluestack-ui/themed';
 import { useState, useCallback } from 'react';
@@ -29,9 +30,9 @@ import { debounce } from 'lodash';
 export const SearchBox = (props: any) => {
     const [searchText, setSearchText] = useState('');
     const [searchResult, setSearchResult] = useState([])
-
     async function fetchResult(searchTerm: string) {
         if (searchTerm.length) {
+            console.log(props.userLocation)
             const response = await geoCodeApi(searchTerm, props.userLocation.join(','));
             setSearchResult(response.features.map((feature: any) => {
                 return {
@@ -42,6 +43,9 @@ export const SearchBox = (props: any) => {
                     address: feature.place_name,
                 };
             }));
+        } else {
+            setSearchResult([]);
+            setSearchText('');
         }
     }
     const debounced = useCallback(debounce(fetchResult, 500), []);
@@ -62,6 +66,11 @@ export const SearchBox = (props: any) => {
                 placeholder="Take me somewhere" 
                 onChangeText={(newText) => {setSearchText(newText); debounced(newText, 1000)}}
                 defaultValue={searchText}/>
+            {searchText.length ? (
+            <InputSlot pl="$3" onPress={() => {setSearchResult([]); setSearchText('');}}>
+                <InputIcon as={CloseCircleIcon} />
+            </InputSlot>
+            ) : null}
         </Input>
         <Box py="$3">
             <FlatList
