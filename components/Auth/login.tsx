@@ -54,7 +54,8 @@ const Auth = ({ navigation }: any) => {
              // setShowModal(false);
               navigation.navigate('Map');
             }}
-           />
+          >
+          </Button>
         </VStack>
       </FormControl>
     );
