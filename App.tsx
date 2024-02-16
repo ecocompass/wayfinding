@@ -7,28 +7,32 @@ import Signup from "./components/Auth/signup";
 import Login from "./components/Auth/login"
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
+import { Provider } from 'react-redux';
+import store from './store';
 
 const Stack = createNativeStackNavigator();
 const App = () => {
   return (
-    <RootSiblingParent>
-      <GluestackUIProvider config={config}>
-        <NavigationContainer>
-          <Stack.Navigator>
-            <Stack.Screen
-              name="Login"
-              component={Login}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              options={{ headerShown: false }}
-              name="Map"
-              component={Map}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
-      </GluestackUIProvider>
-    </RootSiblingParent>
+    <Provider store={store}>
+      <RootSiblingParent>
+        <GluestackUIProvider config={config}>
+          <NavigationContainer>
+            <Stack.Navigator>
+              <Stack.Screen
+                name="Login"
+                component={Login}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="Map"
+                component={Map}
+              />
+            </Stack.Navigator>
+          </NavigationContainer>
+        </GluestackUIProvider>
+      </RootSiblingParent>
+    </Provider>
   );
 };
 

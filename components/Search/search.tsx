@@ -22,18 +22,20 @@ import {
   CloseCircleIcon,
   VStack,
 } from '@gluestack-ui/themed';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import {geoCodeApi} from '../../services/network.service'
 import * as React from "react";
 import { debounce } from 'lodash';
+import { useSelector, useDispatch, UseSelector } from 'react-redux';
 
 export const SearchBox = (props: any) => {
     const [searchText, setSearchText] = useState('');
-    const [searchResult, setSearchResult] = useState([])
-    async function fetchResult(searchTerm: string) {
+    const [searchResult, setSearchResult] = useState([]);
+    let userLocation = useSelector((state: any) => {return state.location;}); // Longitude, Latitude
+
+    const fetchResult = async (searchTerm: string, proximity: any) => {
         if (searchTerm.length) {
-            console.log(props.userLocation)
-            const response = await geoCodeApi(searchTerm, props.userLocation.join(','));
+            const response = await geoCodeApi(searchTerm, userLocation.join(','));
             setSearchResult(response.features.map((feature: any) => {
                 return {
                     id: feature.id,
@@ -64,7 +66,7 @@ export const SearchBox = (props: any) => {
             <InputField 
                 ml="$2" 
                 placeholder="Take me somewhere" 
-                onChangeText={(newText) => {setSearchText(newText); debounced(newText, 1000)}}
+                onChangeText={(newText) => {setSearchText(newText); debounced(newText, userLocation, 1000);}}
                 defaultValue={searchText}/>
             {searchText.length ? (
             <InputSlot pl="$3" onPress={() => {setSearchResult([]); setSearchText('');}}>
