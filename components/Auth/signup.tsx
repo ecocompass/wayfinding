@@ -13,10 +13,11 @@ import {
 import React from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../../store/actions/auth';
 
 
 const Signup = ({ navigation }: any) => {
-  let register = useSelector((state: any) => {return state.register;});
+  let signup = useSelector((state: any) => {return state.register;});
   const dispatch=useDispatch();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -87,7 +88,7 @@ const Signup = ({ navigation }: any) => {
               <Button
                 onPress={() => {
                   Register;
-                  console.log('Signup',register);
+                  console.log('Signup',signup);
                 }}
               >
                 <ButtonText color="$white">Register</ButtonText>
