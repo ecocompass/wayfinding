@@ -10,9 +10,24 @@ import {
   Card,
   HStack,
 } from '@gluestack-ui/themed';
+import React from 'react';
 import { View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+
 
 const Signup = ({ navigation }: any) => {
+  let register = useSelector((state: any) => {return state.register;});
+  const dispatch=useDispatch();
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [email,setEmail] = React.useState('');
+  const Register=()=>{
+    dispatch(register({
+      username:username,
+      email:email,
+      password:password,
+    }))
+  }
   return (
     <View
       style={{
@@ -32,19 +47,35 @@ const Signup = ({ navigation }: any) => {
                 Name
               </Text>
               <Input>
-                <InputField type="text" />
+                <InputField type="text"
+                value={username}
+                onChange={(event:any) => {
+                  setUsername(event.target.value);
+                }} />
               </Input>
               <Text color="$text500" lineHeight="$xs">
                 Email
               </Text>
-              <Input>
-                <InputField type="text" />
+              <Input
+             >
+               <InputField type='text'
+               value={email}
+               onChange={(event:any)=>{
+                setEmail(event.target.value)
+               }}
+               >
+
+               </InputField>
               </Input>
               <Text color="$text500" lineHeight="$xs">
                 Password
               </Text>
               <Input>
-                <InputField type="password" />
+              <InputField type="password"
+              value={password}
+              onChange={(event:any) => {
+                setPassword(event.target.value);
+              }}/>
               </Input>
               <Text color="$text500" lineHeight="$xs">
                 Confirm Password
@@ -55,7 +86,8 @@ const Signup = ({ navigation }: any) => {
             </VStack>
               <Button
                 onPress={() => {
-                  console.log('Signup');
+                  Register;
+                  console.log('Signup',register);
                 }}
               >
                 <ButtonText color="$white">Register</ButtonText>
