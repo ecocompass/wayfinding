@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/react-in-jsx-scope */
 import Mapbox from "@rnmapbox/maps";
@@ -12,6 +13,17 @@ const defaultPointStyle = {
   borderWidth: 1,
 };
 
+const customStyle = {
+  width: 20,
+  height: 20,
+  backgroundColor: '#a55eea',
+  borderRadius: 15,
+  borderBottomEndRadius: 0,
+  position:'relative',
+  transform: [{rotateY: '45deg'}],
+};
+
+
 export function getPointAnnotation(options: any) {
   return (
     <Mapbox.PointAnnotation
@@ -19,7 +31,18 @@ export function getPointAnnotation(options: any) {
       coordinate={options.coordinates}
       key={options.id}
     >
-      <View style={defaultPointStyle} />
+      <View
+       style={{
+        width: 20,
+        height: 20,
+        backgroundColor: '#a55eea',
+        borderRadius: 15,
+        borderBottomEndRadius: 0,
+        position:'relative',
+        transform: [{rotate: '45deg'}],
+        }} />
+
+      <Mapbox.Callout title={'Hello'}/>
     </Mapbox.PointAnnotation>
   );
 }

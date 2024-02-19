@@ -13,7 +13,7 @@ import { getPointAnnotation, getLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch, connect } from 'react-redux';
-import { setLocation } from "../../store/actions/setLocation";
+import { setCenter, setLocation } from "../../store/actions/setLocation";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -59,8 +59,12 @@ const requestLocationPermission = async () => {
 };
 
 const Map = ({ navigation }: any) => {
-  const userLocation = useSelector((state: any) => {
-    return state.location}); // Longitude, Latitude
+  let userLocation = useSelector((state: any) => {
+    return state.location.userLocation}); // Longitude, Latitude
+
+  let centerLocation = useSelector((state: any) => {
+    return state.location.centerLocation
+  });
   const dispatch = useDispatch();
 
 
@@ -74,7 +78,8 @@ const Map = ({ navigation }: any) => {
         if (res) {
           Geolocation.getCurrentPosition(
             (position) => {
-              dispatch(setLocation([position.coords.longitude, position.coords.latitude]))
+              dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
+              dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
             },
             (error) => {
               console.log(error.code, error.message);
@@ -124,7 +129,12 @@ const Map = ({ navigation }: any) => {
   const userLocationUpdate = (data: any) => {
   };
 
+  const selectLocation = (data: any) => {
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: data.center})])
+  }
+
   const getClickedPoint = (feature: any) => {
+    dispatch(setCenter(feature.geometry.coordinates))
     setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})])
   }
 
@@ -144,7 +154,7 @@ const Map = ({ navigation }: any) => {
         >
           <Mapbox.Camera
             zoomLevel={14}
-            centerCoordinate={userLocation}
+            centerCoordinate={centerLocation}
             animationMode={"flyTo"}
             animationDuration={1000}
           />
@@ -152,7 +162,7 @@ const Map = ({ navigation }: any) => {
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
           {/* {route && getLineAnnotation({ route })} */}
         </Mapbox.MapView>
-        <SearchBox/>
+        <SearchBox onLocationSelect={selectLocation}/>
       </View>
     </View>
   );
