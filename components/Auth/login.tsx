@@ -1,3 +1,5 @@
+/* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable prettier/prettier */
 import { FormControl, VStack, Heading, Input, InputField, InputSlot, InputIcon, EyeIcon, EyeOffIcon, ButtonText } from "@gluestack-ui/themed";
 import { useState } from "react";
 import { Button, Text } from "react-native";
@@ -47,10 +49,10 @@ const Auth = ({ navigation }: any) => {
               </InputSlot>
             </Input>
           </VStack>
-          <Button title="Login" 
+          <Button title="Login"
             onPress={()=>{
              // setShowModal(false);
-              navigation.navigate("Map");
+              navigation.navigate('Map');
             }}
           >
           </Button>
