@@ -15,6 +15,7 @@ import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
 import { Card, Heading, Text, Button, ButtonText } from "@gluestack-ui/themed";
+import { geoCodeApi } from "../../services/network.service";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -142,9 +143,15 @@ const Map = ({ navigation }: any) => {
     setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: data.center})])
   }
 
+  const fetchLocationDetails = async (coordinateArr: any) => {
+    const response = await geoCodeApi(coordinateArr.join(','))
+    setLocationData({name: response.features[0].text, address: response.features[0].place_name})
+  }
+
   const getClickedPoint = (feature: any) => {
-    dispatch(setCenter(feature.geometry.coordinates))
-    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})])
+    dispatch(setCenter(feature.geometry.coordinates));
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
+    fetchLocationDetails(feature.geometry.coordinates)
   }
 
   const pointsArr = (coords: any, id: any) => {
@@ -153,6 +160,8 @@ const Map = ({ navigation }: any) => {
       id: id,
     })
   }
+
+  console.log(locationData);
 
   return (
     <View style={styles.page}>
