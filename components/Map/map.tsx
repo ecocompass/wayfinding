@@ -4,7 +4,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable quotes */
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, PermissionsAndroid, Platform } from "react-native";
+import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 
 import Geolocation from "react-native-geolocation-service";
 
@@ -12,8 +12,9 @@ import Mapbox from "@rnmapbox/maps";
 import { getPointAnnotation, getLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
-import { useSelector, useDispatch, connect } from 'react-redux';
-import { setCenter, setLocation } from "../../store/actions/setLocation";
+import { useSelector, useDispatch } from 'react-redux';
+import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
+import { Card, Heading, Text, Button, ButtonText } from "@gluestack-ui/themed";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -24,10 +25,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    bottom: '25%'
+    bottom: '10%',
   },
   container: {
-    height: '70%',
+    height: '100%',
     width: '100%',
   },
   map: {
@@ -65,8 +66,14 @@ const Map = ({ navigation }: any) => {
   let centerLocation = useSelector((state: any) => {
     return state.location.centerLocation
   });
-  const dispatch = useDispatch();
 
+  let isSearching = useSelector((state: any) => {
+    return state.location.isSearching
+  });
+
+  let [isLocationSelected, setLocationCard] = useState(false)
+  let [locationData, setLocationData] = useState<any>({})
+  const dispatch = useDispatch();
 
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
@@ -130,6 +137,8 @@ const Map = ({ navigation }: any) => {
   };
 
   const selectLocation = (data: any) => {
+    setLocationData(data);
+    dispatch(setSearchStatus(false))
     setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: data.center})])
   }
 
@@ -163,6 +172,17 @@ const Map = ({ navigation }: any) => {
           {/* {route && getLineAnnotation({ route })} */}
         </Mapbox.MapView>
         <SearchBox onLocationSelect={selectLocation}/>
+        {!isSearching && locationData.name?
+        (<Card size="md" variant="elevated" m="$2">
+          <Heading mb="$1" size="md">
+            {locationData.name}
+          </Heading>
+          <Text size="sm" mb="$5">{locationData.address}</Text>
+          <Button py="$2" px="$4">
+            <ButtonText size="sm">Directions</ButtonText>
+          </Button>
+        </Card>) : (<></>)
+        }
       </View>
     </View>
   );

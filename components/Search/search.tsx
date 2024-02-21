@@ -28,11 +28,12 @@ import * as React from "react";
 import { debounce } from 'lodash';
 import { useSelector, useDispatch, UseSelector } from 'react-redux';
 import { Touchable, TouchableOpacity } from 'react-native';
-import { setCenter } from '../../store/actions/setLocation';
+import { setCenter, setSearchStatus } from '../../store/actions/setLocation';
 
 export const SearchBox = (props: any) => {
     const [searchText, setSearchText] = useState('');
     const [searchResult, setSearchResult] = useState([]);
+    let isSearching = useSelector((state: any) => {return state.location.isSearching;});
     let userLocation = useSelector((state: any) => {return state.location.userLocation;}); // Longitude, Latitude
     let centerLocation = useSelector((state: any) => {return state.location.centerLocation;});
 
@@ -63,20 +64,22 @@ export const SearchBox = (props: any) => {
 
     const debounced = useCallback(debounce(fetchResult, 500), []);
     return (
-        <><Input
+        <>
+        <Input
             variant="underlined"
             size="md"
             isDisabled={false}
             isInvalid={false}
             isReadOnly={false}
             m="$2"
+            onTouchStart={() => dispatch(setSearchStatus(true))}
         >
             <InputSlot pl="$3">
                 <InputIcon as={SearchIcon} />
             </InputSlot>
             <InputField 
-                ml="$2" 
-                placeholder="Take me somewhere" 
+                ml="$2"
+                placeholder="Take me somewhere"
                 onChangeText={(newText) => {setSearchText(newText); debounced(newText, userLocation, 1000);}}
                 defaultValue={searchText}/>
             {searchText.length ? (

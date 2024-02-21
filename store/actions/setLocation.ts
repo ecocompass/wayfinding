@@ -1,4 +1,4 @@
-import { UPDATECENTERLOCATION, UPDATEUSERLOCATION } from "."
+import { UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION } from "."
 
 export const setLocation = (location) => {
     return {
@@ -13,3 +13,10 @@ export const setCenter = (location) => {
         payload: location,
     };
 };
+
+export const setSearchStatus = (status) => {
+    return {
+        type: UPDATESEARCHSTATUS,
+        payload: status
+    }
+}

@@ -1,8 +1,9 @@
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/react-in-jsx-scope */
+import { ImageBackground } from "@gluestack-ui/themed";
 import Mapbox from "@rnmapbox/maps";
-import { View } from "react-native";
+import { View, Image,StyleSheet } from "react-native";
 
 const defaultPointStyle = {
   height: 20,
@@ -31,18 +32,7 @@ export function getPointAnnotation(options: any) {
       coordinate={options.coordinates}
       key={options.id}
     >
-      <View
-       style={{
-        width: 20,
-        height: 20,
-        backgroundColor: '#a55eea',
-        borderRadius: 15,
-        borderBottomEndRadius: 0,
-        position:'relative',
-        transform: [{rotate: '45deg'}],
-        }} />
-
-      <Mapbox.Callout title={'Hello'}/>
+      <Mapbox.Callout title={'End'} style={{minWidth: 200}} />
     </Mapbox.PointAnnotation>
   );
 }
