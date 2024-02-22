@@ -1,3 +1,5 @@
 export const UPDATEUSERLOCATION = 'UPDATEUSERLOCATION';
 export const REGISTER = 'REGISTER';
-export const LIST_FETCHED = 'LIST_FETCHED';
+export const STORE_TOKEN = 'STORETOKEN';
+export const SESSION_OK = 'SESSIONOK';
+export const LOGIN='LOGIN';

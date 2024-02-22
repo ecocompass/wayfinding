@@ -7,7 +7,7 @@ import authReducer from './authReducer';
 
 const rootReducer = combineReducers({
     location: locationReducer,
-    register:authReducer
+    register: authReducer
 });
 
 export default rootReducer;

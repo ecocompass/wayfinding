@@ -1,15 +1,29 @@
-import { LIST_FETCHED, REGISTER } from ".";
+import { LOGIN, REGISTER, SESSION_OK, STORE_TOKEN } from ".";
 
-export const registerAction = (register:any) => {
+export const loginAction = (login: any) => {
+    return {
+        type: LOGIN,
+        payload: login,
+    };
+};
+
+export const registerAction = (register: any) => {
     return {
         type: REGISTER,
         payload: register,
     };
 };
 
-export const storeListData= (result:any) => {
+export const storeToken = (result: any) => {
     return {
-       type: LIST_FETCHED,
-       data : result,
-     };
- };
+        type: STORE_TOKEN,
+        payload: result,
+    };
+};
+
+export const sessionOK = (bool: any) => {
+    return {
+        type: SESSION_OK,
+        payload: bool
+    }
+}
