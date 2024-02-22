@@ -4,11 +4,12 @@ import { registerAction, storeListData } from "../actions/auth";
 import axios from 'axios';
 // yield pauses and resume the generator functions
 const endpoint = {
-  reg: 'https://3.249.30.30:5000/api/auth/signup'
+  reg: 'http://3.249.30.30:5050/api/auth/signup'
 }
 
 export const userSignup = async (payload: any) => {
   console.log("Payload2", payload.payload)
+  console.log("End",endpoint.reg);
   let payload2=payload.payload
   payload2=JSON.stringify(payload2)
   console.log("length",payload2.length);
