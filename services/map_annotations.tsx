@@ -1,7 +1,9 @@
+/* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/react-in-jsx-scope */
+import { ImageBackground } from "@gluestack-ui/themed";
 import Mapbox from "@rnmapbox/maps";
-import { View } from "react-native";
+import { View, Image,StyleSheet } from "react-native";
 
 const defaultPointStyle = {
   height: 20,
@@ -12,6 +14,36 @@ const defaultPointStyle = {
   borderWidth: 1,
 };
 
+const customStyle = {
+  width: 20,
+  height: 20,
+  backgroundColor: '#a55eea',
+  borderRadius: 15,
+  borderBottomEndRadius: 0,
+  position:'relative',
+  transform: [{rotateY: '45deg'}],
+};
+
+function getLine(start, end) {
+  return {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              start,
+              end,
+            ],
+          },
+        },
+      ],
+    };
+  }
+
+
 export function getPointAnnotation(options: any) {
   return (
     <Mapbox.PointAnnotation
@@ -19,7 +51,7 @@ export function getPointAnnotation(options: any) {
       coordinate={options.coordinates}
       key={options.id}
     >
-      <View style={defaultPointStyle} />
+      <Mapbox.Callout title={'End'} style={{minWidth: 200}} />
     </Mapbox.PointAnnotation>
   );
 }
@@ -38,3 +70,21 @@ export function getLineAnnotation(options: any) {
     </Mapbox.ShapeSource>
   );
 }
+
+export function getPolyLineAnnotation(options: any) {
+  const route = getLine(options.start, options.end);
+  return (
+    <Mapbox.ShapeSource id="shapeSource" shape={route}>
+      <Mapbox.LineLayer
+        id="lineLayer"
+        style={{
+          lineWidth: 3,
+          lineJoin: "bevel",
+          lineColor: "#0000ff",
+        }}
+      />
+    </Mapbox.ShapeSource>
+  );
+}
+
+

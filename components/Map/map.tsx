@@ -4,16 +4,18 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable quotes */
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, PermissionsAndroid, Platform } from "react-native";
+import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 
 import Geolocation from "react-native-geolocation-service";
 
 import Mapbox from "@rnmapbox/maps";
-import { getPointAnnotation, getLineAnnotation } from "../../services";
+import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
-import { useSelector, useDispatch, connect } from 'react-redux';
-import { setLocation } from "../../store/actions/setLocation";
+import { useSelector, useDispatch } from 'react-redux';
+import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
+import { Card, Heading, Text, Button, ButtonText } from "@gluestack-ui/themed";
+import { geoCodeApi } from "../../services/network.service";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -24,10 +26,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    bottom: '25%'
+    bottom: '10%',
   },
   container: {
-    height: '70%',
+    height: '100%',
     width: '100%',
   },
   map: {
@@ -59,10 +61,20 @@ const requestLocationPermission = async () => {
 };
 
 const Map = ({ navigation }: any) => {
-  const userLocation = useSelector((state: any) => {
-    return state.location}); // Longitude, Latitude
-  const dispatch = useDispatch();
+  let userLocation = useSelector((state: any) => {
+    return state.location.userLocation}); // Longitude, Latitude
 
+  let centerLocation = useSelector((state: any) => {
+    return state.location.centerLocation
+  });
+
+  let isSearching = useSelector((state: any) => {
+    return state.location.isSearching
+  });
+
+  let [isLocationSelected, setLocationCard] = useState(false)
+  let [locationData, setLocationData] = useState<any>({})
+  const dispatch = useDispatch();
 
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
@@ -74,7 +86,8 @@ const Map = ({ navigation }: any) => {
         if (res) {
           Geolocation.getCurrentPosition(
             (position) => {
-              dispatch(setLocation([position.coords.longitude, position.coords.latitude]))
+              dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
+              dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
             },
             (error) => {
               console.log(error.code, error.message);
@@ -124,8 +137,21 @@ const Map = ({ navigation }: any) => {
   const userLocationUpdate = (data: any) => {
   };
 
+  const selectLocation = (data: any) => {
+    setLocationData(data);
+    dispatch(setSearchStatus(false))
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: data.center})])
+  }
+
+  const fetchLocationDetails = async (coordinateArr: any) => {
+    const response = await geoCodeApi(coordinateArr.join(','))
+    setLocationData({name: response.features[0].text, address: response.features[0].place_name})
+  }
+
   const getClickedPoint = (feature: any) => {
-    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})])
+    dispatch(setCenter(feature.geometry.coordinates));
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates}), getPolyLineAnnotation({start: userLocation, end: feature.geometry.coordinates})]);
+    fetchLocationDetails(feature.geometry.coordinates)
   }
 
   const pointsArr = (coords: any, id: any) => {
@@ -144,7 +170,7 @@ const Map = ({ navigation }: any) => {
         >
           <Mapbox.Camera
             zoomLevel={14}
-            centerCoordinate={userLocation}
+            centerCoordinate={centerLocation}
             animationMode={"flyTo"}
             animationDuration={1000}
           />
@@ -152,7 +178,18 @@ const Map = ({ navigation }: any) => {
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
           {/* {route && getLineAnnotation({ route })} */}
         </Mapbox.MapView>
-        <SearchBox/>
+        <SearchBox onLocationSelect={selectLocation}/>
+        {!isSearching && locationData.name?
+        (<Card size="md" variant="elevated" m="$2">
+          <Heading mb="$1" size="md">
+            {locationData.name}
+          </Heading>
+          <Text size="sm" mb="$5">{locationData.address}</Text>
+          <Button py="$2" px="$4">
+            <ButtonText size="sm">Directions</ButtonText>
+          </Button>
+        </Card>) : (<></>)
+        }
       </View>
     </View>
   );

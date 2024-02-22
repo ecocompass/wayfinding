@@ -34,7 +34,7 @@ const getUserClickLoc = function (loc: any) {
     });
 };
 
-export const geoCodeApi = function (text: string, proximity: string) {
+export const geoCodeApi = function (text: string, proximity: string = '') {
     return fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${text}.json?` + new URLSearchParams({
         access_token: MAPBOX_PUBLIC_TOKEN,
         proximity,
