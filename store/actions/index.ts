@@ -1,2 +1,3 @@
 export const UPDATEUSERLOCATION = 'UPDATEUSERLOCATION';
-export const REGISTER = 'REGISTER'
+export const REGISTER = 'REGISTER';
+export const LIST_FETCHED = 'LIST_FETCHED';

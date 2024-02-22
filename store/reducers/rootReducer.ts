@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 
 import { combineReducers } from 'redux';
-import locationReducer from './reducers/location';
-import authReducer from './reducers/authReducer';
+import locationReducer from './location';
+import authReducer from './authReducer';
 
 
 const rootReducer = combineReducers({

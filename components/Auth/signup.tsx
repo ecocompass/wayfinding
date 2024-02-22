@@ -13,22 +13,24 @@ import {
 import React from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../../store/actions/auth';
+import { registerAction } from '../../store/actions/auth';
 
 
 const Signup = ({ navigation }: any) => {
-  let signup = useSelector((state: any) => {return state.register;});
+  let register = useSelector((state: any) => {return state.register;});
+  let payt = useSelector((state: any) => {return state.data;});
   const dispatch=useDispatch();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [email,setEmail] = React.useState('');
-  const Register=()=>{
-    dispatch(register({
+/*   const Register=()=>{
+    
+    dispatch(registerAction({
       username:username,
       email:email,
       password:password,
     }))
-  }
+  } */
   return (
     <View
       style={{
@@ -50,8 +52,8 @@ const Signup = ({ navigation }: any) => {
               <Input>
                 <InputField type="text"
                 value={username}
-                onChange={(event:any) => {
-                  setUsername(event.target.value);
+                onChangeText={(event:any) => {
+                  setUsername(event);
                 }} />
               </Input>
               <Text color="$text500" lineHeight="$xs">
@@ -61,8 +63,9 @@ const Signup = ({ navigation }: any) => {
              >
                <InputField type='text'
                value={email}
-               onChange={(event:any)=>{
-                setEmail(event.target.value)
+               onChangeText={(event:any)=>{
+                console.log("Event",event)
+                setEmail(event)
                }}
                >
 
@@ -74,8 +77,10 @@ const Signup = ({ navigation }: any) => {
               <Input>
               <InputField type="password"
               value={password}
-              onChange={(event:any) => {
-                setPassword(event.target.value);
+              onChangeText={(event:any) => {
+              
+                console.log("pass",password)
+                setPassword(event);
               }}/>
               </Input>
               <Text color="$text500" lineHeight="$xs">
@@ -87,8 +92,10 @@ const Signup = ({ navigation }: any) => {
             </VStack>
               <Button
                 onPress={() => {
-                  Register;
-                  console.log('Signup',signup);
+                  dispatch(registerAction({email:email,username:username,password:password}));
+                //  navigation.navigate('Map');
+                  console.log('Signup',register);
+                  console.log('payt',payt);
                 }}
               >
                 <ButtonText color="$white">Register</ButtonText>
