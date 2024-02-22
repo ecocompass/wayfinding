@@ -9,7 +9,7 @@ import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 
 import Mapbox from "@rnmapbox/maps";
-import { getPointAnnotation, getLineAnnotation } from "../../services";
+import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
@@ -150,7 +150,7 @@ const Map = ({ navigation }: any) => {
 
   const getClickedPoint = (feature: any) => {
     dispatch(setCenter(feature.geometry.coordinates));
-    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates}), getPolyLineAnnotation({start: userLocation, end: feature.geometry.coordinates})]);
     fetchLocationDetails(feature.geometry.coordinates)
   }
 
@@ -160,8 +160,6 @@ const Map = ({ navigation }: any) => {
       id: id,
     })
   }
-
-  console.log(locationData);
 
   return (
     <View style={styles.page}>

@@ -10,9 +10,27 @@ import {
   Card,
   HStack,
 } from '@gluestack-ui/themed';
+import React from 'react';
 import { View } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { registerAction } from '../../store/actions/auth';
+
 
 const Signup = ({ navigation }: any) => {
+  let register = useSelector((state: any) => {return state.register;});
+  let payt = useSelector((state: any) => {return state.data;});
+  const dispatch=useDispatch();
+  const [username, setUsername] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [email,setEmail] = React.useState('');
+/*   const Register=()=>{
+    
+    dispatch(registerAction({
+      username:username,
+      email:email,
+      password:password,
+    }))
+  } */
   return (
     <View
       style={{
@@ -32,19 +50,38 @@ const Signup = ({ navigation }: any) => {
                 Name
               </Text>
               <Input>
-                <InputField type="text" />
+                <InputField type="text"
+                value={username}
+                onChangeText={(event:any) => {
+                  setUsername(event);
+                }} />
               </Input>
               <Text color="$text500" lineHeight="$xs">
                 Email
               </Text>
-              <Input>
-                <InputField type="text" />
+              <Input
+             >
+               <InputField type='text'
+               value={email}
+               onChangeText={(event:any)=>{
+                console.log("Event",event)
+                setEmail(event)
+               }}
+               >
+
+               </InputField>
               </Input>
               <Text color="$text500" lineHeight="$xs">
                 Password
               </Text>
               <Input>
-                <InputField type="password" />
+              <InputField type="password"
+              value={password}
+              onChangeText={(event:any) => {
+              
+                console.log("pass",password)
+                setPassword(event);
+              }}/>
               </Input>
               <Text color="$text500" lineHeight="$xs">
                 Confirm Password
@@ -55,7 +92,10 @@ const Signup = ({ navigation }: any) => {
             </VStack>
               <Button
                 onPress={() => {
-                  console.log('Signup');
+                  dispatch(registerAction({email:email,username:username,password:password}));
+                //  navigation.navigate('Map');
+                  console.log('Signup',register);
+                  console.log('payt',payt);
                 }}
               >
                 <ButtonText color="$white">Register</ButtonText>

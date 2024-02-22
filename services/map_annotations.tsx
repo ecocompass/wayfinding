@@ -24,6 +24,25 @@ const customStyle = {
   transform: [{rotateY: '45deg'}],
 };
 
+function getLine(start, end) {
+  return {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: [
+              start,
+              end,
+            ],
+          },
+        },
+      ],
+    };
+  }
+
 
 export function getPointAnnotation(options: any) {
   return (
@@ -51,3 +70,21 @@ export function getLineAnnotation(options: any) {
     </Mapbox.ShapeSource>
   );
 }
+
+export function getPolyLineAnnotation(options: any) {
+  const route = getLine(options.start, options.end);
+  return (
+    <Mapbox.ShapeSource id="shapeSource" shape={route}>
+      <Mapbox.LineLayer
+        id="lineLayer"
+        style={{
+          lineWidth: 3,
+          lineJoin: "bevel",
+          lineColor: "#0000ff",
+        }}
+      />
+    </Mapbox.ShapeSource>
+  );
+}
+
+
