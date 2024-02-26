@@ -2,10 +2,17 @@
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
+import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
+import { useDispatch, useSelector } from "react-redux";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Store } from "lucide-react-native";
+import { storeToken } from "../store/actions/auth";
+
 const baseUrl = 'http://3.249.30.30:5050/api/'
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
-    login: `${baseUrl}auth/login`
+    login: `${baseUrl}auth/login`,
+    logout:`${baseUrl}auth/logout`
 }
 export const getLocationData = async (data: any) => {
     try {
@@ -70,3 +77,47 @@ export const userLogin = async (payload: any) => {
     ).catch(error => console.log("Error", error))
 
 }
+
+export const userLogout= async(token:any)=>{
+    return await fetch(endpoint.logout,{
+        method:'DELETE',
+        headers:{
+            'AUTHORIZATION':token
+        }
+    }).then(response =>{ response.json();
+        RootNavigation.navigate('Login',{})
+    }
+    ).catch(error => console.log("Error", error))
+}
+
+/* export const saveToken = async (STORAGE_KEY:any) => {
+    try {
+       // let STORAGE_KEY = useSelector((state: any) => {return state.token;}); 
+        await AsyncStorage.setItem('accesstoken',STORAGE_KEY.access_token)
+      console.log('Data successfully saved',STORAGE_KEY)
+    } catch (e) {
+      console.log('Failed to save the data to the storage')
+    }
+  }
+
+export const readToken = async () => {
+    try {
+        let STORAGE_KEY = useSelector((state: any) => {return state.token;}); 
+       const value= await AsyncStorage.getItem('accesstoken')
+       const dispatch=useDispatch()
+       dispatch(storeToken(value))
+      console.log('Data successfully retrieved',value)
+      return value
+    } catch (e) {
+      console.log('Failed to save the data to the storage')
+    }
+}  
+
+const clearStorage = async () => {
+    try {
+      await AsyncStorage.clear();
+      console.log('Storage successfully cleared!');
+    } catch (e) {
+      console.log('Failed to clear the async storage.');
+    }
+  }; */

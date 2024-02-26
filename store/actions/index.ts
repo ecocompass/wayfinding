@@ -5,3 +5,4 @@ export const REGISTER = 'REGISTER';
 export const STORE_TOKEN = 'STORETOKEN';
 export const SESSION_OK = 'SESSIONOK';
 export const LOGIN='LOGIN';
+export const LOGOUT='LOGOUT';

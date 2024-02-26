@@ -14,10 +14,10 @@ export const registerAction = (register: any) => {
     };
 };
 
-export const storeToken = (result: any) => {
+export const storeToken = (token: any) => {
     return {
         type: STORE_TOKEN,
-        payload: result,
+        payload: token,
     };
 };
 
@@ -25,5 +25,12 @@ export const sessionOK = (bool: any) => {
     return {
         type: SESSION_OK,
         payload: bool
+    }
+}
+
+export const logoutAction = (token: any) => {
+    return {
+        type: logoutAction,
+        payload: token
     }
 }
