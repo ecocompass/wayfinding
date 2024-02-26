@@ -1,15 +1,24 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable semi */
+/* eslint-disable prettier/prettier */
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable quotes */
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, PermissionsAndroid, Platform } from "react-native";
+import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 
 import Geolocation from "react-native-geolocation-service";
-import Toast from "react-native-root-toast";
+
 import Mapbox from "@rnmapbox/maps";
-import { getAnnotation } from "../../services";
-import { Icon, Input, InputField, InputIcon, InputSlot, SearchIcon, Textarea, TextareaInput } from "@gluestack-ui/themed";
-import { SearchBar } from "react-native-screens";
+import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation, revertCoordinates } from "../../services";
+import { SearchBox } from "../Search/search";
+import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
+import { useSelector, useDispatch } from 'react-redux';
+import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
+import { Card, Heading, Text, Button, ButtonText } from "@gluestack-ui/themed";
+import { geoCodeApi, getPath } from "../../services/network.service";
 
 Mapbox.setAccessToken(
-  "pk.eyJ1IjoiZWxlY3Rybzc1IiwiYSI6ImNscnRlcWJ1eDAxN2QycW82cXp5MWZsbXMifQ.ZlRWWO347Yae46luSV8BCA"
+  MAPBOX_PUBLIC_TOKEN
 );
 
 const styles = StyleSheet.create({
@@ -17,10 +26,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    bottom: '25%'
+    bottom: '10%',
   },
   container: {
-    height: '50%',
+    height: '100%',
     width: '100%',
   },
   map: {
@@ -52,15 +61,25 @@ const requestLocationPermission = async () => {
 };
 
 const Map = ({ navigation }: any) => {
-  const [currentLocation, setCurrentLocation] = useState([0, 0]); // Longitude, Latitude
-  const [searchQuery, setSearchQuery] = useState('');
+  let userLocation = useSelector((state: any) => {
+    return state.location.userLocation}); // Longitude, Latitude
 
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-    // Logic to handle search query with the map (e.g., filtering markers, searching locations) goes here
-  };
+  let centerLocation = useSelector((state: any) => {
+    return state.location.centerLocation
+  });
+
+  let isSearching = useSelector((state: any) => {
+    return state.location.isSearching
+  });
+
+  let [isLocationSelected, setLocationCard] = useState(false)
+  let [locationData, setLocationData] = useState<any>({})
+  let [renderedRoute, setRenderedRoute] = useState<any>([])
+  const dispatch = useDispatch();
+
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
+  const [renderedPoints, setRenderedPoints] = useState<any>([])
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -68,10 +87,8 @@ const Map = ({ navigation }: any) => {
         if (res) {
           Geolocation.getCurrentPosition(
             (position) => {
-              setCurrentLocation([
-                position.coords.longitude,
-                position.coords.latitude,
-              ]);
+              dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
+              dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
             },
             (error) => {
               console.log(error.code, error.message);
@@ -87,121 +104,73 @@ const Map = ({ navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    setCurrentLocation([0, 0]);
+    console.log('default')
+    dispatch(setLocation([0,0]))
   };
 
-  const getLocationData = async (data: any) => {
-    try {
-      // const response = await fetch('https://reactnative.dev/movies.json');
-
-      const response = await fetch(
-        `http://ecocompass.anupal.me/test-core?latitude=${encodeURIComponent(
-          data.latitude
-        )}&longitude=${encodeURIComponent(data.longitude)}`,
-        { method: "GET" }
-      );
-
-      const json = await response.json();
-      Toast.show(json.message, {
-        duration: 10000,
-      });
-      console.log(json);
-    } catch (error) {
-      // console.error(error);
-    } finally {
-      // setLoading(false);
-    }
+  const userLocationUpdate = (data: any) => {
   };
 
-  const getUserClickLoc = function (loc) {
-    let locObj = loc.nativeEvent.coordinate;
-    getLocationData({
-      latitude: locObj.latitude,
-      longitude: locObj.longitude,
-    });
-  };
+  const selectLocation = (data: any) => {
+    setLocationData(data);
+    dispatch(setSearchStatus(false))
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: data.center})])
+  }
 
-  const route: any = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: [
-            [-6.253514221969283, 53.34197087957193],
-            [-6.254546411906972, 53.34218338120337],
-            [-6.255037591946149, 53.34133336832366],
-            [-6.255316230006258, 53.34081162120549],
-            [-6.25694831451014, 53.34111464795052],
-            [-6.2582200014513205, 53.341304780469216],
-            [-6.258598167373265, 53.34016396778034],
-            [-6.258777297322979, 53.339510363304754],
-            [-6.260190443661884, 53.33982528301698],
-            [-6.260688030400814, 53.33991441081503],
-            [-6.261334893161802, 53.339058776262846],
-          ],
-        },
-      },
-    ],
-  };
+  const fetchLocationDetails = async (coordinateArr: any) => {
+    const response = await geoCodeApi(coordinateArr.join(','))
+    setLocationData({name: response.features[0].text, address: response.features[0].place_name})
+  }
+
+  const getClickedPoint = (feature: any) => {
+    dispatch(setCenter(feature.geometry.coordinates));
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
+    fetchLocationDetails(feature.geometry.coordinates)
+  }
+
+  const renderPath = () => {
+    getPath({startCoordinates: userLocation.join(','), endCoordinates: centerLocation.join(',')})
+      .then((body: any) => {
+        setRenderedRoute(body.shortestPathCoordinates);
+      })
+  }
+
+  const pointsArr = (coords: any, id: any) => {
+    getPointAnnotation({
+      coordinates: coords,
+      id: id,
+    })
+  }
 
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-
-        <Mapbox.MapView style={styles.map}>
+        <Mapbox.MapView
+          style={styles.map}
+          onPress={getClickedPoint}
+        >
           <Mapbox.Camera
             zoomLevel={14}
-            centerCoordinate={currentLocation}
+            centerCoordinate={centerLocation}
             animationMode={"flyTo"}
-            animationDuration={2000}
+            animationDuration={1000}
           />
-          {getAnnotation("POINT", {
-            coordinates: currentLocation,
-            id: "currentLocation",
-          })}
-          <Mapbox.PointAnnotation
-            id="destinationPointAnnotation"
-            coordinate={destinationPoint}
-          >
-            <View
-              style={{
-                height: 20,
-                width: 20,
-                backgroundColor: "#00cccc",
-                borderRadius: 15,
-                borderColor: "#fff",
-                borderWidth: 1,
-              }}
-            />
-          </Mapbox.PointAnnotation>
-          {route && (
-            <Mapbox.ShapeSource id="shapeSource" shape={route}>
-              <Mapbox.LineLayer
-                id="lineLayer"
-                style={{
-                  lineWidth: 3,
-                  lineJoin: "bevel",
-                  lineColor: "#0000ff",
-                }}
-              />
-            </Mapbox.ShapeSource>
-          )}
+          {renderedPoints}
+          <Mapbox.UserLocation onUpdate={userLocationUpdate} />
+          { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
-        <Input
-          variant="rounded"
-          size="md"
-          isDisabled={false}
-          isInvalid={false}
-          isReadOnly={false}
-          m="$2"
-        ><InputSlot pl="$3">
-            <InputIcon as={SearchIcon} />
-          </InputSlot>
-          <InputField placeholder="Search here baby..." />
-        </Input>
+        <SearchBox onLocationSelect={selectLocation}/>
+        {!isSearching && locationData.name ?
+        (<Card size="md" variant="elevated" m="$2">
+          <Heading mb="$1" size="md">
+            {locationData.name}
+          </Heading>
+          <Text size="sm" mb="$5">{locationData.address}</Text>
+          <Button py="$2" px="$4" onPress={() => {renderPath()}}>
+            <ButtonText size="sm">Directions</ButtonText>
+          </Button>
+        </Card>) : (<></>)
+        }
       </View>
     </View>
   );
