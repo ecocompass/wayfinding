@@ -37,3 +37,15 @@ export const geoCodeApi = function (text: string, proximity: string = '') {
     })).then(response => response.json())
         .catch(error => console.log(error));
 };
+
+export const getPath = function (coordinateObj: any) {
+    return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),
+        {
+            method: 'GET',
+            headers: {
+                'Host': '141.148.199.176:8080',
+            },
+        })
+        .then((response) => response.json())
+        .then((res) => res);
+};

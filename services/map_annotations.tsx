@@ -24,7 +24,7 @@ const customStyle = {
   transform: [{rotateY: '45deg'}],
 };
 
-function getLine(start, end) {
+function getLine(coordArr: any) {
   return {
       type: "FeatureCollection",
       features: [
@@ -34,8 +34,7 @@ function getLine(start, end) {
           geometry: {
             type: "LineString",
             coordinates: [
-              start,
-              end,
+              coordArr
             ],
           },
         },
@@ -56,9 +55,23 @@ export function getPointAnnotation(options: any) {
   );
 }
 
-export function getLineAnnotation(options: any) {
+export function getLineAnnotation(route: any) {
+  let temp_route: any = {
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: route,
+        },
+      },
+    ],
+  };
+
   return (
-    <Mapbox.ShapeSource id="shapeSource" shape={options.route}>
+    <Mapbox.ShapeSource id="shapeSource" shape={temp_route}>
       <Mapbox.LineLayer
         id="lineLayer"
         style={{
@@ -72,9 +85,10 @@ export function getLineAnnotation(options: any) {
 }
 
 export function getPolyLineAnnotation(options: any) {
-  const route = getLine(options.start, options.end);
+  const route = getLine(options.coordinateArr);
+  console.log(route);
   return (
-    <Mapbox.ShapeSource id="shapeSource" shape={route}>
+    <Mapbox.ShapeSource id="shapeSource" key="line" shape={route}>
       <Mapbox.LineLayer
         id="lineLayer"
         style={{
@@ -85,6 +99,10 @@ export function getPolyLineAnnotation(options: any) {
       />
     </Mapbox.ShapeSource>
   );
+}
+
+export function revertCoordinates(coord: any) {
+  return [coord[1], coord[0]];
 }
 
 
