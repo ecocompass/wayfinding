@@ -52,7 +52,7 @@ const Auth = ({ navigation }: any) => {
           <Button title="Login"
             onPress={()=>{
              // setShowModal(false);
-              navigation.navigate('Map');
+              navigation.navigate('Preference');
             }}
           >
           </Button>

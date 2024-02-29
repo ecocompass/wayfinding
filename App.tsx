@@ -9,6 +9,7 @@ import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import { Provider } from 'react-redux';
 import store from './store';
+import Preference from "./components/Preference/preference";
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -26,6 +27,11 @@ const App = () => {
               {/* <Stack.Screen name="Register"
               component={Signup}
               options={{ headerShown: false }}/> */}
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="Preference"
+                component={Preference}
+              />
               <Stack.Screen
                 options={{ headerShown: false }}
                 name="Map"
