@@ -26,11 +26,12 @@ const Preference = ({ navigation }: any) => {
     {name: 'Driving', isSelected: false}
   ]);
 
+
   const togglePreference = (p) => {
     let newPreferences = allPreferences.map((ap) => {
         if (ap.name === p.name) {
           ap.isSelected = !ap.isSelected;
-        }
+        };
         return ap;
       });
     
@@ -72,7 +73,7 @@ const Preference = ({ navigation }: any) => {
           </HStack>
           <Button
             onPress={() => {
-              console.log("submit preference");
+                navigation.navigate('Map');
             }}
           >
             <ButtonText color="$white">Submit</ButtonText>
