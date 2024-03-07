@@ -12,7 +12,7 @@ const baseUrl = 'http://34.242.139.134:5050/api/';
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
-    logout: `${baseUrl}auth/logout`
+    logout: `${baseUrl}auth/logout`,
 }
 let access_token: any = '';
 
@@ -119,3 +119,15 @@ export const readToken = async () => {
       console.log('Failed to clear the async storage.');
     }
   }; */
+
+export const getPath = function (coordinateObj: any) {
+    return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),
+        {
+            method: 'GET',
+            headers: {
+                'Host': '141.148.199.176:8080',
+            },
+        })
+        .then((response) => response.json())
+        .then((res) => res);
+};

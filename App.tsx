@@ -19,9 +19,11 @@ const App = () => {
         <GluestackUIProvider config={config}>
           <NavigationContainer ref={navigationRef}>
             <Stack.Navigator>
-              <Stack.Screen name="Register"
+              <Stack.Screen
+                name="Register"
                 component={Signup}
-                options={{ headerShown: false }}/>
+                options={{ headerShown: false }}
+              />
               <Stack.Screen
                 name="Login"
                 component={Login}

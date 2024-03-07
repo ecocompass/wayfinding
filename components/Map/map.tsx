@@ -9,13 +9,13 @@ import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 
 import Mapbox from "@rnmapbox/maps";
-import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation } from "../../services";
+import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation, revertCoordinates } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
 import { Card, Heading, Text, Button, ButtonText } from "@gluestack-ui/themed";
-import { geoCodeApi } from "../../services/network.service";
+import { geoCodeApi, getPath } from "../../services/network.service";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -74,6 +74,7 @@ const Map = ({ navigation }: any) => {
 
   let [isLocationSelected, setLocationCard] = useState(false)
   let [locationData, setLocationData] = useState<any>({})
+  let [renderedRoute, setRenderedRoute] = useState<any>([])
   const dispatch = useDispatch();
 
   //   let startingPoint = [-6.2653554, 53.324153];
@@ -107,33 +108,6 @@ const Map = ({ navigation }: any) => {
     dispatch(setLocation([0,0]))
   };
 
-  // sample route
-  // const route: any = {
-  //   type: "FeatureCollection",
-  //   features: [
-  //     {
-  //       type: "Feature",
-  //       properties: {},
-  //       geometry: {
-  //         type: "LineString",
-  //         coordinates: [
-  //           [-6.253514221969283, 53.34197087957193],
-  //           [-6.254546411906972, 53.34218338120337],
-  //           [-6.255037591946149, 53.34133336832366],
-  //           [-6.255316230006258, 53.34081162120549],
-  //           [-6.25694831451014, 53.34111464795052],
-  //           [-6.2582200014513205, 53.341304780469216],
-  //           [-6.258598167373265, 53.34016396778034],
-  //           [-6.258777297322979, 53.339510363304754],
-  //           [-6.260190443661884, 53.33982528301698],
-  //           [-6.260688030400814, 53.33991441081503],
-  //           [-6.261334893161802, 53.339058776262846],
-  //         ],
-  //       },
-  //     },
-  //   ],
-  // };
-
   const userLocationUpdate = (data: any) => {
   };
 
@@ -150,8 +124,15 @@ const Map = ({ navigation }: any) => {
 
   const getClickedPoint = (feature: any) => {
     dispatch(setCenter(feature.geometry.coordinates));
-    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates}), getPolyLineAnnotation({start: userLocation, end: feature.geometry.coordinates})]);
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
     fetchLocationDetails(feature.geometry.coordinates)
+  }
+
+  const renderPath = () => {
+    getPath({startCoordinates: userLocation.join(','), endCoordinates: centerLocation.join(',')})
+      .then((body: any) => {
+        setRenderedRoute(body.shortestPathCoordinates);
+      })
   }
 
   const pointsArr = (coords: any, id: any) => {
@@ -176,16 +157,16 @@ const Map = ({ navigation }: any) => {
           />
           {renderedPoints}
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
-          {/* {route && getLineAnnotation({ route })} */}
+          { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <SearchBox onLocationSelect={selectLocation}/>
-        {!isSearching && locationData.name?
+        {!isSearching && locationData.name ?
         (<Card size="md" variant="elevated" m="$2">
           <Heading mb="$1" size="md">
             {locationData.name}
           </Heading>
           <Text size="sm" mb="$5">{locationData.address}</Text>
-          <Button py="$2" px="$4">
+          <Button py="$2" px="$4" onPress={() => {renderPath()}}>
             <ButtonText size="sm">Directions</ButtonText>
           </Button>
         </Card>) : (<></>)
