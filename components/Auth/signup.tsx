@@ -10,27 +10,22 @@ import {
   Card,
   HStack,
 } from '@gluestack-ui/themed';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
-import { registerAction } from '../../store/actions/auth';
-
+import { getToken, registerAction } from '../../store/actions/auth';
+import { GET_TOKEN } from '../../store/actions';
 
 const Signup = ({ navigation }: any) => {
-  let register = useSelector((state: any) => {return state.register;});
-  let payt = useSelector((state: any) => {return state.data;});
-  const dispatch=useDispatch();
+  const dispatch = useDispatch();
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [email,setEmail] = React.useState('');
-/*   const Register=()=>{
-    
-    dispatch(registerAction({
-      username:username,
-      email:email,
-      password:password,
-    }))
-  } */
+  const [email, setEmail] = React.useState('');
+
+  useEffect(() => {
+    dispatch(getToken());
+  });
+
   return (
     <View
       style={{
@@ -40,69 +35,62 @@ const Signup = ({ navigation }: any) => {
         justifyContent: 'center',
       }}
     >
-        <FormControl p="$4">
-          <VStack space="xl">
-            <Heading size='5xl' color="$text900" >
-              Hello!
-            </Heading>
-            <VStack space="sm">
-              <Text color="$text500" lineHeight="$xs">
-                Name
-              </Text>
-              <Input>
-                <InputField type="text"
+      <FormControl p="$4">
+        <VStack space="xl">
+          <Heading size="5xl">Hello!</Heading>
+          <VStack space="sm">
+            <Text lineHeight="$xs">Name</Text>
+            <Input>
+              <InputField
+                type="text"
                 value={username}
-                onChangeText={(event:any) => {
+                onChangeText={(event: any) => {
                   setUsername(event);
-                }} />
-              </Input>
-              <Text color="$text500" lineHeight="$xs">
-                Email
-              </Text>
-              <Input
-             >
-               <InputField type='text'
-               value={email}
-               onChangeText={(event:any)=>{
-                console.log("Event",event)
-                setEmail(event)
-               }}
-               >
-
-               </InputField>
-              </Input>
-              <Text color="$text500" lineHeight="$xs">
-                Password
-              </Text>
-              <Input>
-              <InputField type="password"
-              value={password}
-              onChangeText={(event:any) => {
-              
-                console.log("pass",password)
-                setPassword(event);
-              }}/>
-              </Input>
-              <Text color="$text500" lineHeight="$xs">
-                Confirm Password
-              </Text>
-              <Input>
-                <InputField type="password" />
-              </Input>
-            </VStack>
-              <Button
-                onPress={() => {
-                  dispatch(registerAction({email:email,username:username,password:password}));
-                //  navigation.navigate('Map');
-                  console.log('Signup',register);
-                  console.log('payt',payt);
                 }}
-              >
-                <ButtonText color="$white">Register</ButtonText>
-              </Button>
+              />
+            </Input>
+            <Text lineHeight="$xs">Email</Text>
+            <Input>
+              <InputField
+                type="text"
+                value={email}
+                onChangeText={(event: any) => {
+                  setEmail(event);
+                }}
+              />
+            </Input>
+            <Text lineHeight="$xs">Password</Text>
+            <Input>
+              <InputField
+                type="password"
+                value={password}
+                onChangeText={(event: any) => {
+                  setPassword(event);
+                }}
+              />
+            </Input>
+            <Text lineHeight="$xs">Confirm Password</Text>
+            <Input>
+              <InputField type="password" />
+            </Input>
           </VStack>
-        </FormControl>
+          <Button
+            onPress={() => {
+              dispatch(
+                registerAction({
+                  email: email,
+                  username: username,
+                  password: password,
+                })
+              );
+            }}
+          >
+            <ButtonText color="$white">Register</ButtonText>
+          </Button>
+        </VStack>
+      </FormControl>
     </View>
   );
 };
+
 export default Signup;
