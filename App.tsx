@@ -13,16 +13,15 @@ import { navigationRef } from "./components/Navigation/RootNavigator";
 
 const Stack = createNativeStackNavigator();
 const App = () => {
-
   return (
     <Provider store={store}>
       <RootSiblingParent>
         <GluestackUIProvider config={config}>
           <NavigationContainer ref={navigationRef}>
             <Stack.Navigator>
-            <Stack.Screen name="Register"
-              component={Signup}
-              options={{ headerShown: false }}/>
+              <Stack.Screen name="Register"
+                component={Signup}
+                options={{ headerShown: false }}/>
               <Stack.Screen
                 name="Login"
                 component={Login}

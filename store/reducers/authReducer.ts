@@ -1,18 +1,18 @@
-import { LOGIN, REGISTER, SESSION_OK, STORE_TOKEN} from "../actions";
-const initialState = {username:'',email:'',password:''};
+import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, STORE_TOKEN, TOKEN_STORE } from "../actions";
+const initialState = { username: '', email: '', password: '', token: '' };
 
 
 const authReducer = (state = initialState, action: any) => {
     switch (action.type) {
+        case TOKEN_STORE:
+            return { ...initialState, token: action.payload };
         case LOGIN:
             return [action.payload]
         case REGISTER:
             return [action.payload];
         case STORE_TOKEN:
-            console.log('TOKEN STORED');
             return [action.payload];
         case SESSION_OK:
-            console.log('Session validated',action.payload);
             return action.payload;
         default:
             return state;
