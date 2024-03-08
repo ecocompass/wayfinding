@@ -14,9 +14,9 @@ import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
-import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, FabLabel } from "@gluestack-ui/themed";
+import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, FabLabel, VStack } from "@gluestack-ui/themed";
 import { geoCodeApi, getPath } from "../../services/network.service";
-import { Settings } from 'lucide-react-native';
+import { Settings, LocateFixed } from 'lucide-react-native';
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -146,6 +146,9 @@ const Map = ({ navigation }: any) => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
+        <Fab size="lg" isHovered={false} placement="top right" mt="$20" isPressed={false} >
+          <FabIcon as={ Settings } size="xl"/>
+        </Fab>
         <Mapbox.MapView
           style={styles.map}
           onPress={getClickedPoint}
@@ -161,8 +164,8 @@ const Map = ({ navigation }: any) => {
           { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
-          <Fab size="lg" placement="bottom right" isHovered={false}  isPressed={false} >
-            <FabIcon as={ Settings } size="xl"/>
+          <Fab size="lg" placement="bottom right" isPressed={false}>
+            <FabIcon as={ LocateFixed } size="xl"/>
           </Fab>
         </Box>
         <SearchBox onLocationSelect={selectLocation}/>
