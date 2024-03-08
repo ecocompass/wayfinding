@@ -95,7 +95,11 @@ export const userLogout = async (token: any) => {
 
 export const saveToken = async (STORAGE_KEY: any) => {
     try {
-        await AsyncStorage.setItem('accesstoken', STORAGE_KEY);
+        let token_obj = {
+            accessToken: STORAGE_KEY,
+            timestamp: (new Date()).getTime(),
+        };
+        await AsyncStorage.setItem('access_token_obj', JSON.stringify(token_obj));
     } catch (e) {
         console.log('Failed to save the data to the storage');
     }
@@ -103,13 +107,17 @@ export const saveToken = async (STORAGE_KEY: any) => {
 
 export const readToken = async () => {
     try {
-        const value = await AsyncStorage.getItem('accesstoken');
-        access_token = value;
-        return value;
+        const value = await AsyncStorage.getItem('access_token_obj');
+        if (value) {
+            let token_obj = JSON.parse(value);
+            return token_obj;
+        }
+
     } catch (e) {
-        console.log('Failed to save the data to the storage')
+        console.log('Failed to save the data to the storage');
+        return '';
     }
-}
+};
 
 /*const clearStorage = async () => {
     try {
@@ -119,6 +127,10 @@ export const readToken = async () => {
       console.log('Failed to clear the async storage.');
     }
   }; */
+
+export const removeStorageItem = function (key: string) {
+    return AsyncStorage.removeItem(key);
+};
 
 export const getPath = function (coordinateObj: any) {
     return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),

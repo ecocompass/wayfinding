@@ -7,6 +7,7 @@ import {
   saveToken,
   userLogin,
   userSignup,
+  removeStorageItem
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { useDispatch, useSelector } from "react-redux";
@@ -23,15 +24,27 @@ function* signUpSaga(payload: any): any {
 
 function* loginSaga(payload: any): any {
   const response = yield userLogin(payload);
-  yield saveToken(response.access_token);
-  RootNavigation.navigate('Map', {});
+  if (response.access_token) {
+    yield saveToken(response.access_token);
+    RootNavigation.navigate('Map', {});
+  } else {
+    console.log("BE Error", response);
+  }
 }
 
 function* tokenSaga() {
   const response = yield readToken();
   if (response) {
-    yield put({ type: TOKEN_STORE, payload: response });
-    RootNavigation.navigate('Map', {});
+    let token_time = response.timestamp;
+    let now = new Date().getTime();
+    let diff = (now - token_time) / 1000 / 60;
+    if (diff < 20) {
+      yield put({ type: TOKEN_STORE, payload: response });
+      RootNavigation.navigate('Map', {});
+    } else {
+      yield removeStorageItem('access_token_obj')
+      RootNavigation.navigate('Login', {});
+    }
   }
 }
 

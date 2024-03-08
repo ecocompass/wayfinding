@@ -14,8 +14,9 @@ import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
-import { Card, Heading, Text, Button, ButtonText } from "@gluestack-ui/themed";
+import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, FabLabel } from "@gluestack-ui/themed";
 import { geoCodeApi, getPath } from "../../services/network.service";
+import { Settings } from 'lucide-react-native';
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -159,6 +160,11 @@ const Map = ({ navigation }: any) => {
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
           { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
+        <Box>
+          <Fab size="lg" placement="bottom right" isHovered={false}  isPressed={false} >
+            <FabIcon as={ Settings } size="xl"/>
+          </Fab>
+        </Box>
         <SearchBox onLocationSelect={selectLocation}/>
         {!isSearching && locationData.name ?
         (<Card size="md" variant="elevated" m="$2">
