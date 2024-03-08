@@ -8,3 +8,5 @@ export const GET_TOKEN = 'GETTOKEN';
 export const SESSION_OK = 'SESSIONOK';
 export const LOGIN = 'LOGIN';
 export const LOGOUT = 'LOGOUT';
+export const LIST_FETCHED = 'LIST_FETCHED';
+export const ZOOMADJUST = 'ZOOMADJUST';

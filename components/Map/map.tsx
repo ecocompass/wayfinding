@@ -13,10 +13,11 @@ import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation, revertCoo
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
-import { setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, FabLabel, VStack } from "@gluestack-ui/themed";
-import { geoCodeApi, getPath } from "../../services/network.service";
 import { Settings, LocateFixed } from 'lucide-react-native';
+import { setCenter, setLocation, setSearchStatus, setZoom } from "../../store/actions/setLocation";
+import { geoCodeApi, getPath } from "../../services/network.service";
+import { ZOOMADJUST } from "../../store/actions";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -62,6 +63,7 @@ const requestLocationPermission = async () => {
 };
 
 const Map = ({ navigation }: any) => {
+  let camRef = null;
   let userLocation = useSelector((state: any) => {
     return state.location.userLocation}); // Longitude, Latitude
 
@@ -71,6 +73,10 @@ const Map = ({ navigation }: any) => {
 
   let isSearching = useSelector((state: any) => {
     return state.location.isSearching
+  });
+
+  let zoomLevel = useSelector((state: any) => {
+    return state.location.zoomLevel
   });
 
   let [isLocationSelected, setLocationCard] = useState(false)
@@ -133,6 +139,7 @@ const Map = ({ navigation }: any) => {
     getPath({startCoordinates: userLocation.join(','), endCoordinates: centerLocation.join(',')})
       .then((body: any) => {
         setRenderedRoute(body.shortestPathCoordinates);
+        this.camRef.fitBounds(userLocation, centerLocation, [120, 120], 500)
       })
   }
 
@@ -154,7 +161,8 @@ const Map = ({ navigation }: any) => {
           onPress={getClickedPoint}
         >
           <Mapbox.Camera
-            zoomLevel={14}
+            ref={(c) => (this.camRef = c)}
+            zoomLevel={zoomLevel}
             centerCoordinate={centerLocation}
             animationMode={"flyTo"}
             animationDuration={1000}
@@ -164,7 +172,7 @@ const Map = ({ navigation }: any) => {
           { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
-          <Fab size="lg" placement="bottom right" isPressed={false}>
+          <Fab size="lg" placement="bottom right" onPress={() => {this.camRef.flyTo(centerLocation, 500)}}>
             <FabIcon as={ LocateFixed } size="xl"/>
           </Fab>
         </Box>

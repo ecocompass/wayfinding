@@ -1,6 +1,6 @@
-import { UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION } from "."
+import { UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, ZOOMADJUST } from "."
 
-export const setLocation = (location:any) => {
+export const setLocation = (location: any) => {
     return {
         type: UPDATEUSERLOCATION,
         payload: location,
@@ -13,6 +13,13 @@ export const setCenter = (location) => {
         payload: location,
     };
 };
+
+export const setZoom = (zoomLevel) => {
+    return {
+        type: ZOOMADJUST,
+        payload: zoomLevel
+    }
+}
 
 export const setSearchStatus = (status) => {
     return {
