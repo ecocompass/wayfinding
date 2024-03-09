@@ -38,7 +38,7 @@ function* tokenSaga() {
     let token_time = response.timestamp;
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
-    if (diff < 20) {
+    if (diff < 2000) {
       yield put({ type: TOKEN_STORE, payload: response });
       RootNavigation.navigate('Map', {});
     } else {
