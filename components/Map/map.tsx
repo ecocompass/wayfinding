@@ -14,7 +14,7 @@ import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut } from 'lucide-react-native';
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
 import { setCenter, setLocation, setSearchStatus, setZoom } from "../../store/actions/setLocation";
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
@@ -221,14 +221,19 @@ const Map = ({ navigation }: any) => {
         <SearchBox onLocationSelect={selectLocation} camRef={this.camRef}/>
         {!isSearching && locationData?.name ?
         (<Card size="md" variant="elevated" m="$2">
-          <Heading mb="$1" size="md">
-            {locationData.name}
-          </Heading>
+          <HStack space="4xl">
+            <Heading mb="$1" size="md">
+              {locationData.name}
+            </Heading>
+            <Button onPress={() => {}}  variant="outline" borderColor="transparent">
+                <ButtonIcon as={Bookmark}/>
+              </Button>
+          </HStack>
           <Text size="sm" mb="$5">{locationData.address}</Text>
           <HStack>
             <Button py="$2" px="$4" action="negative" onPress={() => {cancelSearch()}}>
               <ButtonText size="sm">Cancel</ButtonText>
-              <ButtonIcon as={CloseIcon} ml="$2" style />
+              <ButtonIcon as={CloseIcon} ml="$2"/>
             </Button>
             <Button py="$2" px="$4" ml="$2" onPress={() => {renderPath()}}>
               <ButtonText size="sm">Directions</ButtonText>
