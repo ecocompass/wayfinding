@@ -13,8 +13,11 @@ import {
   ButtonText,
   ButtonIcon,
 } from "@gluestack-ui/themed";
-import { Play } from "lucide-react-native";
+import { MoveLeft, Play, X } from "lucide-react-native";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { updateViewMode } from "../../store/actions/setLocation";
+import { VIEWMODE } from "../../constants";
 
 export const PreviewNavigate = () => {
   const [paths, setPaths] = useState([
@@ -40,26 +43,49 @@ export const PreviewNavigate = () => {
     },
   ]);
 
+  const dispatch = useDispatch();
+
   const updatePath = (pathId) => {
-    setPaths(paths.map(p => {
-      if(p.id === pathId) return {...p, isSelected: true}
-      else {
-        return {...p, isSelected: false}
-      }
-    }))
-  }
+    setPaths(
+      paths.map((p) => {
+        if (p.id === pathId) {
+          return { ...p, isSelected: true };
+        } else {
+          return { ...p, isSelected: false };
+        }
+      })
+    );
+  };
+
+  const updateView = () => {
+    dispatch(updateViewMode(VIEWMODE.search));
+  };
 
   return (
     <Box>
-      <Heading size="xl" p="$4" pb="$3">
-        Routes
-      </Heading>
+      <HStack justifyContent="space-between" alignItems="center" p="$4">
+        <Heading size="xl" pb="$3">
+          Routes
+        </Heading>
+        <Button
+          size="md"
+          variant="solid"
+          action="negative"
+          variant="solid"
+          onPress={() => {
+            updateView();
+          }}
+        >
+          <ButtonIcon as={X} />
+        </Button>
+      </HStack>
       <FlatList
+        h="$48"
         data={paths}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => {
-              updatePath(item.id)
+              updatePath(item.id);
             }}
           >
             <Box
@@ -71,7 +97,12 @@ export const PreviewNavigate = () => {
               py="$4"
               bg={item.isSelected ? "$primary100" : "transparent"}
             >
-              <HStack space="md" justifyContent="space-between" alignItems="center" px="$4">
+              <HStack
+                space="md"
+                justifyContent="space-between"
+                alignItems="center"
+                px="$4"
+              >
                 <Text
                   color="$coolGray800"
                   fontWeight="$bold"
