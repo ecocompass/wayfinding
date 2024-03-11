@@ -17,24 +17,26 @@ import React from 'react';
 import { View } from 'react-native';
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
+import { useDispatch } from 'react-redux';
+import { prefAction } from '../../store/actions/setLocation';
 
 const Preference = ({ navigation }: any) => {
   const [allPreferences, setPreferences] = useState([
     { name: "Biking", isSelected: false },
     { name: 'Walking', isSelected: false },
     { name: 'Public Transport', isSelected: false },
-    {name: 'Driving', isSelected: false}
+    { name: 'Driving', isSelected: false }
   ]);
-
+  const dispatch = useDispatch();
 
   const togglePreference = (p) => {
     let newPreferences = allPreferences.map((ap) => {
-        if (ap.name === p.name) {
-          ap.isSelected = !ap.isSelected;
-        };
-        return ap;
-      });
-    
+      if (ap.name === p.name) {
+        ap.isSelected = !ap.isSelected;
+      };
+      return ap;
+    });
+
     setPreferences(newPreferences);
   };
 
@@ -50,7 +52,7 @@ const Preference = ({ navigation }: any) => {
       <FormControl p="$4">
         <VStack space="l">
           <Heading size="2xl">Set Your Preferences</Heading>
-          <HStack space="xl" rounded="$md" my="$5" style={{flexWrap: 'wrap'}}>
+          <HStack space="xl" rounded="$md" my="$5" style={{ flexWrap: 'wrap' }}>
             {allPreferences.map((p) => {
               return (
                 <TouchableOpacity
@@ -73,7 +75,13 @@ const Preference = ({ navigation }: any) => {
           </HStack>
           <Button
             onPress={() => {
-                navigation.navigate('Map');
+              dispatch(prefAction({
+                public_transport: allPreferences.find((x) => x.name === 'Public Transport')?.isSelected,
+                bike_weight: allPreferences.find((x) => x.name === 'Biking')?.isSelected,
+                walking_weight: allPreferences.find((x) => x.name === 'Walking')?.isSelected,
+                driving_weight: allPreferences.find((x) => x.name === 'Driving')?.isSelected,
+              }));
+             // navigation.navigate('Map');
             }}
           >
             <ButtonText color="$white">Submit</ButtonText>

@@ -1,4 +1,4 @@
-import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, STORE_TOKEN, TOKEN_STORE } from ".";
+import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, TOKEN_STORE } from ".";
 
 export const loginAction = (login: any) => {
     return {
@@ -20,12 +20,6 @@ export const getToken = () => {
     };
 };
 
-export const storeToken = (token: any) => {
-    return {
-        type: STORE_TOKEN,
-        payload: token,
-    };
-};
 
 export const tokenStore = (token: string) => {
     return {

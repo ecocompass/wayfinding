@@ -9,10 +9,12 @@ import { Store } from "lucide-react-native";
 import { storeToken } from "../store/actions/auth";
 
 const baseUrl = 'http://34.242.139.134:5050/api/';
+const baseUrl2='http://34.242.139.134:6969/api/'
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
     logout: `${baseUrl}auth/logout`,
+    pref:`${baseUrl2}user/preferences`
 }
 let access_token: any = '';
 
@@ -131,3 +133,18 @@ export const getPath = function (coordinateObj: any) {
         .then((response) => response.json())
         .then((res) => res);
 };
+
+export const readPref=async(payload:any)=>{
+    let payload2=payload.payload
+    payload2=JSON.stringify(payload2)
+    const access_token= await readToken();
+    return await fetch(endpoint.pref,{
+    method:'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': String(payload2),
+        'AUTHORIZATION': access_token?access_token:'',
+    },
+    body:payload2,
+    }).then(response=>response.json()).catch(err=>console.log("Error",err))
+}

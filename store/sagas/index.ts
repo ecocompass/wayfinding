@@ -1,8 +1,8 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
-import { GET_TOKEN, LOGIN, REGISTER, TOKEN_STORE } from "../actions";
-import { storeToken } from "../actions/auth";
+import { GET_TOKEN, LOGIN, PREF_STORE, REGISTER, SETPREFERENCE, TOKEN_STORE } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
+  readPref,
   readToken,
   saveToken,
   userLogin,
@@ -35,6 +35,14 @@ function* tokenSaga() {
   }
 }
 
+function* prefSaga(payload:any):any{
+  const response= yield readPref(payload);
+  if(response){
+    yield put({type:PREF_STORE,payload:response});
+    RootNavigation.navigate('Map', {});
+  }
+}
+
 function* watchSagaRegister(): SagaIterator {
   yield takeLatest(REGISTER, signUpSaga);
 }
@@ -47,11 +55,17 @@ function* watchTokenSaga(): SagaIterator {
   yield takeLatest(GET_TOKEN, tokenSaga);
 }
 
+
+function* watchPrefSaga(): SagaIterator {
+  yield takeLatest(SETPREFERENCE, prefSaga);
+}
+
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
     call(watchSagaLogin),
     call(watchTokenSaga),
+    call(watchPrefSaga)
   ]);
 }
 
