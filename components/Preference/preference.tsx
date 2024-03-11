@@ -50,7 +50,7 @@ const Preference = ({ navigation }: any) => {
       }}
     >
       <FormControl p="$4">
-        <VStack space="l">
+        <VStack space="xl">
           <Heading size="2xl">Set Your Preferences</Heading>
           <HStack space="xl" rounded="$md" my="$5" style={{ flexWrap: 'wrap' }}>
             {allPreferences.map((p) => {
@@ -76,10 +76,10 @@ const Preference = ({ navigation }: any) => {
           <Button
             onPress={() => {
               dispatch(prefAction({
-                public_transport: allPreferences.find((x) => x.name === 'Public Transport')?.isSelected,
-                bike_weight: allPreferences.find((x) => x.name === 'Biking')?.isSelected,
-                walking_weight: allPreferences.find((x) => x.name === 'Walking')?.isSelected,
-                driving_weight: allPreferences.find((x) => x.name === 'Driving')?.isSelected,
+                public_transport: (allPreferences.find((x) => x.name === 'Public Transport')?.isSelected)?"0":"1",
+                bike_weight: (allPreferences.find((x) => x.name === 'Biking')?.isSelected)?"0":"1",
+                walking_weight: (allPreferences.find((x) => x.name === 'Walking')?.isSelected)?"0":"1",
+                driving_weight: (allPreferences.find((x) => x.name === 'Driving')?.isSelected)?"0":"1",
               }));
              // navigation.navigate('Map');
             }}

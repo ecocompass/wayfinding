@@ -3,10 +3,8 @@
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
-import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Store } from "lucide-react-native";
-import { storeToken } from "../store/actions/auth";
+
 
 const baseUrl = 'http://34.242.139.134:5050/api/';
 const baseUrl2='http://34.242.139.134:6969/api/'

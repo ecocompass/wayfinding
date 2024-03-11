@@ -15,7 +15,9 @@ function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
   if (response.access_token) {
     yield saveToken(response.access_token);
-    RootNavigation.navigate('Map', {});
+  //  RootNavigation.navigate('Map', {});
+    RootNavigation.navigate('Preference', {});
+
   } else {
     console.log("BE Error", response);
   }
@@ -36,8 +38,10 @@ function* tokenSaga() {
 }
 
 function* prefSaga(payload:any):any{
+  console.log("Pref",payload)
   const response= yield readPref(payload);
   if(response){
+    console.log("Pref res",response)
     yield put({type:PREF_STORE,payload:response});
     RootNavigation.navigate('Map', {});
   }

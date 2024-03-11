@@ -15,6 +15,7 @@ import {
   FormControlErrorIcon,
   FormControlError,
   AlertCircleIcon,
+  Icon,
 } from '@gluestack-ui/themed';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
@@ -93,15 +94,12 @@ const Signup = ({ navigation }: any) => {
               <InputField type="password"
                 value={confirmPassword}
                 onChangeText={handleConfirmPasswordChange} />
-
             </Input>
             {isConfirmPasswordInvalid && (
-              <FormControlError>
-                <FormControlErrorIcon as={AlertCircleIcon} />
-                <FormControlErrorText>
-                  Passwords do not match
-                </FormControlErrorText>
-              </FormControlError>
+              <FormControlHelper>
+                <Icon as={AlertCircleIcon} size="md" color='red' />
+                <FormControlHelperText color='red'>Passwords must match</FormControlHelperText>
+              </FormControlHelper>
             )}
           </VStack>
           <Button
