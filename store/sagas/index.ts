@@ -1,5 +1,5 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
-import { GET_TOKEN, LOGIN, REGISTER, TOKEN_STORE } from "../actions";
+import { GETROUTES, GET_TOKEN, LOGIN, REGISTER, TOKEN_STORE } from "../actions";
 import { storeToken } from "../actions/auth";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -7,7 +7,8 @@ import {
   saveToken,
   userLogin,
   userSignup,
-  removeStorageItem
+  removeStorageItem,
+  getPath,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { useDispatch, useSelector } from "react-redux";
@@ -48,6 +49,17 @@ function* tokenSaga() {
   }
 }
 
+function* getPathSaga(action) {
+  const response = yield getPath(action.payload);
+
+  console.log(response);
+  // add path to store change view
+}
+
+function* watchGetPath(): SagaIterator {
+  yield takeLatest(GETROUTES, getPathSaga);
+}
+
 function* watchSagaRegister(): SagaIterator {
   yield takeLatest(REGISTER, signUpSaga);
 }
@@ -65,6 +77,7 @@ function* appSagas() {
     call(watchSagaRegister),
     call(watchSagaLogin),
     call(watchTokenSaga),
+    call(watchGetPath),
   ]);
 }
 

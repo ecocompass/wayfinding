@@ -15,7 +15,7 @@ import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
-import { setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { getRoutes, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
 import { PreviewNavigate } from "./preview-navigate";
@@ -148,7 +148,8 @@ const Map = ({ navigation }: any) => {
   }
 
   const renderPath = () => {
-    dispatch(updateViewMode(VIEWMODE.preview))
+    dispatch(getRoutes({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")}))
+    // dispatch(updateViewMode(VIEWMODE.preview))
     // getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
     //   .then((body: any) => {
     //     setRenderedRoute(body.shortestPathCoordinates);
@@ -220,7 +221,10 @@ const Map = ({ navigation }: any) => {
           { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
-          <Fab size="lg" placement="bottom right" onPress={() => {this.camRef.flyTo(centerLocation, 500)}}>
+          <Fab size="lg" placement="bottom right" onPress={() => {
+            console.log('move pls')
+            this.camRef.flyTo(centerLocation, 500)
+          }}>
             <FabIcon as={ LocateFixed } size="xl"/>
           </Fab>
         </Box>

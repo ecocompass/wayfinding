@@ -133,6 +133,7 @@ export const removeStorageItem = function (key: string) {
 };
 
 export const getPath = function (coordinateObj: any) {
+    console.log(coordinateObj);
     return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),
         {
             method: 'GET',

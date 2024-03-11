@@ -14,7 +14,7 @@ import {
   ButtonIcon,
 } from "@gluestack-ui/themed";
 import { MoveLeft, Play, X } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { updateViewMode } from "../../store/actions/setLocation";
 import { VIEWMODE } from "../../constants";
