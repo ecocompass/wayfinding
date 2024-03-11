@@ -1,15 +1,19 @@
-import { LIST_FETCHED, REGISTER} from "../actions";
-const initialState = {username:'',email:'',password:''};
+import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, STORE_TOKEN, TOKEN_STORE } from "../actions";
+const initialState = { username: '', email: '', password: '', token: '' };
 
 
 const authReducer = (state = initialState, action: any) => {
     switch (action.type) {
+        case TOKEN_STORE:
+            return { ...initialState, token: action.payload };
+        case LOGIN:
+            return [action.payload]
         case REGISTER:
-            console.log('updated');
             return [action.payload];
-        case LIST_FETCHED:
-            console.log('list fetched');
-            return [...action.data];
+        case STORE_TOKEN:
+            return [action.payload];
+        case SESSION_OK:
+            return action.payload;
         default:
             return state;
     }

@@ -1,51 +1,58 @@
-import { call, put, takeLatest, takeEvery } from "redux-saga/effects";
-import { REGISTER } from "../actions";
-import { registerAction, storeListData } from "../actions/auth";
-import axios from 'axios';
-// yield pauses and resume the generator functions
-const endpoint = {
-  reg: 'http://3.249.30.30:5050/api/auth/signup'
-}
+import { all, call, put, takeLatest } from "redux-saga/effects";
+import { GET_TOKEN, LOGIN, REGISTER, TOKEN_STORE } from "../actions";
+import { storeToken } from "../actions/auth";
+import * as RootNavigation from '../../components/Navigation/RootNavigator';
+import {
+  readToken,
+  saveToken,
+  userLogin,
+  userSignup,
+} from "../../services/network.service";
+import { SagaIterator } from "redux-saga";
+import { useDispatch, useSelector } from "react-redux";
 
-export const userSignup = async (payload: any) => {
-  console.log("Payload2", payload.payload)
-  console.log("End",endpoint.reg);
-  let payload2=payload.payload
-  payload2=JSON.stringify(payload2)
-  console.log("length",payload2.length);
-  //const payload3= Buffer.byteLength(payload2,'utf-8')
-  return  await fetch(endpoint.reg, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Content-Length':String(payload2)
-      },
-      body: payload2
-    }).then(response => response.json()
-    ).catch(error=> console.log("Error",error))
-  //if(!response.ok) throw new Error('Something Went Wrong!!');
-  //const responseData = await response.json()
-
-}
 function* signUpSaga(payload: any): any {
-  try {
-    console.log("Payload", payload)
-    //let payload=registerAction;
-    const response = yield userSignup(payload);
-    console.log("Response",response)
-    if (response.status == 201) {
-      // to fire another action, use put method
-      // here I am storing the data by firing action LIST_FETCHED
-      yield put(storeListData(response));
-      // for calling another generator funtion use call method
-    } else {
-      // handle other response code
-    }
-  } catch (error) {
-    console.log(error);
+  const response = yield userSignup(payload);
+  if (response.access_token) {
+    yield saveToken(response.access_token);
+    RootNavigation.navigate('Map', {});
+  } else {
+    console.log("BE Error", response);
   }
 }
-function* appSagas() {
+
+function* loginSaga(payload: any): any {
+  const response = yield userLogin(payload);
+  yield saveToken(response.access_token);
+  RootNavigation.navigate('Map', {});
+}
+
+function* tokenSaga() {
+  const response = yield readToken();
+  if (response) {
+    yield put({ type: TOKEN_STORE, payload: response });
+    RootNavigation.navigate('Map', {});
+  }
+}
+
+function* watchSagaRegister(): SagaIterator {
   yield takeLatest(REGISTER, signUpSaga);
 }
+
+function* watchSagaLogin(): SagaIterator {
+  yield takeLatest(LOGIN, loginSaga);
+}
+
+function* watchTokenSaga(): SagaIterator {
+  yield takeLatest(GET_TOKEN, tokenSaga);
+}
+
+function* appSagas() {
+  yield all([
+    call(watchSagaRegister),
+    call(watchSagaLogin),
+    call(watchTokenSaga),
+  ]);
+}
+
 export default appSagas;
