@@ -11,13 +11,14 @@ import Geolocation from "react-native-geolocation-service";
 import Mapbox from "@rnmapbox/maps";
 import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation, revertCoordinates } from "../../services";
 import { SearchBox } from "../Search/search";
-import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
+import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
-import { setCenter, setLocation, setSearchStatus, setZoom } from "../../store/actions/setLocation";
+import { setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
+import { PreviewNavigate } from "./preview-navigate";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -77,6 +78,10 @@ const Map = ({ navigation }: any) => {
 
   let zoomLevel = useSelector((state: any) => {
     return state.location.zoomLevel
+  });
+
+  let viewMode = useSelector((state: any) => {
+    return state.location.viewMode
   });
 
   let [pointViewed, setPointViewed] = useState([])
@@ -143,11 +148,12 @@ const Map = ({ navigation }: any) => {
   }
 
   const renderPath = () => {
-    getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
-      .then((body: any) => {
-        setRenderedRoute(body.shortestPathCoordinates);
-        this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
-      })
+    dispatch(updateViewMode(VIEWMODE.preview))
+    // getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
+    //   .then((body: any) => {
+    //     setRenderedRoute(body.shortestPathCoordinates);
+    //     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
+    //   })
   }
 
   const cancelSearch = () => {
@@ -218,8 +224,8 @@ const Map = ({ navigation }: any) => {
             <FabIcon as={ LocateFixed } size="xl"/>
           </Fab>
         </Box>
-        <SearchBox onLocationSelect={selectLocation} camRef={this.camRef}/>
-        {!isSearching && locationData?.name ?
+        {(viewMode === VIEWMODE.search) ? (<SearchBox onLocationSelect={selectLocation} camRef={this.camRef}/>) : (<></>)}
+        {!isSearching && locationData?.name && viewMode === VIEWMODE.search ?
         (<Card size="md" variant="elevated" m="$2">
           <HStack space="4xl">
             <Heading mb="$1" size="md">
@@ -240,8 +246,10 @@ const Map = ({ navigation }: any) => {
               <ButtonIcon as={Compass} ml="$2"/>
             </Button>
           </HStack>
-        </Card>) : (<></>)
-        }
+        </Card>) : (<></>)}
+        {(viewMode === VIEWMODE.preview) ? (
+          <PreviewNavigate/>
+        ) : (<></>)}
       </View>
     </View>
   );

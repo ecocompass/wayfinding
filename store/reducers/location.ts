@@ -1,15 +1,19 @@
 /* eslint-disable prettier/prettier */
-import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST } from "../actions";
+import { VIEWMODE } from "../../constants";
+import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, UPDATEVIEWMODE } from "../actions";
 
 const initialState = {
     centerLocation: [0, 0],
     userLocation: [0, 0],
     isSearching: false,
     zoomLevel: 14,
+    viewMode: VIEWMODE.search,
 };
 
 const locationReducer = (state = initialState, action: any) => {
     switch (action.type) {
+        case UPDATEVIEWMODE:
+            return { state, viewMode: action.payload };
         case UPDATEUSERLOCATION:
             return { ...state, userLocation: action.payload };
         case UPDATECENTERLOCATION:

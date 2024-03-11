@@ -1,4 +1,4 @@
-import { UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, ZOOMADJUST } from "."
+import { UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
 
 export const setLocation = (location: any) => {
     return {
@@ -25,5 +25,12 @@ export const setSearchStatus = (status) => {
     return {
         type: UPDATESEARCHSTATUS,
         payload: status
+    }
+}
+
+export const updateViewMode = (mode: string) => {
+    return {
+        type: UPDATEVIEWMODE,
+        payload: mode
     }
 }
