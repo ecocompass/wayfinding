@@ -118,7 +118,6 @@ const Map = ({ navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    console.log('default')
     dispatch(setLocation([0,0]))
   };
 
@@ -147,7 +146,7 @@ const Map = ({ navigation }: any) => {
     fetchLocationDetails(feature.geometry.coordinates)
   }
 
-  const renderPath = () => {
+  const getPaths = () => {
     dispatch(getRoutes({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")}))
     // dispatch(updateViewMode(VIEWMODE.preview))
     // getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
@@ -155,6 +154,11 @@ const Map = ({ navigation }: any) => {
     //     setRenderedRoute(body.shortestPathCoordinates);
     //     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
     //   })
+  }
+
+  const onPathRender = (routeArr) => {
+    setRenderedRoute(routeArr);
+    this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
   }
 
   const cancelSearch = () => {
@@ -222,7 +226,6 @@ const Map = ({ navigation }: any) => {
         </Mapbox.MapView>
         <Box>
           <Fab size="lg" placement="bottom right" onPress={() => {
-            console.log('move pls')
             this.camRef.flyTo(centerLocation, 500)
           }}>
             <FabIcon as={ LocateFixed } size="xl"/>
@@ -245,14 +248,14 @@ const Map = ({ navigation }: any) => {
               <ButtonText size="sm">Cancel</ButtonText>
               <ButtonIcon as={CloseIcon} ml="$2"/>
             </Button>
-            <Button py="$2" px="$4" ml="$2" onPress={() => {renderPath()}}>
+            <Button py="$2" px="$4" ml="$2" onPress={() => {getPaths()}}>
               <ButtonText size="sm">Directions</ButtonText>
               <ButtonIcon as={Compass} ml="$2"/>
             </Button>
           </HStack>
         </Card>) : (<></>)}
         {(viewMode === VIEWMODE.preview) ? (
-          <PreviewNavigate/>
+          <PreviewNavigate onRender={onPathRender}/>
         ) : (<></>)}
       </View>
     </View>

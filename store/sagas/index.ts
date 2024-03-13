@@ -1,5 +1,13 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
-import { GETROUTES, GET_TOKEN, LOGIN, REGISTER, TOKEN_STORE } from "../actions";
+import {
+  GETROUTES,
+  GET_TOKEN,
+  LOGIN,
+  REGISTER,
+  ROUTES_STORE,
+  TOKEN_STORE,
+  UPDATEVIEWMODE,
+} from "../actions";
 import { storeToken } from "../actions/auth";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -12,6 +20,7 @@ import {
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { useDispatch, useSelector } from "react-redux";
+import { VIEWMODE } from "../../constants";
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
@@ -43,7 +52,7 @@ function* tokenSaga() {
       yield put({ type: TOKEN_STORE, payload: response });
       RootNavigation.navigate('Map', {});
     } else {
-      yield removeStorageItem('access_token_obj')
+      yield removeStorageItem('access_token_obj');
       RootNavigation.navigate('Login', {});
     }
   }
@@ -52,8 +61,11 @@ function* tokenSaga() {
 function* getPathSaga(action) {
   const response = yield getPath(action.payload);
 
-  console.log(response);
-  // add path to store change view
+  yield put({
+    type: ROUTES_STORE,
+    payload: { walk: response.shortestPathCoordinates },
+  });
+  yield put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview });
 }
 
 function* watchGetPath(): SagaIterator {

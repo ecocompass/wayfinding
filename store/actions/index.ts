@@ -12,3 +12,4 @@ export const LIST_FETCHED = 'LIST_FETCHED';
 export const ZOOMADJUST = 'ZOOMADJUST';
 export const UPDATEVIEWMODE = 'UPDATEVIEWMODE';
 export const GETROUTES = 'GETROUTES';
+export const ROUTES_STORE = 'ROUTES_STORE';

@@ -5,7 +5,6 @@ import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
 import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Store } from "lucide-react-native";
 import { storeToken } from "../store/actions/auth";
 
 const baseUrl = 'http://34.242.139.134:5050/api/';
@@ -133,7 +132,6 @@ export const removeStorageItem = function (key: string) {
 };
 
 export const getPath = function (coordinateObj: any) {
-    console.log(coordinateObj);
     return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),
         {
             method: 'GET',
@@ -141,6 +139,6 @@ export const getPath = function (coordinateObj: any) {
                 'Host': '141.148.199.176:8080',
             },
         })
-        .then((response) => response.json())
-        .then((res) => res);
+        .then((response) => response.json());
+    // .then((res) => res);
 };

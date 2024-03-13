@@ -15,11 +15,15 @@ import {
 } from "@gluestack-ui/themed";
 import { MoveLeft, Play, X } from "lucide-react-native";
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateViewMode } from "../../store/actions/setLocation";
 import { VIEWMODE } from "../../constants";
 
-export const PreviewNavigate = () => {
+export const PreviewNavigate = (props: any) => {
+  const routes = useSelector((state) => {
+    return state.location.routes;
+  });
+
   const [paths, setPaths] = useState([
     {
       id: 1,
@@ -60,6 +64,11 @@ export const PreviewNavigate = () => {
   const updateView = () => {
     dispatch(updateViewMode(VIEWMODE.search));
   };
+
+  useEffect(() => {
+    props.onRender(routes.walk);
+  });
+
 
   return (
     <Box>
