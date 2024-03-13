@@ -1,4 +1,4 @@
-import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, TOKEN_STORE } from ".";
+import { GET_TOKEN, LOGIN, LOGOUT, REGISTER, SESSION_OK, TOKEN_STORE } from ".";
 
 export const loginAction = (login: any) => {
     return {
@@ -35,9 +35,8 @@ export const sessionOK = (bool: any) => {
     };
 };
 
-export const logoutAction = (token: any) => {
+export const logoutAction = () => {
     return {
-        type: logoutAction,
-        payload: token,
+        type: LOGOUT,
     };
 };

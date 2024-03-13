@@ -11,12 +11,15 @@ import Geolocation from "react-native-geolocation-service";
 import Mapbox from "@rnmapbox/maps";
 import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation, revertCoordinates } from "../../services";
 import { SearchBox } from "../Search/search";
-import { MAPBOX_PUBLIC_TOKEN } from "../../constants";
+import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
-import { setCenter, setLocation, setSearchStatus, setZoom } from "../../store/actions/setLocation";
-import { Card, Heading, Text, Button, ButtonText } from "@gluestack-ui/themed";
+import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
+import { getRoutes, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
+import { PreviewNavigate } from "./preview-navigate";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -79,6 +82,12 @@ const Map = ({ navigation }: any) => {
     return state.location.zoomLevel
   });
 
+  let viewMode = useSelector((state: any) => {
+    return state.location.viewMode
+  });
+
+  let [pointViewed, setPointViewed] = useState([])
+
   let [isLocationSelected, setLocationCard] = useState(false)
   let [locationData, setLocationData] = useState<any>({})
   let [renderedRoute, setRenderedRoute] = useState<any>([])
@@ -113,14 +122,15 @@ const Map = ({ navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    console.log('default')
-    dispatch(setLocation([0, 0]))
+    dispatch(setLocation([0,0]))
   };
 
   const userLocationUpdate = (data: any) => {
   };
 
   const selectLocation = (data: any) => {
+    setPointViewed(data.center);
+    this.camRef.flyTo(data.center, 500);
     setLocationData(data);
     dispatch(setSearchStatus(false))
     setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: data.center })])
@@ -132,17 +142,41 @@ const Map = ({ navigation }: any) => {
   }
 
   const getClickedPoint = (feature: any) => {
-    dispatch(setCenter(feature.geometry.coordinates));
-    setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: feature.geometry.coordinates })]);
+    // use ref for flyto
+    // dispatch(setCenter(feature.geometry.coordinates));
+    setPointViewed(feature.geometry.coordinates);
+    this.camRef.flyTo(feature.geometry.coordinates, 500)
+    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
     fetchLocationDetails(feature.geometry.coordinates)
   }
 
-  const renderPath = () => {
-    getPath({ startCoordinates: userLocation.join(','), endCoordinates: centerLocation.join(',') })
-      .then((body: any) => {
-        setRenderedRoute(body.shortestPathCoordinates);
-        this.camRef.fitBounds(userLocation, centerLocation, [120, 120], 500)
-      })
+  const getPaths = () => {
+    dispatch(getRoutes({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")}))
+    // dispatch(updateViewMode(VIEWMODE.preview))
+    // getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
+    //   .then((body: any) => {
+    //     setRenderedRoute(body.shortestPathCoordinates);
+    //     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
+    //   })
+  }
+
+  const onPathRender = (routeArr) => {
+    setRenderedRoute(routeArr);
+    this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
+  }
+
+  const onLogout = () => {
+    dispatch(logoutAction())
+  }
+
+  const cancelSearch = () => {
+    // null data point.
+    setLocationData(null);
+    dispatch(setSearchStatus(false));
+    setPointViewed([]);
+    this.camRef.flyTo(userLocation, 500)
+    setRenderedPoints([]);
+    setRenderedRoute([]);
   }
 
   const pointsArr = (coords: any, id: any) => {
@@ -155,6 +189,34 @@ const Map = ({ navigation }: any) => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
+      <Menu
+        placement="bottom"
+        $py="$0"
+        trigger={({ ...triggerProps }) => {
+          return (
+            <Fab size="lg" allowAsProps={true} isHovered={false} placement="top left" mt="$20" isPressed={false} {...triggerProps} >
+              <FabIcon as={ Settings } size="xl"/>
+            </Fab>
+          )
+        }}
+      >
+        <MenuItem key="profile" textValue="profile">
+          <Icon as={CircleUser} size="md" mr="$2" />
+          <MenuItemLabel size="md">Profile</MenuItemLabel>
+        </MenuItem>
+        <MenuItem key="locs" textValue="locs">
+          <Icon as={BookmarkCheck} size="md" mr="$2" />
+          <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
+        </MenuItem>
+        <MenuItem key="trips" textValue="trips">
+          <Icon as={Car} size="md" mr="$2" />
+          <MenuItemLabel size="md">Your Trips</MenuItemLabel>
+        </MenuItem>
+        <MenuItem key="logout" textValue="logout" onPress={() => {onLogout()}}>
+          <Icon as={LogOut} size="md" mr="$2" />
+          <MenuItemLabel size="md">Logout</MenuItemLabel>
+        </MenuItem>
+      </Menu>
         <Mapbox.MapView
           style={styles.map}
           onPress={getClickedPoint}
@@ -170,18 +232,39 @@ const Map = ({ navigation }: any) => {
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
           {renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
-        <SearchBox onLocationSelect={selectLocation} />
-        {!isSearching && locationData.name ?
-          (<Card size="md" variant="elevated" m="$2">
+        <Box>
+          <Fab size="lg" placement="bottom right" onPress={() => {
+            this.camRef.flyTo(centerLocation, 500)
+          }}>
+            <FabIcon as={ LocateFixed } size="xl"/>
+          </Fab>
+        </Box>
+        {(viewMode === VIEWMODE.search) ? (<SearchBox onLocationSelect={selectLocation} camRef={this.camRef}/>) : (<></>)}
+        {!isSearching && locationData?.name && viewMode === VIEWMODE.search ?
+        (<Card size="md" variant="elevated" m="$2">
+          <HStack space="4xl">
             <Heading mb="$1" size="md">
               {locationData.name}
             </Heading>
-            <Text size="sm" mb="$5">{locationData.address}</Text>
-            <Button py="$2" px="$4" onPress={() => { renderPath() }}>
-              <ButtonText size="sm">Directions</ButtonText>
+            <Button onPress={() => {}}  variant="outline" borderColor="transparent">
+                <ButtonIcon as={Bookmark}/>
+              </Button>
+          </HStack>
+          <Text size="sm" mb="$5">{locationData.address}</Text>
+          <HStack>
+            <Button py="$2" px="$4" action="negative" onPress={() => {cancelSearch()}}>
+              <ButtonText size="sm">Cancel</ButtonText>
+              <ButtonIcon as={CloseIcon} ml="$2"/>
             </Button>
-          </Card>) : (<></>)
-        }
+            <Button py="$2" px="$4" ml="$2" onPress={() => {getPaths()}}>
+              <ButtonText size="sm">Directions</ButtonText>
+              <ButtonIcon as={Compass} ml="$2"/>
+            </Button>
+          </HStack>
+        </Card>) : (<></>)}
+        {(viewMode === VIEWMODE.preview) ? (
+          <PreviewNavigate onRender={onPathRender}/>
+        ) : (<></>)}
       </View>
     </View>
   );

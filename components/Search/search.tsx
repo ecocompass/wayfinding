@@ -58,7 +58,7 @@ export const SearchBox = (props: any) => {
     };
 
     const setCenterLocation = (destLocation: any) => {
-        dispatch(setCenter(destLocation.center));
+        // dispatch(setCenter(destLocation.center));
         props.onLocationSelect(destLocation);
     };
 

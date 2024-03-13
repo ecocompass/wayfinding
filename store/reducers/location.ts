@@ -1,15 +1,21 @@
 /* eslint-disable prettier/prettier */
 import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE } from "../actions";
+import { VIEWMODE } from "../../constants";
+import { UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
 
 const initialState = {
     centerLocation: [0, 0],
     userLocation: [0, 0],
     isSearching: false,
     zoomLevel: 14,
+    viewMode: VIEWMODE.search,
+    routes: {},
 };
 
 const locationReducer = (state = initialState, action: any) => {
     switch (action.type) {
+        case UPDATEVIEWMODE:
+            return { ...state, viewMode: action.payload };
         case UPDATEUSERLOCATION:
             return { ...state, userLocation: action.payload };
         case UPDATECENTERLOCATION:
@@ -22,8 +28,10 @@ const locationReducer = (state = initialState, action: any) => {
             return { ...state, zoomLevel: zoom };
         case PREF_STORE:
             return { ...state, pref: action.payload };
+        case ROUTES_STORE:
+            return { ...state, routes: action.payload };
         default:
-            return initialState;
+            return state;
     }
 };
 
