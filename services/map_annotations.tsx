@@ -76,8 +76,9 @@ export function getLineAnnotation(route: any) {
         id="lineLayer"
         style={{
           lineWidth: 3,
-          lineJoin: "bevel",
+          lineJoin: "round",
           lineColor: "#0000ff",
+          lineDasharray: route.map(r => 1),
         }}
       />
     </Mapbox.ShapeSource>
@@ -86,7 +87,6 @@ export function getLineAnnotation(route: any) {
 
 export function getPolyLineAnnotation(options: any) {
   const route = getLine(options.coordinateArr);
-  console.log(route);
   return (
     <Mapbox.ShapeSource id="shapeSource" key="line" shape={route}>
       <Mapbox.LineLayer

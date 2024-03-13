@@ -9,6 +9,7 @@ import {
   ButtonText,
   Card,
   HStack,
+  Center,
 } from '@gluestack-ui/themed';
 import React, { useEffect } from 'react';
 import { View } from 'react-native';
@@ -74,19 +75,31 @@ const Signup = ({ navigation }: any) => {
               <InputField type="password" />
             </Input>
           </VStack>
-          <Button
-            onPress={() => {
-              dispatch(
-                registerAction({
-                  email: email,
-                  username: username,
-                  password: password,
-                })
-              );
-            }}
-          >
-            <ButtonText color="$white">Register</ButtonText>
-          </Button>
+          <VStack>
+            <Button
+              onPress={() => {
+                dispatch(
+                  registerAction({
+                    email: email,
+                    username: username,
+                    password: password,
+                  })
+                );
+              }}
+            >
+              <ButtonText color="$white">Register</ButtonText>
+            </Button>
+            <Center h={50}>
+              <Text>OR</Text>
+            </Center>
+            <Button
+              onPress={() => {
+                navigation.navigate('Login', {});
+              }}
+            >
+              <ButtonText color="$white">Login</ButtonText>
+            </Button>
+          </VStack>
         </VStack>
       </FormControl>
     </View>
