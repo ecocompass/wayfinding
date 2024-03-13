@@ -7,14 +7,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const baseUrl = 'http://34.242.139.134:5050/api/';
-const baseUrl2='http://34.242.139.134:6969/api/'
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
     logout: `${baseUrl}auth/logout`,
-    pref:`${baseUrl2}user/preferences`
-}
+    pref: `${baseUrl}user/preferences`,
+};
 let access_token: any = '';
+
+const getTokenString = () => {
+    let access_token_str = `Bearer ${access_token}`;
+    return access_token_str;
+};
 
 export const getLocationData = async (data: any) => {
     try {
@@ -85,10 +89,10 @@ export const userLogout = async (token: any) => {
         method: 'DELETE',
         headers: {
             'AUTHORIZATION': token,
-        }
+        },
     }).then(response => {
         response.json();
-        RootNavigation.navigate('Login', {})
+        RootNavigation.navigate('Login', {});
     }
     ).catch(error => console.log("Error", error));
 };
@@ -107,7 +111,7 @@ export const readToken = async () => {
         access_token = value;
         return value;
     } catch (e) {
-        console.log('Failed to save the data to the storage')
+        console.log('Failed to save the data to the storage');
     }
 }
 
@@ -132,17 +136,18 @@ export const getPath = function (coordinateObj: any) {
         .then((res) => res);
 };
 
-export const readPref=async(payload:any)=>{
-    let payload2=payload.payload
-    payload2=JSON.stringify(payload2)
-    const access_token= await readToken();
-    return await fetch(endpoint.pref,{
-    method:'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Content-Length': String(payload2),
-        'AUTHORIZATION': access_token?access_token:'',
-    },
-    body:payload2,
-    }).then(response=>response.json()).catch(err=>console.log("Error",err))
-}
+export const readPref = async (payload: any) => {
+    let payload2 = payload.payload;
+    payload2 = JSON.stringify(payload2);
+    console.log(access_token);
+    return await fetch(endpoint.pref, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': String(payload2),
+            'Authorization': getTokenString(),
+        },
+        body: payload2,
+    }).then(response => response.json())
+        .catch(err => console.log("Error", err));
+};

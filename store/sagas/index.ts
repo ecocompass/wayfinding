@@ -15,7 +15,7 @@ function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
   if (response.access_token) {
     yield saveToken(response.access_token);
-  //  RootNavigation.navigate('Map', {});
+    //  RootNavigation.navigate('Map', {});
     RootNavigation.navigate('Preference', {});
 
   } else {
@@ -33,16 +33,15 @@ function* tokenSaga() {
   const response = yield readToken();
   if (response) {
     yield put({ type: TOKEN_STORE, payload: response });
-    RootNavigation.navigate('Map', {});
+    RootNavigation.navigate('Preference', {});
   }
 }
 
-function* prefSaga(payload:any):any{
-  console.log("Pref",payload)
-  const response= yield readPref(payload);
-  if(response){
-    console.log("Pref res",response)
-    yield put({type:PREF_STORE,payload:response});
+function* prefSaga(payload: any): any {
+  const response = yield readPref(payload);
+  console.log(response);
+  if (response) {
+    yield put({ type: PREF_STORE, payload: response });
     RootNavigation.navigate('Map', {});
   }
 }
@@ -69,7 +68,7 @@ function* appSagas() {
     call(watchSagaRegister),
     call(watchSagaLogin),
     call(watchTokenSaga),
-    call(watchPrefSaga)
+    call(watchPrefSaga),
   ]);
 }
 
