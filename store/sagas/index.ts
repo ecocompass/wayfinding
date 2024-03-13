@@ -29,9 +29,9 @@ import { VIEWMODE } from "../../constants";
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
+  console.log(response);
   if (response.access_token) {
     yield saveToken(response.access_token);
-    //  RootNavigation.navigate('Map', {});
     RootNavigation.navigate('Preference', {});
   } else {
     console.log("BE Error", response);
@@ -51,27 +51,24 @@ function* loginSaga(payload: any): any {
 function* tokenSaga() {
   const response = yield readToken();
   if (response) {
-    yield put({ type: TOKEN_STORE, payload: response });
-    RootNavigation.navigate('Preference', {});
-  }
-}
-
-function* prefSaga(payload: any): any {
-  const response = yield readPref(payload);
-  console.log(response);
-  if (response) {
-    yield put({ type: PREF_STORE, payload: response });
-    RootNavigation.navigate('Map', {});
     let token_time = response.timestamp;
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
     if (diff < 2000) {
       yield put({ type: TOKEN_STORE, payload: response });
-      RootNavigation.navigate('Map', {});
+      RootNavigation.navigate('Preference', {});
     } else {
       yield removeStorageItem('access_token_obj');
       RootNavigation.navigate('Login', {});
     }
+  }
+}
+
+function* prefSaga(payload: any): any {
+  const response = yield readPref(payload);
+  if (response) {
+    yield put({ type: PREF_STORE, payload: response });
+    RootNavigation.navigate('Map', {});
   }
 }
 
@@ -87,7 +84,7 @@ function* getPathSaga(action) {
 
 function* logoutSaga() {
   const response = yield userLogout();
-
+  console.log(response);
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Login', {});
 }

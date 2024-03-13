@@ -91,8 +91,7 @@ export const userLogout = async () => {
             'AUTHORIZATION': getTokenString(),
         },
     }).then(response => {
-        response.json();
-        RootNavigation.navigate('Login', {});
+        return response.json();
     }
     ).catch(error => console.log("Error", error));
 };
@@ -151,15 +150,18 @@ export const getPath = function (coordinateObj: any) {
 export const readPref = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
-    console.log(access_token);
+    let token = await readToken();
     return await fetch(endpoint.pref, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'Content-Length': String(payload2),
-            'Authorization': getTokenString(),
+            'Authorization': `Bearer ${token.accessToken}`,
         },
         body: payload2,
-    }).then(response => response.json())
+    }).then(response => {
+
+        return response.json();
+    })
         .catch(err => console.log("Error", err));
 };

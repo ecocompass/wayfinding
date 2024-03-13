@@ -62,8 +62,6 @@ const Auth = ({ navigation }: any) => {
           </VStack>
           <Button title="Login"
             onPress={()=>{
-             // setShowModal(false);
-            // navigation.navigate('Preference');
              dispatch(loginAction({ email: email, password: password}));
             }}
           >

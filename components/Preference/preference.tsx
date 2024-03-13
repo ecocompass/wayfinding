@@ -25,7 +25,7 @@ const Preference = ({ navigation }: any) => {
     { name: "Biking", isSelected: false },
     { name: 'Walking', isSelected: false },
     { name: 'Public Transport', isSelected: false },
-    { name: 'Driving', isSelected: false }
+    { name: 'Driving', isSelected: false },
   ]);
   const dispatch = useDispatch();
 
@@ -33,7 +33,7 @@ const Preference = ({ navigation }: any) => {
     let newPreferences = allPreferences.map((ap) => {
       if (ap.name === p.name) {
         ap.isSelected = !ap.isSelected;
-      };
+      }
       return ap;
     });
 
@@ -67,7 +67,9 @@ const Preference = ({ navigation }: any) => {
                     borderColor={p.isSelected ? "" : '$primary500'}
                     rounded="$md"
                   >
-                    <Text color={p.isSelected ? 'white' : "$primary500"}>{p.name}</Text>
+                    <Text color={p.isSelected ? 'white' : '$primary500'}>
+                      {p.name}
+                    </Text>
                   </Box>
                 </TouchableOpacity>
               );
@@ -75,13 +77,30 @@ const Preference = ({ navigation }: any) => {
           </HStack>
           <Button
             onPress={() => {
-              dispatch(prefAction({
-                public_transport: (allPreferences.find((x) => x.name === 'Public Transport')?.isSelected)?"0":"1",
-                bike_weight: (allPreferences.find((x) => x.name === 'Biking')?.isSelected)?"0":"1",
-                walking_weight: (allPreferences.find((x) => x.name === 'Walking')?.isSelected)?"0":"1",
-                driving_weight: (allPreferences.find((x) => x.name === 'Driving')?.isSelected)?"0":"1",
-              }));
-             // navigation.navigate('Map');
+              dispatch(
+                prefAction({
+                  public_transport: allPreferences.find(
+                    (x) => x.name === 'Public Transport'
+                  )?.isSelected
+                    ? '0'
+                    : '1',
+                  bike_weight: allPreferences.find((x) => x.name === 'Biking')
+                    ?.isSelected
+                    ? '0'
+                    : '1',
+                  walking_weight: allPreferences.find(
+                    (x) => x.name === 'Walking'
+                  )?.isSelected
+                    ? '0'
+                    : '1',
+                  driving_weight: allPreferences.find(
+                    (x) => x.name === 'Driving'
+                  )?.isSelected
+                    ? '0'
+                    : '1',
+                })
+              );
+              // navigation.navigate('Map');
             }}
           >
             <ButtonText color="$white">Submit</ButtonText>
