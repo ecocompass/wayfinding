@@ -78,7 +78,7 @@ export function getLineAnnotation(route: any) {
           lineWidth: 3,
           lineJoin: "round",
           lineColor: "#0000ff",
-          // lineDashArray: temp_route.lenght / 2,
+          lineDasharray: route.map(r => 1),
         }}
       />
     </Mapbox.ShapeSource>
