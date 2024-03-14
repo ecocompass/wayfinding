@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import {
   Input,
   VStack,
@@ -9,36 +10,43 @@ import {
   ButtonText,
   Card,
   HStack,
+  AlertCircleIcon,
+  FormControlHelper,
+  FormControlHelperText,
+  Icon,
 } from '@gluestack-ui/themed';
-import React, { useEffect } from 'react';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToken, registerAction } from '../../store/actions/auth';
-import { GET_TOKEN } from '../../store/actions';
 
 const Signup = ({ navigation }: any) => {
   const dispatch = useDispatch();
-  const [username, setUsername] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [email, setEmail] = React.useState('');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [isEmailValid, setIsEmailValid] = useState(true);
 
   useEffect(() => {
     dispatch(getToken());
   });
 
+  const validateEmail = (email: string) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const handleEmailChange = (event: any) => {
+    setEmail(event);
+    setIsEmailValid(validateEmail(event));
+  };
+
   return (
-    <View
-      style={{
-        display: 'flex',
-        flex: 1,
-        flexDirection: 'column',
-        justifyContent: 'center',
-      }}
-    >
+    <View style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center' }}>
       <FormControl p="$4">
         <VStack space="xl">
           <Heading size="5xl">Hello!</Heading>
           <VStack space="sm">
+            {/* Other input fields */}
             <Text lineHeight="$xs">Name</Text>
             <Input>
               <InputField
@@ -54,11 +62,15 @@ const Signup = ({ navigation }: any) => {
               <InputField
                 type="text"
                 value={email}
-                onChangeText={(event: any) => {
-                  setEmail(event);
-                }}
+                onChangeText={handleEmailChange}
               />
             </Input>
+            {!isEmailValid &&  <FormControlHelper>
+                <Icon as={AlertCircleIcon} size="md" color='red' />
+                <FormControlHelperText color='red'> Invalid Email </FormControlHelperText>
+              </FormControlHelper>
+               }
+            {/* Other input fields */}
             <Text lineHeight="$xs">Password</Text>
             <Input>
               <InputField
@@ -76,14 +88,17 @@ const Signup = ({ navigation }: any) => {
           </VStack>
           <Button
             onPress={() => {
-              dispatch(
-                registerAction({
-                  email: email,
-                  username: username,
-                  password: password,
-                })
-              );
+              if (isEmailValid) {
+                dispatch(
+                  registerAction({
+                    email: email,
+                    username: username,
+                    password: password,
+                  })
+                );
+              }
             }}
+            disabled={!isEmailValid}
           >
             <ButtonText color="$white">Register</ButtonText>
           </Button>

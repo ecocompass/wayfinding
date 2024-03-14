@@ -11,12 +11,23 @@ const Auth = ({ navigation }: any) => {
     const [showPassword, setShowPassword] = useState(false);
     const [password, setPassword] = React.useState('');
     const [email, setEmail] = React.useState('');
-    const dispatch=useDispatch();
-    const handleState = () => {
-      setShowPassword((showState) => {
-        return !showState;
-      });
-    };
+    const [isEmailValid, setIsEmailValid] = useState(true);
+    const dispatch = useDispatch();
+
+    const validateEmail = (email: string) => {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  };
+
+  const handleEmailChange = (event: any) => {
+    setEmail(event);
+    setIsEmailValid(validateEmail(event));
+  };
+
+  const handleState = () => {
+    setShowPassword((showState) => !showState);
+  };
+    
     return (
       <FormControl
       p="$4"
@@ -36,14 +47,14 @@ const Auth = ({ navigation }: any) => {
               Email
             </Text>
             <Input>
-              <InputField
-                type="text" value={email}
-                onChangeText={(event: any) => {
-                  setEmail(event)
-                }}
-              />
-            </Input>
-          </VStack>
+            <InputField
+              type="text"
+              value={email}
+              onChangeText={handleEmailChange}
+            />
+          </Input>
+          {!isEmailValid && <Text style={{ color: 'red' }}>Invalid Email</Text>}
+        </VStack>
           <VStack space='xs'>
             <Text>
               Password
