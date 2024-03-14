@@ -16,7 +16,6 @@ import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToken, registerAction } from '../../store/actions/auth';
 import { GET_TOKEN } from '../../store/actions';
-
 const Signup = ({ navigation }: any) => {
   const dispatch = useDispatch();
   const [username, setUsername] = React.useState('');
@@ -26,7 +25,6 @@ const Signup = ({ navigation }: any) => {
   useEffect(() => {
     dispatch(getToken());
   });
-
   return (
     <View
       style={{
