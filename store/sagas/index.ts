@@ -8,10 +8,14 @@ import {
   SAVE_LOCATION,
   TOKEN_STORE,
   UPDATEVIEWMODE,
+  PREF_STORE,
+  SETPREFERENCE,
+  LOGOUT,
 } from "../actions";
 import { storeToken } from "../actions/auth";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
+  readPref,
   readToken,
   saveToken,
   userLogin,
@@ -19,6 +23,7 @@ import {
   removeStorageItem,
   getPath,
   saveLocation,
+  userLogout,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { useDispatch, useSelector } from "react-redux";
@@ -26,9 +31,10 @@ import { VIEWMODE } from "../../constants";
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
+  console.log(response);
   if (response.access_token) {
     yield saveToken(response.access_token);
-    RootNavigation.navigate('Map', {});
+    RootNavigation.navigate('Preference', {});
   } else {
     console.log("BE Error", response);
   }
@@ -52,11 +58,19 @@ function* tokenSaga() {
     let diff = (now - token_time) / 1000 / 60;
     if (diff < 2000) {
       yield put({ type: TOKEN_STORE, payload: response });
-      RootNavigation.navigate('Map', {});
+      RootNavigation.navigate('Preference', {});
     } else {
       yield removeStorageItem('access_token_obj');
       RootNavigation.navigate('Login', {});
     }
+  }
+}
+
+function* prefSaga(payload: any): any {
+  const response = yield readPref(payload);
+  if (response) {
+    yield put({ type: PREF_STORE, payload: response });
+    RootNavigation.navigate('Map', {});
   }
 }
 
@@ -74,6 +88,13 @@ function* saveLocationSaga(action) {
   const response = yield saveLocation(action.payload);
   // handle response
   console.log(response);
+}
+
+function* logoutSaga() {
+  const response = yield userLogout();
+  console.log(response);
+  yield removeStorageItem('access_token_obj');
+  RootNavigation.navigate('Login', {});
 }
 
 function* watchGetPath(): SagaIterator {
@@ -95,14 +116,23 @@ function* watchTokenSaga(): SagaIterator {
 function* watchSaveLocationSaga(): SagaIterator {
   yield takeLatest(SAVE_LOCATION, saveLocationSaga);
 }
+function* watchPrefSaga(): SagaIterator {
+  yield takeLatest(SETPREFERENCE, prefSaga);
+}
+
+function* watchLogoutSaga(): SagaIterator {
+  yield takeLatest(LOGOUT, logoutSaga);
+}
 
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
     call(watchSagaLogin),
     call(watchTokenSaga),
+    call(watchPrefSaga),
     call(watchGetPath),
     call(watchSaveLocationSaga),
+    call(watchLogoutSaga),
   ]);
 }
 
