@@ -5,6 +5,7 @@ import {
   LOGIN,
   REGISTER,
   ROUTES_STORE,
+  SAVE_LOCATION,
   TOKEN_STORE,
   UPDATEVIEWMODE,
 } from "../actions";
@@ -17,6 +18,7 @@ import {
   userSignup,
   removeStorageItem,
   getPath,
+  saveLocation,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { useDispatch, useSelector } from "react-redux";
@@ -68,6 +70,12 @@ function* getPathSaga(action) {
   yield put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview });
 }
 
+function* saveLocationSaga(action) {
+  const response = yield saveLocation(action.payload);
+  // handle response
+  console.log(response);
+}
+
 function* watchGetPath(): SagaIterator {
   yield takeLatest(GETROUTES, getPathSaga);
 }
@@ -84,12 +92,17 @@ function* watchTokenSaga(): SagaIterator {
   yield takeLatest(GET_TOKEN, tokenSaga);
 }
 
+function* watchSaveLocationSaga(): SagaIterator {
+  yield takeLatest(SAVE_LOCATION, saveLocationSaga);
+}
+
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
     call(watchSagaLogin),
     call(watchTokenSaga),
     call(watchGetPath),
+    call(watchSaveLocationSaga),
   ]);
 }
 

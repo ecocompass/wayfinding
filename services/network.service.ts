@@ -7,11 +7,12 @@ import { useDispatch, useSelector } from "react-redux";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { storeToken } from "../store/actions/auth";
 
-const baseUrl = 'http://34.242.139.134:5050/api/';
+const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
     logout: `${baseUrl}auth/logout`,
+    saveLocation: `${baseUrl}user/savedlocations`,
 }
 let access_token: any = '';
 
@@ -84,7 +85,7 @@ export const userLogout = async (token: any) => {
         method: 'DELETE',
         headers: {
             'AUTHORIZATION': token,
-        }
+        },
     }).then(response => {
         response.json();
         RootNavigation.navigate('Login', {})
@@ -141,4 +142,45 @@ export const getPath = function (coordinateObj: any) {
         })
         .then((response) => response.json());
     // .then((res) => res);
+};
+
+// export const saveLocation = async function (data: any) {
+//     const token = await readToken();
+//     console.log(data, endpoint.saveLocation);
+//     let stringData = JSON.stringify(data);
+//     return await fetch(endpoint.saveLocation, {
+//         method: 'POST',
+//         headers: {
+//             'Authorization': `Bearer ${token.accessToken}`,
+//             'Content-Type': 'application/json',
+//             'Content-Length': stringData,
+//         },
+//         body: data,
+//     }).then(response => {
+//         console.log(response.status);
+//         return response.json();
+//     })
+//         .catch(error => {
+//             return { error: true, message: error };
+//         });
+// };
+
+export const saveLocation = async (payload: any) => {
+    let payload2 = payload;
+    payload2 = JSON.stringify(payload2);
+    let token = await readToken();
+    console.log(token);
+    return await fetch(endpoint.saveLocation, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': String(payload2),
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+        body: payload2,
+    }).then(response => {
+
+        return response.json();
+    })
+        .catch(err => console.log("Error", err));
 };

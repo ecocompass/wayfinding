@@ -1,4 +1,4 @@
-import { GETROUTES, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
+import { GETROUTES, SAVE_LOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
 
 export const setLocation = (location: any) => {
     return {
@@ -38,6 +38,13 @@ export const updateViewMode = (mode: string) => {
 export const getRoutes = (payload: any) => {
     return {
         type: GETROUTES,
+        payload
+    }
+}
+
+export const saveLocationAPI = (payload: any) => {
+    return {
+        type: SAVE_LOCATION,
         payload
     }
 }

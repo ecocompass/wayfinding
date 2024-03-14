@@ -36,8 +36,8 @@ const App = () => {
                 component={Map}
               />
               <Stack.Screen
-                options={{ headerShown: True }}
-                name="SavedLocations"
+                options={{ headerShown: true }}
+                name="Saved Locations"
                 component={SavedLocations}
               />
             </Stack.Navigator>

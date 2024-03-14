@@ -1,5 +1,13 @@
-import { Text } from "lucide-react-native";
+import { Box, Text } from "@gluestack-ui/themed";
+import { useSelector } from "react-redux";
 
 export const SavedLocations = () => {
-  return <Text>Your saved Locations</Text>;
+  const saved_locations = useSelector((state) => {
+    return state.userDetails.savedLocations;
+  });
+  return (
+    <Box p="$5">
+      {saved_locations.length ? (<Text>Locations</Text>) : (<Text>Your Locations will appear here</Text>)}
+    </Box>
+  )
 };
