@@ -10,6 +10,7 @@ import { config } from "@gluestack-ui/config";
 import { Provider } from 'react-redux';
 import store from './store';
 import { navigationRef } from "./components/Navigation/RootNavigator";
+import { SavedLocations } from "./components/Settings/saved_locations";
 
 const Stack = createNativeStackNavigator();
 const App = () => {
@@ -33,6 +34,11 @@ const App = () => {
                 options={{ headerShown: false }}
                 name="Map"
                 component={Map}
+              />
+              <Stack.Screen
+                options={{ headerShown: True }}
+                name="SavedLocations"
+                component={SavedLocations}
               />
             </Stack.Navigator>
           </NavigationContainer>
