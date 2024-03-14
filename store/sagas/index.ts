@@ -1,5 +1,13 @@
 import { all, call, put, takeLatest } from "redux-saga/effects";
-import { GET_TOKEN, LOGIN, REGISTER, TOKEN_STORE } from "../actions";
+import {
+  GETROUTES,
+  GET_TOKEN,
+  LOGIN,
+  REGISTER,
+  ROUTES_STORE,
+  TOKEN_STORE,
+  UPDATEVIEWMODE,
+} from "../actions";
 import { storeToken } from "../actions/auth";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -7,9 +15,12 @@ import {
   saveToken,
   userLogin,
   userSignup,
+  removeStorageItem,
+  getPath,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { useDispatch, useSelector } from "react-redux";
+import { VIEWMODE } from "../../constants";
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
@@ -23,16 +34,42 @@ function* signUpSaga(payload: any): any {
 
 function* loginSaga(payload: any): any {
   const response = yield userLogin(payload);
-  yield saveToken(response.access_token);
-  RootNavigation.navigate('Map', {});
+  if (response.access_token) {
+    yield saveToken(response.access_token);
+    RootNavigation.navigate('Map', {});
+  } else {
+    console.log("BE Error", response);
+  }
 }
 
 function* tokenSaga() {
   const response = yield readToken();
   if (response) {
-    yield put({ type: TOKEN_STORE, payload: response });
-    RootNavigation.navigate('Map', {});
+    let token_time = response.timestamp;
+    let now = new Date().getTime();
+    let diff = (now - token_time) / 1000 / 60;
+    if (diff < 2000) {
+      yield put({ type: TOKEN_STORE, payload: response });
+      RootNavigation.navigate('Map', {});
+    } else {
+      yield removeStorageItem('access_token_obj');
+      RootNavigation.navigate('Login', {});
+    }
   }
+}
+
+function* getPathSaga(action) {
+  const response = yield getPath(action.payload);
+
+  yield put({
+    type: ROUTES_STORE,
+    payload: { walk: response.shortestPathCoordinates },
+  });
+  yield put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview });
+}
+
+function* watchGetPath(): SagaIterator {
+  yield takeLatest(GETROUTES, getPathSaga);
 }
 
 function* watchSagaRegister(): SagaIterator {
@@ -52,6 +89,7 @@ function* appSagas() {
     call(watchSagaRegister),
     call(watchSagaLogin),
     call(watchTokenSaga),
+    call(watchGetPath),
   ]);
 }
 

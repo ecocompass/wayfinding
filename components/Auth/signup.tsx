@@ -14,11 +14,11 @@ import {
   FormControlHelper,
   FormControlHelperText,
   Icon,
+  Center,
 } from '@gluestack-ui/themed';
 import { View } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getToken, registerAction } from '../../store/actions/auth';
-
 const Signup = ({ navigation }: any) => {
   const dispatch = useDispatch();
   const [username, setUsername] = useState('');
@@ -39,7 +39,6 @@ const Signup = ({ navigation }: any) => {
     setEmail(event);
     setIsEmailValid(validateEmail(event));
   };
-
   return (
     <View style={{ display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center' }}>
       <FormControl p="$4">
@@ -86,22 +85,34 @@ const Signup = ({ navigation }: any) => {
               <InputField type="password" />
             </Input>
           </VStack>
-          <Button
-            onPress={() => {
+          <VStack>
+            <Button
+              onPress={() => {
               if (isEmailValid) {
-                dispatch(
-                  registerAction({
-                    email: email,
-                    username: username,
-                    password: password,
-                  })
-                );
+                  dispatch(
+                    registerAction({
+                      email: email,
+                      username: username,
+                      password: password,
+                    })
+                  );
               }
-            }}
+              }}
             disabled={!isEmailValid}
-          >
-            <ButtonText color="$white">Register</ButtonText>
-          </Button>
+            >
+              <ButtonText color="$white">Register</ButtonText>
+            </Button>
+            <Center h={50}>
+              <Text>OR</Text>
+            </Center>
+            <Button
+              onPress={() => {
+                navigation.navigate('Login', {});
+              }}
+            >
+              <ButtonText color="$white">Login</ButtonText>
+            </Button>
+          </VStack>
         </VStack>
       </FormControl>
     </View>
