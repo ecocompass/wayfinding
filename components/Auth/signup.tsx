@@ -9,6 +9,13 @@ import {
   ButtonText,
   Card,
   HStack,
+  FormControlHelper,
+  FormControlHelperText,
+  FormControlErrorText,
+  FormControlErrorIcon,
+  FormControlError,
+  AlertCircleIcon,
+  Icon,
   Center,
 } from '@gluestack-ui/themed';
 import React, { useEffect } from 'react';
@@ -21,6 +28,17 @@ const Signup = ({ navigation }: any) => {
   const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [email, setEmail] = React.useState('');
+  const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [isPasswordInvalid, setIsPasswordInvalid] = React.useState(false);
+  const [isConfirmPasswordInvalid, setIsConfirmPasswordInvalid] = React.useState(false);
+  const handlePasswordChange = (event: any) => {
+    setPassword(event);
+    setIsPasswordInvalid(event.length < 8); // Check password length on change
+  };
+  const handleConfirmPasswordChange = (event: any) => {
+    setConfirmPassword(event);
+    setIsConfirmPasswordInvalid(password !== event); // Check password match
+  };
 
   useEffect(() => {
     dispatch(getToken());
@@ -59,30 +77,43 @@ const Signup = ({ navigation }: any) => {
               />
             </Input>
             <Text lineHeight="$xs">Password</Text>
-            <Input>
+            <Input isInvalid={isPasswordInvalid} isRequired={true}>
               <InputField
                 type="password"
                 value={password}
-                onChangeText={(event: any) => {
-                  setPassword(event);
-                }}
+                onChangeText={handlePasswordChange}
               />
             </Input>
+            {isPasswordInvalid && (
+              <FormControlHelper>
+                <FormControlHelperText>Password must be at least 8 characters</FormControlHelperText>
+              </FormControlHelper>
+            )}
             <Text lineHeight="$xs">Confirm Password</Text>
-            <Input>
-              <InputField type="password" />
+            <Input isInvalid={isConfirmPasswordInvalid} isRequired={true}>
+              <InputField type="password"
+                value={confirmPassword}
+                onChangeText={handleConfirmPasswordChange} />
             </Input>
+            {isConfirmPasswordInvalid && (
+              <FormControlHelper>
+                <Icon as={AlertCircleIcon} size="md" color='red' />
+                <FormControlHelperText color='red'>Passwords must match</FormControlHelperText>
+              </FormControlHelper>
+            )}
           </VStack>
           <VStack>
             <Button
               onPress={() => {
-                dispatch(
-                  registerAction({
-                    email: email,
-                    username: username,
-                    password: password,
-                  })
-                );
+                if (!isPasswordInvalid && !isConfirmPasswordInvalid) {
+                  dispatch(
+                    registerAction({
+                      email: email,
+                      username: username,
+                      password: password,
+                    })
+                  );
+                }
               }}
             >
               <ButtonText color="$white">Register</ButtonText>
