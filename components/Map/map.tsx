@@ -13,19 +13,12 @@ import { getPointAnnotation, getLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
-<<<<<<< HEAD
-import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem,MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
-import { getRoutes, setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
-import { geoCodeApi } from "../../services/network.service";
-=======
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
 import { getRoutes, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
->>>>>>> main
 import { PreviewNavigate } from "./preview-navigate";
 
 Mapbox.setAccessToken(
