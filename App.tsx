@@ -10,16 +10,17 @@ import { config } from "@gluestack-ui/config";
 import { Provider } from 'react-redux';
 import store from './store';
 import { navigationRef } from "./components/Navigation/RootNavigator";
-import SplashScreen from 'react-native-splash-screen';
+import ToastComponent from "./components/Toast/toast";
+
 const Stack = createNativeStackNavigator();
 const App = () => {
- 
- 
+
   return (
     <Provider store={store}>
       <RootSiblingParent>
         <GluestackUIProvider config={config}>
           <NavigationContainer ref={navigationRef}>
+          <ToastComponent/>
             <Stack.Navigator>
               <Stack.Screen
                 name="Register"
@@ -37,10 +38,10 @@ const App = () => {
                 component={Map}
               />
             </Stack.Navigator>
-          </NavigationContainer>
-        </GluestackUIProvider>
-      </RootSiblingParent>
-    </Provider>
+        </NavigationContainer>
+      </GluestackUIProvider>
+    </RootSiblingParent>
+    </Provider >
   );
 };
 

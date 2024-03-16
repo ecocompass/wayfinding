@@ -13,3 +13,5 @@ export const ZOOMADJUST = 'ZOOMADJUST';
 export const UPDATEVIEWMODE = 'UPDATEVIEWMODE';
 export const GETROUTES = 'GETROUTES';
 export const ROUTES_STORE = 'ROUTES_STORE';
+export const SHOWTOAST="SHOWTOAST";
+export const HIDETOAST="HIDETOAST";

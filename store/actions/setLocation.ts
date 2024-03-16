@@ -1,4 +1,4 @@
-import { GETROUTES, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
+import { GETROUTES, HIDETOAST, SHOWTOAST, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
 
 export const setLocation = (location: any) => {
     return {
@@ -7,21 +7,21 @@ export const setLocation = (location: any) => {
     };
 };
 
-export const setCenter = (location) => {
+export const setCenter = (location:any) => {
     return {
         type: UPDATECENTERLOCATION,
         payload: location,
     };
 };
 
-export const setZoom = (zoomLevel) => {
+export const setZoom = (zoomLevel:any) => {
     return {
         type: ZOOMADJUST,
         payload: zoomLevel
     }
 }
 
-export const setSearchStatus = (status) => {
+export const setSearchStatus = (status:any) => {
     return {
         type: UPDATESEARCHSTATUS,
         payload: status
@@ -39,5 +39,19 @@ export const getRoutes = (payload: any) => {
     return {
         type: GETROUTES,
         payload
+    }
+}
+
+
+export const showToast= (message: any) => {
+    return {
+        type: SHOWTOAST,
+        payload:message
+    }
+}
+
+export const hideToast=()=>{
+    return {
+        type:HIDETOAST
     }
 }
