@@ -11,8 +11,14 @@ const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
     logout: `${baseUrl}auth/logout`,
-}
+    pref: `${baseUrl}user/preferences`,
+};
 let access_token: any = '';
+
+const getTokenString = () => {
+    let access_token_str = `Bearer ${access_token}`;
+    return access_token_str;
+};
 
 export const getLocationData = async (data: any) => {
     try {
@@ -80,15 +86,14 @@ export const userLogin = async (payload: any) => {
 
 };
 
-export const userLogout = async (token: any) => {
+export const userLogout = async () => {
     return await fetch(endpoint.logout, {
         method: 'DELETE',
         headers: {
-            'AUTHORIZATION': token,
-        }
+            'AUTHORIZATION': getTokenString(),
+        },
     }).then(response => {
-        response.json();
-        RootNavigation.navigate('Login', {})
+        return response.json();
     }
     ).catch(error => console.log("Error", error));
 };
@@ -142,4 +147,23 @@ export const getPath = function (coordinateObj: any) {
         })
         .then((response) => response.json());
     // .then((res) => res);
+};
+
+export const readPref = async (payload: any) => {
+    let payload2 = payload.payload;
+    payload2 = JSON.stringify(payload2);
+    let token = await readToken();
+    return await fetch(endpoint.pref, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': String(payload2),
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+        body: payload2,
+    }).then(response => {
+
+        return response.json();
+    })
+        .catch(err => console.log("Error", err));
 };

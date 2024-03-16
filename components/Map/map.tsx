@@ -13,10 +13,19 @@ import { getPointAnnotation, getLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
+<<<<<<< HEAD
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem,MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
 import { getRoutes, setCenter, setLocation, setSearchStatus } from "../../store/actions/setLocation";
 import { geoCodeApi } from "../../services/network.service";
+=======
+import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
+import { getRoutes, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { logoutAction } from '../../store/actions/auth';
+import { geoCodeApi, getPath } from "../../services/network.service";
+import { ZOOMADJUST } from "../../store/actions";
+>>>>>>> main
 import { PreviewNavigate } from "./preview-navigate";
 
 Mapbox.setAccessToken(
@@ -65,7 +74,8 @@ const requestLocationPermission = async () => {
 const Map = ({ navigation }: any) => {
   let camRef = null;
   let userLocation = useSelector((state: any) => {
-    return state.location.userLocation}); // Longitude, Latitude
+    return state.location.userLocation
+  }); // Longitude, Latitude
 
   let centerLocation = useSelector((state: any) => {
     return state.location.centerLocation
@@ -89,7 +99,19 @@ const Map = ({ navigation }: any) => {
   let [locationData, setLocationData] = useState<any>({})
   let [renderedRoute, setRenderedRoute] = useState<any>([])
   const dispatch = useDispatch();
-
+  const getGeoLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
+        dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
+      },
+      (error) => {
+        console.log(error.code, error.message);
+        setDefaultLocation();
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
   const [renderedPoints, setRenderedPoints] = useState<any>([])
@@ -98,21 +120,11 @@ const Map = ({ navigation }: any) => {
     if (Platform.OS === "android") {
       const result = requestLocationPermission().then((res) => {
         if (res) {
-          Geolocation.getCurrentPosition(
-            (position) => {
-              dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
-              dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
-            },
-            (error) => {
-              console.log(error.code, error.message);
-              setDefaultLocation();
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-          );
+          getGeoLocation();
         }
       });
     } else {
-      setDefaultLocation();
+      getGeoLocation();
     }
   }, []);
 
@@ -128,12 +140,12 @@ const Map = ({ navigation }: any) => {
     this.camRef.flyTo(data.center, 500);
     setLocationData(data);
     dispatch(setSearchStatus(false))
-    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: data.center})])
+    setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: data.center })])
   }
 
   const fetchLocationDetails = async (coordinateArr: any) => {
     const response = await geoCodeApi(coordinateArr.join(','))
-    setLocationData({name: response.features[0].text, address: response.features[0].place_name})
+    setLocationData({ name: response.features[0].text, address: response.features[0].place_name })
   }
 
   const getClickedPoint = (feature: any) => {
@@ -158,6 +170,10 @@ const Map = ({ navigation }: any) => {
   const onPathRender = (routeArr) => {
     setRenderedRoute(routeArr);
     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
+  }
+
+  const onLogout = () => {
+    dispatch(logoutAction())
   }
 
   const cancelSearch = () => {
@@ -203,7 +219,7 @@ const Map = ({ navigation }: any) => {
           <Icon as={Car} size="md" mr="$2" />
           <MenuItemLabel size="md">Your Trips</MenuItemLabel>
         </MenuItem>
-        <MenuItem key="logout" textValue="logout">
+        <MenuItem key="logout" textValue="logout" onPress={() => {onLogout()}}>
           <Icon as={LogOut} size="md" mr="$2" />
           <MenuItemLabel size="md">Logout</MenuItemLabel>
         </MenuItem>
@@ -221,7 +237,7 @@ const Map = ({ navigation }: any) => {
           />
           {renderedPoints}
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
-          { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
+          {renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
           <Fab size="lg" placement="bottom right" onPress={() => {

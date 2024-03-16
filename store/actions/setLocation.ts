@@ -1,4 +1,4 @@
-import { GETROUTES, HIDETOAST, SHOWTOAST, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
+import { GETROUTES, HIDETOAST, PREF_STORE, SETPREFERENCE, SHOWTOAST, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
 
 export const setLocation = (location: any) => {
     return {
@@ -7,33 +7,46 @@ export const setLocation = (location: any) => {
     };
 };
 
-export const setCenter = (location:any) => {
+export const setCenter = (location: any) => {
     return {
         type: UPDATECENTERLOCATION,
         payload: location,
     };
 };
 
-export const setZoom = (zoomLevel:any) => {
+export const setZoom = (zoomLevel: any) => {
     return {
         type: ZOOMADJUST,
-        payload: zoomLevel
-    }
-}
+        payload: zoomLevel,
+    };
+};
 
-export const setSearchStatus = (status:any) => {
+export const setSearchStatus = (status: any) => {
     return {
         type: UPDATESEARCHSTATUS,
-        payload: status
-    }
-}
+        payload: status,
+    };
+};
 
+export const prefAction = (pref: any) => {
+    return {
+        type: SETPREFERENCE,
+        payload: pref,
+    };
+};
+
+export const prefStore = (pref: string) => {
+    return {
+        type: PREF_STORE,
+        payload: pref,
+    };
+};
 export const updateViewMode = (mode: string) => {
     return {
         type: UPDATEVIEWMODE,
-        payload: mode
-    }
-}
+        payload: mode,
+    };
+};
 
 export const getRoutes = (payload: any) => {
     return {
