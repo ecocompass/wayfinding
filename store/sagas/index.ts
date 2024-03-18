@@ -10,8 +10,8 @@ import {
   PREF_STORE,
   SETPREFERENCE,
   LOGOUT,
+  PROFILE,
 } from "../actions";
-import { storeToken } from "../actions/auth";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
   readPref,
@@ -22,9 +22,9 @@ import {
   removeStorageItem,
   getPath,
   userLogout,
+  readProfile,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
-import { useDispatch, useSelector } from "react-redux";
 import { VIEWMODE } from "../../constants";
 
 function* signUpSaga(payload: any): any {
@@ -88,6 +88,11 @@ function* logoutSaga() {
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Login', {});
 }
+function* ProfileSaga() {
+  const response = yield readProfile();
+  console.log(response);
+  yield put(readProfile(response))
+}
 
 function* watchGetPath(): SagaIterator {
   yield takeLatest(GETROUTES, getPathSaga);
@@ -113,6 +118,9 @@ function* watchLogoutSaga(): SagaIterator {
   yield takeLatest(LOGOUT, logoutSaga);
 }
 
+function* watchProfileSaga(): SagaIterator {
+  yield takeLatest(PROFILE, ProfileSaga);
+}
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
@@ -121,6 +129,7 @@ function* appSagas() {
     call(watchPrefSaga),
     call(watchGetPath),
     call(watchLogoutSaga),
+    call(watchProfileSaga)
   ]);
 }
 

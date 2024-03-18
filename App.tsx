@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import Map from "./components/Map/map";
 import { NavigationContainer } from "@react-navigation/native";
@@ -11,17 +11,21 @@ import { Provider } from 'react-redux';
 import store from './store';
 import Preference from "./components/Preference/preference";
 import { navigationRef } from "./components/Navigation/RootNavigator";
-import SplashScreen from 'react-native-splash-screen';
+import Profile from "./components/Profile/profile";
 const Stack = createNativeStackNavigator();
 const App = () => {
- 
- 
+
   return (
     <Provider store={store}>
       <RootSiblingParent>
         <GluestackUIProvider config={config}>
           <NavigationContainer ref={navigationRef}>
             <Stack.Navigator>
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="Profile"
+                component={Profile}
+              />
               <Stack.Screen
                 name="Register"
                 component={Signup}

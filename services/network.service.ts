@@ -2,9 +2,7 @@
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
-import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { storeToken } from "../store/actions/auth";
 
 const baseUrl = 'http://34.242.139.134:5050/api/';
 const endpoint = {
@@ -12,6 +10,7 @@ const endpoint = {
     login: `${baseUrl}auth/login`,
     logout: `${baseUrl}auth/logout`,
     pref: `${baseUrl}user/preferences`,
+    profile: `${baseUrl}user/profile`
 };
 let access_token: any = '';
 
@@ -159,6 +158,23 @@ export const readPref = async (payload: any) => {
             'Authorization': `Bearer ${token.accessToken}`,
         },
         body: payload2,
+    }).then(response => {
+
+        return response.json();
+    })
+        .catch(err => console.log("Error", err));
+};
+
+
+export const readProfile = async () => {
+
+    let token = await readToken();
+    return await fetch(endpoint.profile, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
     }).then(response => {
 
         return response.json();
