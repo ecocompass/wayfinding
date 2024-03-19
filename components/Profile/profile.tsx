@@ -28,7 +28,7 @@ const Profile = () => {
     return (
         <View style={styles.page}>
             <Center bg="$primary500" h={300} w={390} borderBottomRightRadius={200} borderBottomLeftRadius={200}>
-                <Text>{username}</Text>
+                <Text size="4xl" color="$white" bold={true}>{username}</Text>
                 <Avatar bgColor='$primary600' size="2xl" borderRadius="$full" bottom={-50} position="absolute">
                     <AvatarFallbackText>{username}</AvatarFallbackText>
                 </Avatar>
@@ -43,14 +43,14 @@ const Profile = () => {
                     <Icon as={PhoneIcon} size="xl" />
                     <Text>+353 213193212</Text>
                 </HStack>
-                <Divider></Divider>
+{/*                 <Divider></Divider>
                 <HStack space="lg" alignItems="center">
                     <Icon as={!passwordVisible ? EyeIcon : EyeOffIcon} size="xl" />
                     <Text color="grey" bold={true}>{passwordText}</Text>
                     <Button onPress={handleIconPress} variant="solid" isDisabled={false} size="md"><ButtonIcon as={RefreshCw} />
                     </Button>
                 </HStack>
-                <Divider></Divider>
+                <Divider></Divider> */}
             </VStack>
         </View>
 

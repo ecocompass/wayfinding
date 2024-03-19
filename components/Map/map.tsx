@@ -200,9 +200,9 @@ const Map = ({ navigation }: any) => {
           )
         }}
       >
-        <MenuItem key="profile" textValue="profile">
+        <MenuItem key="profile" textValue="profile"  onPress={()=>{ RootNavigation.navigate('Profile', {})}}>
           <Icon as={CircleUser} size="md" mr="$2" />
-          <MenuItemLabel size="md" onPress={()=>{ RootNavigation.navigate('Profile', {})}}>Profile</MenuItemLabel>
+          <MenuItemLabel size="md">Profile</MenuItemLabel>
         </MenuItem>
         <MenuItem key="locs" textValue="locs">
           <Icon as={BookmarkCheck} size="md" mr="$2" />
