@@ -47,7 +47,7 @@ export const profileAction = () => {
     }
 }
 
-export const readProfile = (profile: any) => {
+export const storeProfile = (profile: any) => {
     return {
         type: READPROFILE,
         payload: profile

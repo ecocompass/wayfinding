@@ -21,15 +21,16 @@ const App = () => {
         <GluestackUIProvider config={config}>
           <NavigationContainer ref={navigationRef}>
             <Stack.Navigator>
-              <Stack.Screen
-                options={{ headerShown: false }}
-                name="Profile"
-                component={Profile}
-              />
+              
               <Stack.Screen
                 name="Register"
                 component={Signup}
                 options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="Profile"
+                component={Profile}
               />
               <Stack.Screen
                 name="Login"

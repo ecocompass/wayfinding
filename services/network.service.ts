@@ -4,13 +4,14 @@ import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+const liveUrl='https://api.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5050/api/';
 const endpoint = {
-    signup: `${baseUrl}auth/signup`,
-    login: `${baseUrl}auth/login`,
-    logout: `${baseUrl}auth/logout`,
-    pref: `${baseUrl}user/preferences`,
-    profile: `${baseUrl}user/profile`
+    signup: `${liveUrl}auth/signup`,
+    login: `${liveUrl}auth/login`,
+    logout: `${liveUrl}auth/logout`,
+    pref: `${liveUrl}user/preferences`,
+    profile: `${liveUrl}user/profile`
 };
 let access_token: any = '';
 
@@ -170,7 +171,7 @@ export const readProfile = async () => {
 
     let token = await readToken();
     return await fetch(endpoint.profile, {
-        method: 'POST',
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token.accessToken}`,

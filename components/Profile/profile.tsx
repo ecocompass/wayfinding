@@ -16,7 +16,8 @@ const Profile = () => {
     };
 
     const passwordText = passwordVisible ? 'Show Password' : 'Password';
-    const username = useSelector((state: any) => { return state.profile.username })
+    const profile = useSelector((state: any) => { return state.profile.payload})
+    const username=`${profile.first_name} ${profile.last_name}`;
     const styles = StyleSheet.create({
         page: {
 
@@ -35,7 +36,7 @@ const Profile = () => {
             <VStack width={390} space="md" marginTop={"$10"} p="$4">
                 <HStack space="lg" alignItems="center">
                     <Icon as={MailIcon} size="lg" />
-                    <Text>agrawasa@tcd.ie</Text>
+                    <Text>{profile.email}</Text>
                 </HStack>
                 <Divider></Divider>
                 <HStack space="lg" alignItems="center">

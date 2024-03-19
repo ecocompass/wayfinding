@@ -16,4 +16,4 @@ export const UPDATEVIEWMODE = 'UPDATEVIEWMODE';
 export const GETROUTES = 'GETROUTES';
 export const ROUTES_STORE = 'ROUTES_STORE';
 export const PROFILE = 'PROFILE';
-export const READPROFILE = "FETCH_PROFILE"
+export const READPROFILE = "READPROFILE"

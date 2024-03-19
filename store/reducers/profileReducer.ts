@@ -5,7 +5,7 @@ const initialState = { username: '' };
 const profileReducer = (state = initialState, action: any) => {
     switch (action.type) {
         case READPROFILE:
-            return { username: action.payload }
+            return {...state, payload: action.payload }
         default:
             return state;
     }

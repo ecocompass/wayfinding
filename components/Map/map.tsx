@@ -20,7 +20,7 @@ import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
 import { PreviewNavigate } from "./preview-navigate";
-
+import * as RootNavigation from '../../components/Navigation/RootNavigator';
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
 );
@@ -202,7 +202,7 @@ const Map = ({ navigation }: any) => {
       >
         <MenuItem key="profile" textValue="profile">
           <Icon as={CircleUser} size="md" mr="$2" />
-          <MenuItemLabel size="md">Profile</MenuItemLabel>
+          <MenuItemLabel size="md" onPress={()=>{ RootNavigation.navigate('Profile', {})}}>Profile</MenuItemLabel>
         </MenuItem>
         <MenuItem key="locs" textValue="locs">
           <Icon as={BookmarkCheck} size="md" mr="$2" />

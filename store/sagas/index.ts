@@ -26,6 +26,7 @@ import {
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE } from "../../constants";
+import { storeProfile } from "../actions/auth";
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
@@ -91,7 +92,7 @@ function* logoutSaga() {
 function* ProfileSaga() {
   const response = yield readProfile();
   console.log(response);
-  yield put(readProfile(response))
+  yield put(storeProfile(response))
 }
 
 function* watchGetPath(): SagaIterator {
