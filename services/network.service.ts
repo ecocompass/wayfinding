@@ -6,7 +6,7 @@ import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavi
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ToastComponent from "../components/Toast/toast";
 
-const baseUrl = 'http://34.242.139.134:5000/api/';
+const baseUrl = 'https://core.ecocompass.live/api/';
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
@@ -67,9 +67,10 @@ export const userSignup = async (payload: any) => {
         },
         body: payload2,
     }).then(response => response.json()
-    ).catch(error =>{ 
-     
-        console.log("Error", error)});
+    ).catch(error => {
+
+        console.log("Error", error)
+    });
 };
 
 export const userLogin = async (payload: any) => {

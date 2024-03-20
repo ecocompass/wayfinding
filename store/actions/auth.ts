@@ -1,4 +1,4 @@
-import { GET_TOKEN, LOGIN, LOGOUT, REGISTER, SESSION_OK, TOKEN_STORE } from ".";
+import { GET_TOKEN, LOGIN, LOGOUT, REGISTER, SESSION_OK, TOGGLESPINNER, TOKEN_STORE } from ".";
 
 export const loginAction = (login: any) => {
     return {
@@ -40,3 +40,8 @@ export const logoutAction = () => {
         type: LOGOUT,
     };
 };
+
+
+export const toggleSpinner = () => {
+    return { type: TOGGLESPINNER }
+}

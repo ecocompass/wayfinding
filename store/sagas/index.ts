@@ -27,11 +27,19 @@ import {
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE } from "../../constants";
 import { hideToast, showToast } from "../actions/setLocation";
+import { useDispatch } from "react-redux";
+import { toggleSpinner } from "../actions/auth";
 
 
 function* signUpSaga(payload: any): any {
+
+  yield put(toggleSpinner());
+
   const response = yield userSignup(payload);
   console.log(response);
+
+  yield put(toggleSpinner());
+
   if (response.access_token) {
     yield saveToken(response.access_token);
     RootNavigation.navigate('Preference', {});
@@ -43,7 +51,13 @@ function* signUpSaga(payload: any): any {
 }
 
 function* loginSaga(payload: any): any {
+
+  yield put(toggleSpinner());
+
   const response = yield userLogin(payload);
+
+  yield put(toggleSpinner());
+
   if (response.access_token) {
     yield saveToken(response.access_token);
     RootNavigation.navigate('Map', {});
@@ -53,9 +67,20 @@ function* loginSaga(payload: any): any {
     yield put(hideToast());
   }
 }
+function* handleToast(message: string) {
+  yield put(showToast(message));
+  yield delay(2000);
+  yield put(hideToast());
+}
 
 function* tokenSaga() {
+
+  yield put(toggleSpinner());
+
   const response = yield readToken();
+
+  yield put(toggleSpinner());
+
   if (response) {
     let token_time = response.timestamp;
     let now = new Date().getTime();
@@ -71,7 +96,13 @@ function* tokenSaga() {
 }
 
 function* prefSaga(payload: any): any {
+
+  yield put(toggleSpinner());
+
   const response = yield readPref(payload);
+
+  yield put(toggleSpinner());
+
   if (response) {
     yield put({ type: PREF_STORE, payload: response });
     RootNavigation.navigate('Map', {});
@@ -79,23 +110,34 @@ function* prefSaga(payload: any): any {
 }
 
 function* getPathSaga(action) {
+
+  yield put(toggleSpinner());
+
   const response = yield getPath(action.payload);
 
-  yield put({
+  yield all([
+  put(toggleSpinner()),
+  put({
     type: ROUTES_STORE,
     payload: { walk: response.shortestPathCoordinates },
-  });
-  yield put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview });
+  }), 
+  put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview })
+])
+
 }
 
 function* saveLocationSaga(action) {
+  yield put(toggleSpinner());
   const response = yield saveLocation(action.payload);
+  yield put(toggleSpinner());
   // handle response
   console.log(response);
 }
 
 function* logoutSaga() {
+  yield put(toggleSpinner());
   const response = yield userLogout();
+  yield put(toggleSpinner());
   console.log(response);
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Login', {});

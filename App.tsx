@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react";
+import React from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import Map from "./components/Map/map";
 import { NavigationContainer } from "@react-navigation/native";
@@ -7,14 +7,17 @@ import Signup from "./components/Auth/signup";
 import Login from "./components/Auth/login";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
-import { Provider } from 'react-redux';
+import { Provider} from 'react-redux';
 import store from './store';
 import Preference from "./components/Preference/preference";
 import { navigationRef } from "./components/Navigation/RootNavigator";
 import ToastComponent from "./components/Toast/toast";
 import { SavedLocations } from "./components/Settings/saved_locations";
+import SpinnerComponent from "./components/Spinner/spinner";
 const Stack = createNativeStackNavigator();
+
 const App = () => {
+
   return (
     <Provider store={store}>
       <RootSiblingParent>
@@ -48,6 +51,7 @@ const App = () => {
                 component={SavedLocations}
               />
             </Stack.Navigator>
+            <SpinnerComponent />
           </NavigationContainer>
         </GluestackUIProvider>
       </RootSiblingParent>
