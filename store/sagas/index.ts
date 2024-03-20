@@ -46,6 +46,7 @@ function* loginSaga(payload: any): any {
   const response = yield userLogin(payload);
   if (response.access_token) {
     yield saveToken(response.access_token);
+    yield put(showToast("Success!", "success"));
     RootNavigation.navigate('Map', {});
   } else {
     yield put(showToast(response.message));

@@ -68,10 +68,10 @@ export const getRoutes = (payload: any) => {
     }
 }
 
-export const showToast = (message: any) => {
+export const showToast = (message: any, type: string = 'info') => {
     return {
         type: SHOWTOAST,
-        payload: message,
+        payload: { message, type },
     };
 };
 
