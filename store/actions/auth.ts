@@ -41,15 +41,3 @@ export const logoutAction = () => {
     };
 };
 
-export const profileAction = () => {
-    return {
-        type: PROFILE,
-    }
-}
-
-export const storeProfile = (profile: any) => {
-    return {
-        type: READPROFILE,
-        payload: profile
-    }
-}

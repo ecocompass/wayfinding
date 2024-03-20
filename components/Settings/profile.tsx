@@ -1,14 +1,17 @@
 import { Avatar, AvatarFallbackText, Box, Center, Divider, HStack, Icon, MailIcon, Text, VStack, EyeIcon, PhoneIcon, EyeOffIcon, Button, ButtonIcon } from "@gluestack-ui/themed";
 import { RefreshCw, View } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { profileAction } from "../../store/actions/auth";
+import { profileAction } from "../../store/actions/user";
 
 const Profile = () => {
-
     const dispatch = useDispatch()
+useEffect(()=>{
     dispatch(profileAction());
+},[])
+    
+
     const [passwordVisible, setPasswordVisible] = useState(false);
     const handleIconPress = () => {
         console.log("PRessed")
@@ -16,7 +19,7 @@ const Profile = () => {
     };
 
     const passwordText = passwordVisible ? 'Show Password' : 'Password';
-    const profile = useSelector((state: any) => { return state.profile.payload})
+    const profile = useSelector((state: any) => { return state.userDetails.profile})
     const username=`${profile.first_name} ${profile.last_name}`;
     const styles = StyleSheet.create({
         page: {

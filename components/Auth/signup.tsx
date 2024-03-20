@@ -39,10 +39,9 @@ const Signup = ({ navigation }: any) => {
     setConfirmPassword(event);
     setIsConfirmPasswordInvalid(password !== event); // Check password match
   };
-
   useEffect(() => {
     dispatch(getToken());
-  });
+  },[]);
   return (
     <View
       style={{

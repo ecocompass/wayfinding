@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RootSiblingParent } from "react-native-root-siblings";
 import Map from "./components/Map/map";
 import { NavigationContainer } from "@react-navigation/native";
@@ -11,9 +11,8 @@ import { Provider } from 'react-redux';
 import store from './store';
 import Preference from "./components/Preference/preference";
 import { navigationRef } from "./components/Navigation/RootNavigator";
-import Profile from "./components/Profile/profile";
+import Profile from "./components/Settings/profile";
 import { SavedLocations } from "./components/Settings/saved_locations";
-import SplashScreen from 'react-native-splash-screen';
 const Stack = createNativeStackNavigator();
 const App = () => {
 

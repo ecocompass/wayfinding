@@ -189,7 +189,7 @@ const Map = ({ navigation }: any) => {
     })
   }
 
-  const openSaveLocationModal = (locationData) => {
+  const openSaveLocationModal = (locationData:any) => {
     // open modal
     dispatch(ToggleLocationModal({visibility: true, data: locationData}))
 

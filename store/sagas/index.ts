@@ -15,7 +15,6 @@ import {
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
-  readPref,
   readToken,
   saveToken,
   userLogin,
@@ -25,10 +24,12 @@ import {
   saveLocation,
   userLogout,
   readProfile,
+  userPref,
+  getPreference,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE } from "../../constants";
-import { storeProfile } from "../actions/auth";
+import { prefStore, storeProfile } from "../actions/user";
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
@@ -45,7 +46,16 @@ function* loginSaga(payload: any): any {
   const response = yield userLogin(payload);
   if (response.access_token) {
     yield saveToken(response.access_token);
-    RootNavigation.navigate('Map', {});
+    const res= yield getPreference();
+    if(res.payload){
+      console.log("Preferences",res)
+      yield put(prefStore(res.payload))
+      RootNavigation.navigate('Map', {});
+    }
+    else {
+      RootNavigation.navigate('Preference', {});
+    }
+   
   } else {
     console.log("BE Error", response);
   }
@@ -53,22 +63,30 @@ function* loginSaga(payload: any): any {
 
 function* tokenSaga() {
   const response = yield readToken();
+
   if (response) {
     let token_time = response.timestamp;
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
-    if (diff < 2000) {
-      yield put({ type: TOKEN_STORE, payload: response });
-      RootNavigation.navigate('Preference', {});
-    } else {
-      yield removeStorageItem('access_token_obj');
-      RootNavigation.navigate('Login', {});
+    const res = yield getPreference();
+    if(res.payload){
+      yield put(prefStore(res.payload))
+      console.log("Preferences",res)
+      RootNavigation.navigate('Map', {});
     }
+    else{
+      RootNavigation.navigate('Preference', {});
+    }
+     
+  }
+  else {
+    yield removeStorageItem('access_token_obj');
+    RootNavigation.navigate('Register', {});
   }
 }
 
 function* prefSaga(payload: any): any {
-  const response = yield readPref(payload);
+  const response = yield userPref(payload);
   if (response) {
     yield put({ type: PREF_STORE, payload: response });
     RootNavigation.navigate('Map', {});
@@ -95,7 +113,7 @@ function* logoutSaga() {
   const response = yield userLogout();
   console.log(response);
   yield removeStorageItem('access_token_obj');
-  RootNavigation.navigate('Login', {});
+  RootNavigation.navigate('Register', {});
 }
 function* ProfileSaga() {
   const response = yield readProfile();
