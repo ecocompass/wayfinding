@@ -4,7 +4,7 @@ import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const liveUrl='https://api.ecocompass.live/api/'
+const liveUrl='https://core.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5050/api/';
 const endpoint = {
     signup: `${liveUrl}auth/signup`,
