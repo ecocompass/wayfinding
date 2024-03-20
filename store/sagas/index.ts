@@ -61,7 +61,7 @@ function* loginSaga(payload: any): any {
   }
 }
 
-function* tokenSaga() {
+function* tokenSaga() :any{
   const response = yield readToken();
 
   if (response) {
@@ -93,7 +93,7 @@ function* prefSaga(payload: any): any {
   }
 }
 
-function* getPathSaga(action) {
+function* getPathSaga(action:any):any {
   const response = yield getPath(action.payload);
 
   yield put({
@@ -103,19 +103,19 @@ function* getPathSaga(action) {
   yield put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview });
 }
 
-function* saveLocationSaga(action) {
+function* saveLocationSaga(action:any):any {
   const response = yield saveLocation(action.payload);
   // handle response
   console.log(response);
 }
 
-function* logoutSaga() {
+function* logoutSaga():any {
   const response = yield userLogout();
   console.log(response);
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Register', {});
 }
-function* ProfileSaga() {
+function* ProfileSaga() :any{
   const response = yield readProfile();
   console.log(response);
   yield put(storeProfile(response))
