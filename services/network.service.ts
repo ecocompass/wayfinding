@@ -6,7 +6,7 @@ import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavi
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { storeToken } from "../store/actions/auth";
 
-const baseUrl = 'http://34.242.139.134:5000/api/';
+const baseUrl = 'https://core.ecocompass.live/api/';
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
@@ -161,7 +161,6 @@ export const saveLocation = async function (data: any) {
         },
         body: data,
     }).then(response => {
-        console.log(response.status);
         return response.json();
     })
         .catch(error => {
