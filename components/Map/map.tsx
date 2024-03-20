@@ -21,6 +21,9 @@ import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
 import { PreviewNavigate } from "./preview-navigate";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
+import SavedLocationModal from "../Modals/saved_location_modal";
+import { ToggleLocationModal } from "../../store/actions/modal";
+
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
 );
@@ -138,7 +141,7 @@ const Map = ({ navigation }: any) => {
 
   const fetchLocationDetails = async (coordinateArr: any) => {
     const response = await geoCodeApi(coordinateArr.join(','))
-    setLocationData({ name: response.features[0].text, address: response.features[0].place_name })
+    setLocationData({name: response.features[0].text, address: response.features[0].place_name, coordinates: response.features[0].center});
   }
 
   const getClickedPoint = (feature: any) => {
@@ -186,6 +189,12 @@ const Map = ({ navigation }: any) => {
     })
   }
 
+  const openSaveLocationModal = (locationData) => {
+    // open modal
+    dispatch(ToggleLocationModal({visibility: true, data: locationData}))
+
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.container}>
@@ -204,7 +213,7 @@ const Map = ({ navigation }: any) => {
           <Icon as={CircleUser} size="md" mr="$2" />
           <MenuItemLabel size="md">Profile</MenuItemLabel>
         </MenuItem>
-        <MenuItem key="locs" textValue="locs">
+        <MenuItem key="locs" textValue="locs" onPress={() => {navigation.navigate('Saved Locations')}}>
           <Icon as={BookmarkCheck} size="md" mr="$2" />
           <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
         </MenuItem>
@@ -246,7 +255,7 @@ const Map = ({ navigation }: any) => {
             <Heading mb="$1" size="md">
               {locationData.name}
             </Heading>
-            <Button onPress={() => {}}  variant="outline" borderColor="transparent">
+            <Button onPress={() => {openSaveLocationModal(locationData)}}  variant="outline" borderColor="transparent">
                 <ButtonIcon as={Bookmark}/>
               </Button>
           </HStack>
@@ -265,6 +274,7 @@ const Map = ({ navigation }: any) => {
         {(viewMode === VIEWMODE.preview) ? (
           <PreviewNavigate onRender={onPathRender}/>
         ) : (<></>)}
+        {locationData.name ? <SavedLocationModal/> : <></>}
       </View>
     </View>
   );

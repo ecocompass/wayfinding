@@ -12,6 +12,8 @@ import store from './store';
 import Preference from "./components/Preference/preference";
 import { navigationRef } from "./components/Navigation/RootNavigator";
 import Profile from "./components/Profile/profile";
+import { SavedLocations } from "./components/Settings/saved_locations";
+import SplashScreen from 'react-native-splash-screen';
 const Stack = createNativeStackNavigator();
 const App = () => {
 
@@ -46,6 +48,11 @@ const App = () => {
                 options={{ headerShown: false }}
                 name="Map"
                 component={Map}
+              />
+              <Stack.Screen
+                options={{ headerShown: true }}
+                name="Saved Locations"
+                component={SavedLocations}
               />
             </Stack.Navigator>
           </NavigationContainer>

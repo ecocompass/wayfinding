@@ -5,11 +5,12 @@ import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const liveUrl='https://core.ecocompass.live/api/'
-const baseUrl = 'http://34.242.139.134:5050/api/';
+const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
     signup: `${liveUrl}auth/signup`,
     login: `${liveUrl}auth/login`,
     logout: `${liveUrl}auth/logout`,
+    saveLocation: `${baseUrl}user/savedlocations`,
     pref: `${liveUrl}user/preferences`,
     profile: `${liveUrl}user/profile`
 };
@@ -145,6 +146,27 @@ export const getPath = function (coordinateObj: any) {
         })
         .then((response) => response.json());
     // .then((res) => res);
+};
+
+export const saveLocation = async function (data: any) {
+    const token = await readToken();
+    console.log(data, endpoint.saveLocation);
+    let stringData = JSON.stringify(data);
+    return await fetch(endpoint.saveLocation, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+            'Content-Length': stringData,
+        },
+        body: data,
+    }).then(response => {
+        console.log(response.status);
+        return response.json();
+    })
+        .catch(error => {
+            return { error: true, message: error };
+        });
 };
 
 export const readPref = async (payload: any) => {
