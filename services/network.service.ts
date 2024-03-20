@@ -3,6 +3,7 @@
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ToastComponent from "../components/Toast/toast";
 
 const liveUrl='https://core.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5000/api/';
@@ -67,7 +68,9 @@ export const userSignup = async (payload: any) => {
         },
         body: payload2,
     }).then(response => response.json()
-    ).catch(error => console.log("Error", error));
+    ).catch(error =>{ 
+     
+        console.log("Error", error)});
 };
 
 export const userLogin = async (payload: any) => {

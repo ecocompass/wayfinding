@@ -1,4 +1,4 @@
-import { all, call, put, takeLatest } from "redux-saga/effects";
+import { all, call, delay, put, takeLatest } from "redux-saga/effects";
 import {
   GETROUTES,
   GET_TOKEN,
@@ -30,6 +30,8 @@ import {
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE } from "../../constants";
 import { prefStore, storeProfile } from "../actions/user";
+import { hideToast, showToast } from "../actions/setLocation";
+
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
@@ -38,7 +40,9 @@ function* signUpSaga(payload: any): any {
     yield saveToken(response.access_token);
     RootNavigation.navigate('Preference', {});
   } else {
-    console.log("BE Error", response);
+    yield put(showToast(response.message));
+    yield delay(2000);
+    yield put(hideToast());
   }
 }
 
@@ -57,7 +61,9 @@ function* loginSaga(payload: any): any {
     }
    
   } else {
-    console.log("BE Error", response);
+    yield put(showToast(response.message));
+    yield delay(2000);
+    yield put(hideToast());
   }
 }
 
