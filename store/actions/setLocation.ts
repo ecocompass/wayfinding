@@ -1,4 +1,16 @@
-import { GETROUTES, HIDETOAST, PREF_STORE, SETPREFERENCE, SHOWTOAST, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, UPDATEUSERLOCATION, UPDATEVIEWMODE, ZOOMADJUST } from "."
+import {
+    SAVE_LOCATION,
+    PREF_STORE,
+    SHOWTOAST,
+    HIDETOAST,
+    SETPREFERENCE,
+    UPDATECENTERLOCATION,
+    UPDATESEARCHSTATUS,
+    UPDATEUSERLOCATION,
+    ZOOMADJUST,
+    GETROUTES,
+    UPDATEVIEWMODE,
+} from '.';
 
 export const setLocation = (location: any) => {
     return {
@@ -51,20 +63,25 @@ export const updateViewMode = (mode: string) => {
 export const getRoutes = (payload: any) => {
     return {
         type: GETROUTES,
-        payload
-    }
-}
+        payload,
+    };
+};
 
-
-export const showToast= (message: any) => {
+export const showToast = (message: any) => {
     return {
         type: SHOWTOAST,
-        payload:message
-    }
-}
+        payload: message,
+    };
+};
 
-export const hideToast=()=>{
+export const hideToast = () => {
     return {
-        type:HIDETOAST
-    }
-}
+        type: HIDETOAST,
+    };
+};
+export const saveLocationAPI = (payload: any) => {
+    return {
+        type: SAVE_LOCATION,
+        payload,
+    };
+};

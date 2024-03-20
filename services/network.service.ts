@@ -6,11 +6,12 @@ import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavi
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ToastComponent from "../components/Toast/toast";
 
-const baseUrl = 'http://34.242.139.134:5050/api/';
+const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
     signup: `${baseUrl}auth/signup`,
     login: `${baseUrl}auth/login`,
     logout: `${baseUrl}auth/logout`,
+    saveLocation: `${baseUrl}user/savedlocations`,
     pref: `${baseUrl}user/preferences`,
 };
 let access_token: any = '';
@@ -147,6 +148,27 @@ export const getPath = function (coordinateObj: any) {
         })
         .then((response) => response.json());
     // .then((res) => res);
+};
+
+export const saveLocation = async function (data: any) {
+    const token = await readToken();
+    console.log(data, endpoint.saveLocation);
+    let stringData = JSON.stringify(data);
+    return await fetch(endpoint.saveLocation, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+            'Content-Length': stringData,
+        },
+        body: data,
+    }).then(response => {
+        console.log(response.status);
+        return response.json();
+    })
+        .catch(error => {
+            return { error: true, message: error };
+        });
 };
 
 export const readPref = async (payload: any) => {
