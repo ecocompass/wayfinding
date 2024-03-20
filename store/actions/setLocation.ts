@@ -1,4 +1,6 @@
+
 import {
+    SAVE_LOCATION,
     PREF_STORE,
     SETPREFERENCE,
     UPDATECENTERLOCATION,
@@ -60,6 +62,14 @@ export const updateViewMode = (mode: string) => {
 export const getRoutes = (payload: any) => {
     return {
         type: GETROUTES,
-        payload,
-    };
+        payload
+    }
+}
+
+export const saveLocationAPI = (payload: any) => {
+    return {
+        type: SAVE_LOCATION,
+        payload
+    }
 };
+
