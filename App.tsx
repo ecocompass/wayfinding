@@ -4,24 +4,23 @@ import Map from "./components/Map/map";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import Signup from "./components/Auth/signup";
-import Login from "./components/Auth/login"
+import Login from "./components/Auth/login";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
 import { Provider } from 'react-redux';
 import store from './store';
 import Preference from "./components/Preference/preference";
 import { navigationRef } from "./components/Navigation/RootNavigator";
+import ToastComponent from "./components/Toast/toast";
 import { SavedLocations } from "./components/Settings/saved_locations";
-import SplashScreen from 'react-native-splash-screen';
 const Stack = createNativeStackNavigator();
 const App = () => {
- 
- 
   return (
     <Provider store={store}>
       <RootSiblingParent>
         <GluestackUIProvider config={config}>
           <NavigationContainer ref={navigationRef}>
+            <ToastComponent />
             <Stack.Navigator>
               <Stack.Screen
                 name="Register"

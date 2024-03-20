@@ -9,7 +9,7 @@ import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 
 import Mapbox from "@rnmapbox/maps";
-import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation, revertCoordinates } from "../../services";
+import { getPointAnnotation, getLineAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';

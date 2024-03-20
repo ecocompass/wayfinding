@@ -1,7 +1,8 @@
-
 import {
     SAVE_LOCATION,
     PREF_STORE,
+    SHOWTOAST,
+    HIDETOAST,
     SETPREFERENCE,
     UPDATECENTERLOCATION,
     UPDATESEARCHSTATUS,
@@ -62,14 +63,25 @@ export const updateViewMode = (mode: string) => {
 export const getRoutes = (payload: any) => {
     return {
         type: GETROUTES,
-        payload
-    }
-}
+        payload,
+    };
+};
 
+export const showToast = (message: any) => {
+    return {
+        type: SHOWTOAST,
+        payload: message,
+    };
+};
+
+export const hideToast = () => {
+    return {
+        type: HIDETOAST,
+    };
+};
 export const saveLocationAPI = (payload: any) => {
     return {
         type: SAVE_LOCATION,
-        payload
-    }
+        payload,
+    };
 };
-

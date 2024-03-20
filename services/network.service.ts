@@ -4,7 +4,7 @@ import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { storeToken } from "../store/actions/auth";
+import ToastComponent from "../components/Toast/toast";
 
 const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
@@ -67,7 +67,9 @@ export const userSignup = async (payload: any) => {
         },
         body: payload2,
     }).then(response => response.json()
-    ).catch(error => console.log("Error", error));
+    ).catch(error =>{ 
+     
+        console.log("Error", error)});
 };
 
 export const userLogin = async (payload: any) => {
