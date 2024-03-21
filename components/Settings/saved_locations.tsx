@@ -14,7 +14,6 @@ export const SavedLocations = ({navigation}) => {
   const dispatch = useDispatch();
 
   const displayLocation = (loc: any) => {
-    dispatch(updateViewMode(VIEWMODE.search));
     dispatch(setCenter([loc.longitude, loc.latitude]));
     navigation.navigate('Map', {isFromSaved: true, locData: [loc.longitude, loc.latitude]});
   };

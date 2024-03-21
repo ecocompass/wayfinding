@@ -14,7 +14,7 @@ import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked } from 'lucide-react-native';
 import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
@@ -23,6 +23,7 @@ import { PreviewNavigate } from "./preview-navigate";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import SavedLocationModal from "../Modals/saved_location_modal";
 import { ToggleLocationModal } from "../../store/actions/modal";
+import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -67,7 +68,7 @@ const requestLocationPermission = async () => {
   }
 };
 
-const Map = ({ route ,navigation }: any) => {
+const Map = ({ route, navigation }: any) => {
   let camRef = null;
   let userLocation = useSelector((state: any) => {
     return state.location.userLocation
@@ -140,9 +141,14 @@ const Map = ({ route ,navigation }: any) => {
     setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: data.center })])
   }
 
-  const fetchLocationDetails = async (coordinateArr: any) => {
+  const fetchLocationDetails = async (coordinateArr: any, isFromSaved: boolean = false) => {
     const response = await geoCodeApi(coordinateArr.join(','))
-    setLocationData({name: response.features[0].text, address: response.features[0].place_name, coordinates: response.features[0].center});
+    setLocationData({name: response.features[0].text, address: response.features[0].place_name, coordinates: response.features[0].center, isFromSaved});
+    if (isFromSaved) {
+      setPointViewed(route.params.locData);
+      this.camRef.flyTo(route.params.locData, 500);
+      setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: route.params.locData })])
+    }
   }
 
   const getClickedPoint = (feature: any) => {
@@ -151,7 +157,7 @@ const Map = ({ route ,navigation }: any) => {
     setPointViewed(feature.geometry.coordinates);
     this.camRef.flyTo(feature.geometry.coordinates, 500)
     setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
-    fetchLocationDetails(feature.geometry.coordinates)
+    fetchLocationDetails(feature.geometry.coordinates);
   }
 
   const getPaths = () => {
@@ -196,12 +202,12 @@ const Map = ({ route ,navigation }: any) => {
 
   }
 
-  if (route.params && route.params.isFromSaved) {
-    fetchLocationDetails(route.params.locData);
-    setTimeout(() => {
-      setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: route.params.locData, })])
-    })
-  }
+  useFocusEffect(() => {
+    if (route?.params.isFromSaved) {
+      fetchLocationDetails(route.params.locData, true)
+      navigation.setParams({isFromSaved: false});
+    }
+  })
 
   return (
     <View style={styles.page}>
@@ -266,9 +272,11 @@ const Map = ({ route ,navigation }: any) => {
             <Heading mb="$1" size="md">
               {locationData.name}
             </Heading>
-            <Button onPress={() => {openSaveLocationModal(locationData)}}  variant="outline" borderColor="transparent">
+            {(!locationData.isFromSaved)? (<Button onPress={() => {openSaveLocationModal(locationData)}}  variant="outline" borderColor="transparent">
                 <ButtonIcon as={Bookmark}/>
-              </Button>
+              </Button>) : (<Button  variant="outline" borderColor="transparent">
+                <ButtonIcon as={BookMarked}/>
+              </Button>)}
           </HStack>
           <Text size="sm" mb="$5">{locationData.address}</Text>
           <HStack>
