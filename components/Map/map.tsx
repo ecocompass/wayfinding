@@ -20,6 +20,7 @@ import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
 import { PreviewNavigate } from "./preview-navigate";
+import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import SavedLocationModal from "../Modals/saved_location_modal";
 import { ToggleLocationModal } from "../../store/actions/modal";
 
@@ -188,7 +189,7 @@ const Map = ({ navigation }: any) => {
     })
   }
 
-  const openSaveLocationModal = (locationData) => {
+  const openSaveLocationModal = (locationData:any) => {
     // open modal
     dispatch(ToggleLocationModal({visibility: true, data: locationData}))
 
@@ -208,7 +209,7 @@ const Map = ({ navigation }: any) => {
           )
         }}
       >
-        <MenuItem key="profile" textValue="profile">
+        <MenuItem key="profile" textValue="profile"  onPress={()=>{ RootNavigation.navigate('Profile', {})}}>
           <Icon as={CircleUser} size="md" mr="$2" />
           <MenuItemLabel size="md">Profile</MenuItemLabel>
         </MenuItem>
