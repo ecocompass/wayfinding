@@ -2,17 +2,18 @@
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
-import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ToastComponent from "../components/Toast/toast";
 
+const liveUrl='https://core.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
-    signup: `${baseUrl}auth/signup`,
-    login: `${baseUrl}auth/login`,
-    logout: `${baseUrl}auth/logout`,
-    saveLocation: `${baseUrl}user/savedlocations`,
-    pref: `${baseUrl}user/preferences`,
+    signup: `${liveUrl}auth/signup`,
+    login: `${liveUrl}auth/login`,
+    logout: `${liveUrl}auth/logout`,
+    saveLocation: `${liveUrl}user/savedlocations`,
+    pref: `${liveUrl}user/preferences`,
+    profile: `${liveUrl}user/profile`
 };
 let access_token: any = '';
 
@@ -171,7 +172,7 @@ export const saveLocation = async function (data: any) {
         });
 };
 
-export const readPref = async (payload: any) => {
+export const userPref = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
     let token = await readToken();
@@ -189,3 +190,33 @@ export const readPref = async (payload: any) => {
     })
         .catch(err => console.log("Error", err));
 };
+
+
+export const readProfile = async () => {
+
+    let token = await readToken();
+    return await fetch(endpoint.profile, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+    }).then(response => {
+
+        return response.json();
+    })
+        .catch(err => console.log("Error", err));
+};
+
+export const getPreference=async()=>{
+    let token = await readToken();
+    return await fetch(endpoint.pref, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+}).then(response=>{
+    return response.json();
+}).catch(err=>console.log("Error", err))
+}
