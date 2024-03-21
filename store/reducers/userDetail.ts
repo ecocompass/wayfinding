@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { UPDATESAVEDLOCATIONS } from "../actions";
+import { SAVE_LOCATION_STORE } from "../actions";
 
 const initialState = {
     savedLocations: [],
@@ -7,7 +7,7 @@ const initialState = {
 
 const userDetailReducer = (state = initialState, action: any) => {
     switch (action.type) {
-        case UPDATESAVEDLOCATIONS:
+        case SAVE_LOCATION_STORE:
             return { ...state, savedLocations: action.payload };
 
         default:

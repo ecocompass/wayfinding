@@ -23,14 +23,14 @@ const App = () => {
           <NavigationContainer ref={navigationRef}>
             <ToastComponent />
             <Stack.Navigator>
-              <Stack.Screen
-                name="Register"
-                component={Signup}
+            <Stack.Screen
+                name="Login"
+                component={Login}
                 options={{ headerShown: false }}
               />
               <Stack.Screen
-                name="Login"
-                component={Login}
+                name="Register"
+                component={Signup}
                 options={{ headerShown: false }}
               />
               <Stack.Screen

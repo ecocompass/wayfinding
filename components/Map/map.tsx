@@ -15,7 +15,7 @@ import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
-import { getRoutes, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
@@ -212,7 +212,10 @@ const Map = ({ navigation }: any) => {
           <Icon as={CircleUser} size="md" mr="$2" />
           <MenuItemLabel size="md">Profile</MenuItemLabel>
         </MenuItem>
-        <MenuItem key="locs" textValue="locs" onPress={() => {navigation.navigate('Saved Locations')}}>
+        <MenuItem key="locs" textValue="locs" onPress={() => {
+          dispatch(getSaveLocationsAPI());
+          navigation.navigate('Saved Locations')
+          }}>
           <Icon as={BookmarkCheck} size="md" mr="$2" />
           <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
         </MenuItem>

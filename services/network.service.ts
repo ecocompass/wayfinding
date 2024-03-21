@@ -2,9 +2,7 @@
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
-import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ToastComponent from "../components/Toast/toast";
 
 const baseUrl = 'https://core.ecocompass.live/api/';
 const endpoint = {
@@ -151,9 +149,26 @@ export const getPath = function (coordinateObj: any) {
     // .then((res) => res);
 };
 
+export const getSaveLocations = async function () {
+    const token = await readToken();
+    return await fetch(endpoint.saveLocation, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw 'error';
+            }
+        }).catch(e => console.log(e));
+}
+
 export const saveLocation = async function (data: any) {
     const token = await readToken();
-    console.log(data, endpoint.saveLocation);
     let stringData = JSON.stringify(data);
     return await fetch(endpoint.saveLocation, {
         method: 'POST',

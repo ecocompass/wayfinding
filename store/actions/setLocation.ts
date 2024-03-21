@@ -11,6 +11,7 @@ import {
     ZOOMADJUST,
     GETROUTES,
     UPDATEVIEWMODE,
+    GET_SAVE_LOCATIONS,
 } from '.';
 
 export const setLocation = (location: any) => {
@@ -86,3 +87,9 @@ export const saveLocationAPI = (payload: any) => {
         payload,
     };
 };
+
+export const getSaveLocationsAPI = () => {
+    return {
+        type: GET_SAVE_LOCATIONS
+    }
+}

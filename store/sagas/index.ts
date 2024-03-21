@@ -11,6 +11,8 @@ import {
   PREF_STORE,
   SETPREFERENCE,
   LOGOUT,
+  GET_SAVE_LOCATIONS,
+  SAVE_LOCATION_STORE,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -23,6 +25,7 @@ import {
   getPath,
   saveLocation,
   userLogout,
+  getSaveLocations,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE } from "../../constants";
@@ -46,7 +49,6 @@ function* loginSaga(payload: any): any {
   const response = yield userLogin(payload);
   if (response.access_token) {
     yield saveToken(response.access_token);
-    yield put(showToast("Success!", "success"));
     RootNavigation.navigate('Map', {});
   } else {
     yield put(showToast(response.message));
@@ -93,6 +95,15 @@ function* saveLocationSaga(action) {
   const response = yield saveLocation(action.payload);
   // handle response
   console.log(response);
+  yield put(showToast('saved successfully!', 'success'));
+  yield delay(2000);
+  yield put(hideToast());
+}
+
+function* getSaveLocationSaga() {
+  const response = yield getSaveLocations();
+  console.log(response);
+  yield put({ type: SAVE_LOCATION_STORE, payload: response });
 }
 
 function* logoutSaga() {
@@ -129,6 +140,10 @@ function* watchLogoutSaga(): SagaIterator {
   yield takeLatest(LOGOUT, logoutSaga);
 }
 
+function* watchGetLocationSaga(): SagaIterator {
+  yield takeLatest(GET_SAVE_LOCATIONS, getSaveLocationSaga);
+}
+
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
@@ -138,6 +153,7 @@ function* appSagas() {
     call(watchGetPath),
     call(watchSaveLocationSaga),
     call(watchLogoutSaga),
+    call(watchGetLocationSaga),
   ]);
 }
 
