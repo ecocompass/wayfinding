@@ -18,7 +18,7 @@ import { View } from 'react-native';
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { prefAction } from '../../store/actions/setLocation';
+import { prefAction } from '../../store/actions/user';
 
 const Preference = ({ navigation }: any) => {
   const [allPreferences, setPreferences] = useState([
@@ -100,7 +100,6 @@ const Preference = ({ navigation }: any) => {
                     : '1',
                 })
               );
-              // navigation.navigate('Map');
             }}
           >
             <ButtonText color="$white">Submit</ButtonText>

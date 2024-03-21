@@ -42,19 +42,7 @@ export const setSearchStatus = (status: any) => {
     };
 };
 
-export const prefAction = (pref: any) => {
-    return {
-        type: SETPREFERENCE,
-        payload: pref,
-    };
-};
 
-export const prefStore = (pref: string) => {
-    return {
-        type: PREF_STORE,
-        payload: pref,
-    };
-};
 export const updateViewMode = (mode: string) => {
     return {
         type: UPDATEVIEWMODE,
