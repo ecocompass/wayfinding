@@ -68,9 +68,10 @@ export const userSignup = async (payload: any) => {
         },
         body: payload2,
     }).then(response => response.json()
-    ).catch(error =>{ 
-     
-        console.log("Error", error)});
+    ).catch(error => {
+
+        console.log("Error", error)
+    });
 };
 
 export const userLogin = async (payload: any) => {

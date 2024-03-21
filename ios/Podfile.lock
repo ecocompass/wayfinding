@@ -15,14 +15,14 @@ PODS:
     - hermes-engine/Pre-built (= 0.72.7)
   - hermes-engine/Pre-built (0.72.7)
   - libevent (2.1.12)
-  - MapboxCommon (23.8.6)
-  - MapboxCoreMaps (10.16.4):
-    - MapboxCommon (~> 23.8)
-  - MapboxMaps (10.16.4):
-    - MapboxCommon (= 23.8.6)
-    - MapboxCoreMaps (= 10.16.4)
+  - MapboxCommon (23.9.1)
+  - MapboxCoreMaps (10.16.6):
+    - MapboxCommon (~> 23.9)
+  - MapboxMaps (10.16.6):
+    - MapboxCommon (= 23.9.1)
+    - MapboxCoreMaps (= 10.16.6)
     - MapboxMobileEvents (= 1.0.10)
-    - Turf (~> 2.0)
+    - Turf (= 2.7.0)
   - MapboxMobileEvents (1.0.10)
   - RCT-Folly (2021.07.22.00):
     - boost
@@ -461,7 +461,7 @@ PODS:
   - RNSVG (13.4.0):
     - React-Core
   - SocketRocket (0.6.1)
-  - Turf (2.8.0)
+  - Turf (2.7.0)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -632,9 +632,9 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   hermes-engine: 9180d43df05c1ed658a87cc733dc3044cf90c00a
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
-  MapboxCommon: 90f76693dc02438acbb5ea9a5b266a4c0eb1c875
-  MapboxCoreMaps: 7b07d1ca8c454a4381daf09df901b9d6bf90bce0
-  MapboxMaps: cbb38845a9bf49b124f0e937975d560a4e01894e
+  MapboxCommon: 20466d839cc43381c44df09d19f7f794b55b9a93
+  MapboxCoreMaps: c21f433decbb295874f0c2464e492166db813b56
+  MapboxMaps: c3b36646b9038706bbceb5de203bcdd0f411e9d0
   MapboxMobileEvents: de50b3a4de180dd129c326e09cd12c8adaaa46d6
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: 83bca1c184feb4d2e51c72c8369b83d641443f95
@@ -677,7 +677,7 @@ SPEC CHECKSUMS:
   RNScreens: 3c5b9f4a9dcde752466854b6109b79c0e205dad3
   RNSVG: 07dbd870b0dcdecc99b3a202fa37c8ca163caec2
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
-  Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
+  Turf: 13d1a92d969ca0311bbc26e8356cca178ce95da2
   Yoga: 4c3aa327e4a6a23eeacd71f61c81df1bcdf677d5
 
 PODFILE CHECKSUM: 4222c96cf11cfbfcf2cd02725c72c53f8592df15
