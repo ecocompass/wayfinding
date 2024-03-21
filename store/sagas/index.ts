@@ -38,7 +38,6 @@ import { hideToast, showToast } from "../actions/setLocation";
 
 function* signUpSaga(payload: any): any {
   const response = yield userSignup(payload);
-  console.log(response);
   if (response.access_token) {
     yield saveToken(response.access_token);
     RootNavigation.navigate('Preference', {});
@@ -55,7 +54,6 @@ function* loginSaga(payload: any): any {
     yield saveToken(response.access_token);
     const res = yield getPreference();
     if (res.payload) {
-      console.log("Preferences", res)
       yield put(prefStore(res.payload))
       RootNavigation.navigate('Map', {});
     }
@@ -79,8 +77,7 @@ function* tokenSaga(): any {
     let diff = (now - token_time) / 1000 / 60;
     const res = yield getPreference();
     if (res.payload) {
-      yield put(prefStore(res.payload))
-      console.log("Preferences", res)
+      yield put(prefStore(res.payload));
       RootNavigation.navigate('Map', {});
     }
     else {
@@ -115,7 +112,6 @@ function* getPathSaga(action: any): any {
 function* saveLocationSaga(action: any): any {
   const response = yield saveLocation(action.payload);
   // handle response
-  console.log(response);
   yield put(showToast('saved successfully!', 'success'));
   yield delay(2000);
   yield put(hideToast());
@@ -123,20 +119,17 @@ function* saveLocationSaga(action: any): any {
 
 function* getSaveLocationSaga() {
   const response = yield getSaveLocations();
-  console.log(response);
-  yield put({ type: SAVE_LOCATION_STORE, payload: response });
+  yield put({ type: SAVE_LOCATION_STORE, payload: response.saved_locations });
 }
 
 function* logoutSaga(): any {
   const response = yield userLogout();
-  console.log(response);
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Register', {});
 }
 function* ProfileSaga(): any {
   const response = yield readProfile();
-  console.log(response);
-  yield put(storeProfile(response))
+  yield put(storeProfile(response));
 }
 
 function* watchGetPath(): SagaIterator {

@@ -67,7 +67,7 @@ const requestLocationPermission = async () => {
   }
 };
 
-const Map = ({ navigation }: any) => {
+const Map = ({ route ,navigation }: any) => {
   let camRef = null;
   let userLocation = useSelector((state: any) => {
     return state.location.userLocation
@@ -132,6 +132,7 @@ const Map = ({ navigation }: any) => {
   };
 
   const selectLocation = (data: any) => {
+    console.log(data);
     setPointViewed(data.center);
     this.camRef.flyTo(data.center, 500);
     setLocationData(data);
@@ -193,6 +194,13 @@ const Map = ({ navigation }: any) => {
     // open modal
     dispatch(ToggleLocationModal({visibility: true, data: locationData}))
 
+  }
+
+  if (route.params && route.params.isFromSaved) {
+    fetchLocationDetails(route.params.locData);
+    setTimeout(() => {
+      setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: route.params.locData, })])
+    })
   }
 
   return (
