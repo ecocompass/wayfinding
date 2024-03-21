@@ -1,3 +1,4 @@
+
 import {
     SAVE_LOCATION,
     PREF_STORE,
@@ -10,6 +11,7 @@ import {
     ZOOMADJUST,
     GETROUTES,
     UPDATEVIEWMODE,
+    GET_SAVE_LOCATIONS,
 } from '.';
 
 export const setLocation = (location: any) => {
@@ -51,14 +53,14 @@ export const updateViewMode = (mode: string) => {
 export const getRoutes = (payload: any) => {
     return {
         type: GETROUTES,
-        payload,
-    };
-};
+        payload
+    }
+}
 
-export const showToast = (message: any) => {
+export const showToast = (message: any, type: string = 'info') => {
     return {
         type: SHOWTOAST,
-        payload: message,
+        payload: { message, type },
     };
 };
 
@@ -73,3 +75,9 @@ export const saveLocationAPI = (payload: any) => {
         payload,
     };
 };
+
+export const getSaveLocationsAPI = () => {
+    return {
+        type: GET_SAVE_LOCATIONS
+    }
+}

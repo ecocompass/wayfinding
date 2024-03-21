@@ -3,9 +3,8 @@
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import ToastComponent from "../components/Toast/toast";
 
-const liveUrl='https://core.ecocompass.live/api/'
+const liveUrl = 'https://core.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
     signup: `${liveUrl}auth/signup`,
@@ -13,7 +12,7 @@ const endpoint = {
     logout: `${liveUrl}auth/logout`,
     saveLocation: `${liveUrl}user/savedlocations`,
     pref: `${liveUrl}user/preferences`,
-    profile: `${liveUrl}user/profile`
+    profile: `${liveUrl}user/profile`,
 };
 let access_token: any = '';
 
@@ -152,9 +151,26 @@ export const getPath = function (coordinateObj: any) {
     // .then((res) => res);
 };
 
+export const getSaveLocations = async function () {
+    const token = await readToken();
+    return await fetch(endpoint.saveLocation, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            if (response.status === 200) {
+                return response.json();
+            } else {
+                throw 'error';
+            }
+        }).catch(e => console.log(e));
+}
+
 export const saveLocation = async function (data: any) {
     const token = await readToken();
-    console.log(data, endpoint.saveLocation);
     let stringData = JSON.stringify(data);
     return await fetch(endpoint.saveLocation, {
         method: 'POST',
@@ -209,7 +225,7 @@ export const readProfile = async () => {
         .catch(err => console.log("Error", err));
 };
 
-export const getPreference=async()=>{
+export const getPreference = async () => {
     let token = await readToken();
     return await fetch(endpoint.pref, {
         method: 'GET',
@@ -217,7 +233,7 @@ export const getPreference=async()=>{
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token.accessToken}`,
         },
-}).then(response=>{
-    return response.json();
-}).catch(err=>console.log("Error", err))
+    }).then(response => {
+        return response.json();
+    }).catch(err => console.log("Error", err))
 }

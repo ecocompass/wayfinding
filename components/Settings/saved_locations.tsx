@@ -1,13 +1,58 @@
-import { Box, Text } from "@gluestack-ui/themed";
-import { useSelector } from "react-redux";
+import { Box, FlatList, HStack, Pressable, Text, Badge, BadgeIcon, BadgeText } from "@gluestack-ui/themed";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { MapPin } from 'lucide-react-native';
+import { setCenter, updateViewMode } from "../../store/actions/setLocation";
+import { VIEWMODE } from "../../constants";
+import * as RootNavigation from '../../components/Navigation/RootNavigator';
 
-export const SavedLocations = () => {
+export const SavedLocations = ({navigation}) => {
   const saved_locations = useSelector((state) => {
     return state.userDetails.savedLocations;
   });
+
+  const dispatch = useDispatch();
+
+  const displayLocation = (loc: any) => {
+    dispatch(setCenter([loc.longitude, loc.latitude]));
+    navigation.navigate('Map', {isFromSaved: true, locData: [loc.longitude, loc.latitude]});
+  };
+
   return (
     <Box p="$5">
-      {saved_locations.length ? (<Text>Locations</Text>) : (<Text>Your Locations will appear here</Text>)}
+      {saved_locations.length ? (
+        <Box py="$5">
+        <FlatList
+          data={saved_locations}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => {displayLocation(item)}}>
+              <Box
+                borderBottomWidth="$1"
+                borderColor="$trueGray300"
+                $dark-borderColor="$trueGray100"
+                $base-pl={0}
+                $base-pr={0}
+                py="$5"
+              >
+                <HStack space="md" justifyContent="space-between">
+                  <Text>
+                    {item.location_name}
+                  </Text>
+                  <Box>
+                    <Badge size="lg" variant="solid" borderRadius="$none" action="info">
+                      <BadgeText>{item.longitude}, {item.latitude}</BadgeText>
+                      <BadgeIcon as={MapPin} ml="$2" />
+                  </Badge>
+                  </Box>
+                </HStack>
+              </Box>
+            </Pressable>
+            
+          )}
+          keyExtractor={(item) => item.location_name}
+        />
+      </Box>
+      ) : (<Text>Your Locations will appear here</Text>)}
     </Box>
   )
 };

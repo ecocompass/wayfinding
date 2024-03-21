@@ -1,37 +1,40 @@
-import { VStack, ToastTitle, ToastDescription,} from "@gluestack-ui/themed";
+import { VStack, ToastTitle, ToastDescription } from "@gluestack-ui/themed";
 import { Toast } from '@gluestack-ui/themed';
-import { connect } from "react-redux";
+import { useSelector } from "react-redux";
 import { StyleSheet } from "react-native";
 
-const mapStateToProps = (state:any) => ({
-  message: state.toast.toastMessage,
-  show: state.toast.show,
-});
 const styles = StyleSheet.create({
-    container: {
-    width:'92%',
-      position:"absolute", 
-      top:25,
-      zIndex:100
+  container: {
+    width: '75%',
+    position: 'absolute',
+    top: 5,
+    left: 75,
+    zIndex: 100,
+  },
+});
 
-    },
+const ToastComponent = () => {
+  const message = useSelector((state: any) => {
+    return state.toast.toastMessage;
   });
 
-const ToastComponent = ({ message, show }) => {
+  const show = useSelector((state: any) => {
+    return state.toast.show;
+  });
 
+  const type = useSelector((state: any) => {
+    return state.toast.type;
+  });
 
   return (
     show && (
-
-      <Toast style={styles.container} action="error" variant="accent">
+      <Toast style={styles.container} action={type} variant="accent">
         <VStack space="xs">
-          <ToastTitle>Error</ToastTitle>
           <ToastDescription>{message}</ToastDescription>
         </VStack>
       </Toast>
     )
   );
-
 };
 
-export default connect(mapStateToProps)(ToastComponent);
+export default ToastComponent;
