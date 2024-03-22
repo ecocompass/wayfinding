@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
-import { MAPBOX_PUBLIC_TOKEN } from "../constants";
+import { MAPBOX_PUBLIC_TOKEN, status } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const liveUrl = 'https://core.ecocompass.live/api/'
@@ -95,7 +95,8 @@ export const userLogout = async () => {
             'AUTHORIZATION': getTokenString(),
         },
     }).then(response => {
-        return response.json();
+
+        return response.status === status.ok ? response.json() : false;
     }
     ).catch(error => console.log("Error", error));
 };
@@ -161,11 +162,10 @@ export const getSaveLocations = async function () {
         },
     })
         .then(response => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw 'error';
-            }
+
+
+            return response.status === status.ok ? response.json() : false;
+
         }).catch(e => console.log(e));
 }
 
@@ -181,8 +181,8 @@ export const saveLocation = async function (data: any) {
         },
         body: data,
     }).then(response => {
-        console.log(response.status);
-        return response.json();
+
+        return response.status === status.ok ? response.json() : false;
     })
         .catch(error => {
             return { error: true, message: error };
@@ -202,8 +202,8 @@ export const userPref = async (payload: any) => {
         },
         body: payload2,
     }).then(response => {
-
-        return response.json();
+        console.log("ResponseUserPref", response)
+        return response.status === status.ok ? response.json() : false;
     })
         .catch(err => console.log("Error", err));
 };
@@ -220,7 +220,7 @@ export const readProfile = async () => {
         },
     }).then(response => {
 
-        return response.json();
+        return response.status === status.ok ? response.json() : false;
     })
         .catch(err => console.log("Error", err));
 };
@@ -234,6 +234,7 @@ export const getPreference = async () => {
             'Authorization': `Bearer ${token.accessToken}`,
         },
     }).then(response => {
-        return response.json();
+
+        return response.status === status.ok ? response.json() : false;
     }).catch(err => console.log("Error", err))
 }
