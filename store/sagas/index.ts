@@ -36,6 +36,7 @@ import { prefStore, storeProfile } from "../actions/user";
 import { hideToast, showToast } from "../actions/setLocation";
 import { useDispatch } from "react-redux";
 import { toggleSpinner } from "../actions/auth";
+import { process_path } from "../../services/path_processor";
 
 function* signUpSaga(payload: any): any {
   yield put(toggleSpinner());
@@ -124,12 +125,12 @@ function* getPathSaga(action: any): any {
   yield put(toggleSpinner());
 
   const response = yield getPath(action.payload);
-
+  let recommendationList = process_path(response);
   yield all([
     put(toggleSpinner()),
     put({
       type: ROUTES_STORE,
-      payload: { walk: response.shortestPathCoordinates },
+      payload: { options: recommendationList },
     }),
     put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview }),
   ]);

@@ -140,15 +140,28 @@ export const removeStorageItem = function (key: string) {
 };
 
 export const getPath = function (coordinateObj: any) {
-    return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),
-        {
-            method: 'GET',
-            headers: {
-                'Host': '141.148.199.176:8080',
-            },
-        })
-        .then((response) => response.json());
+    // temp
+    // let tempObj = {
+    //     startCoordinates: '-6.112460,53.254836',
+    //     endCoordinates: '-6.235733,53.425014',
+    // }
+    // const token = await readToken();
+    // return fetch(`https://route.ecocompass.live/api/routes?` + new URLSearchParams(tempObj),
+    //     {
+    //         method: 'GET',
+    //         headers: {
+    //             'AUTHORIZATION': token,
+    //         },
+    //     })
+    //     .then((response) => {
+    //         console.log(response.status);
+    //         return response.json();
+    //     })
+    //     .catch(e => console.log(e));
     // .then((res) => res);
+
+    // temp
+    return true;
 };
 
 export const getSaveLocations = async function () {

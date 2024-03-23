@@ -12,53 +12,80 @@ import {
   Button,
   ButtonText,
   ButtonIcon,
+  Accordion,
+  AccordionHeader,
+  AccordionIcon,
+  AccordionItem,
+  AccordionTitleText,
+  AccordionContent,
+  AccordionContentText,
+  AccordionTrigger,
+  Divider,
+  Icon,
 } from "@gluestack-ui/themed";
-import { MoveLeft, Play, X } from "lucide-react-native";
+import {
+  MoveLeft,
+  Play,
+  X,
+  PlusIcon,
+  MinusIcon,
+  FootprintsIcon,
+  BusIcon,
+  TramFrontIcon,
+} from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { updateViewMode } from "../../store/actions/setLocation";
+import { updateViewMode, updateViewedPath } from "../../store/actions/setLocation";
 import { VIEWMODE } from "../../constants";
+import { getTimeFromDistance } from "../../services/time_to_dest";
 
 export const PreviewNavigate = (props: any) => {
-  const routes = useSelector((state) => {
-    return state.location.routes;
+  const paths = useSelector((state) => {
+    return state.location.recommendedRoutes.options;
   });
 
-  const [paths, setPaths] = useState([
-    {
-      id: 1,
-      mode: 'Walk',
-      isSelected: true,
-    },
-    {
-      id: 2,
-      mode: 'Drive',
-      isSelected: false,
-    },
-    {
-      id: 3,
-      mode: 'Cycle',
-      isSelected: false,
-    },
-    {
-      id: 4,
-      mode: 'Taxi',
-      isSelected: false,
-    },
-  ]);
+  const iconMap = {
+    walk: FootprintsIcon,
+    bus: BusIcon,
+    luas: TramFrontIcon,
+  };
+
+  // const [paths, setPaths] = useState([
+  //   {
+  //     id: 1,
+  //     mode: 'Walk',
+  //     isSelected: true,
+  //   },
+  //   {
+  //     id: 2,
+  //     mode: 'Drive',
+  //     isSelected: false,
+  //   },
+  //   {
+  //     id: 3,
+  //     mode: 'Cycle',
+  //     isSelected: false,
+  //   },
+  //   {
+  //     id: 4,
+  //     mode: 'Taxi',
+  //     isSelected: false,
+  //   },
+  // ]);
 
   const dispatch = useDispatch();
 
   const updatePath = (pathId) => {
-    setPaths(
-      paths.map((p) => {
-        if (p.id === pathId) {
-          return { ...p, isSelected: true };
-        } else {
-          return { ...p, isSelected: false };
-        }
-      })
-    );
+    // setPaths(
+    //   paths.map((p) => {
+    //     if (p.id === pathId) {
+    //       return { ...p, isSelected: true };
+    //     } else {
+    //       return { ...p, isSelected: false };
+    //     }
+    //   })
+    // );
+    dispatch(updateViewedPath(pathId));
   };
 
   const updateView = () => {
@@ -66,9 +93,8 @@ export const PreviewNavigate = (props: any) => {
   };
 
   useEffect(() => {
-    props.onRender(routes.walk);
+    // props.onRender(routes.walk);
   });
-
 
   return (
     <Box>
@@ -94,7 +120,7 @@ export const PreviewNavigate = (props: any) => {
         renderItem={({ item }) => (
           <Pressable
             onPress={() => {
-              updatePath(item.id);
+              updatePath(item.pathId);
             }}
           >
             <Box
@@ -104,7 +130,7 @@ export const PreviewNavigate = (props: any) => {
               $base-pl={0}
               $base-pr={0}
               py="$4"
-              bg={item.isSelected ? "$primary100" : "transparent"}
+              bg={item.isViewed ? "$primary100" : "transparent"}
             >
               <HStack
                 space="md"
@@ -117,17 +143,31 @@ export const PreviewNavigate = (props: any) => {
                   fontWeight="$bold"
                   $dark-color="$warmGray100"
                 >
-                  {item.mode}
+                  {item.displayModes.map((mode, i) => {
+                    if (mode.length) {
+                      return (
+                        <HStack
+                          space="md"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          key={i}
+                        >
+                          <Icon as={iconMap[mode]} m="$2" size="xl" />
+                        </HStack>
+                      );
+                    }
+                  })}
                 </Text>
-                <Button size="md" variant="solid" action="positive">
+                <Text>{getTimeFromDistance(item.pathDistance, item.displayModes)} mins</Text>
+                {/* <Button size="md" variant="solid" action="positive">
                   <ButtonText>Go </ButtonText>
                   <ButtonIcon as={Play} />
-                </Button>
+                </Button> */}
               </HStack>
             </Box>
           </Pressable>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.pathId}
       />
     </Box>
   );
