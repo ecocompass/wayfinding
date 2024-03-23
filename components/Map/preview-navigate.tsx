@@ -50,41 +50,9 @@ export const PreviewNavigate = (props: any) => {
     luas: TramFrontIcon,
   };
 
-  // const [paths, setPaths] = useState([
-  //   {
-  //     id: 1,
-  //     mode: 'Walk',
-  //     isSelected: true,
-  //   },
-  //   {
-  //     id: 2,
-  //     mode: 'Drive',
-  //     isSelected: false,
-  //   },
-  //   {
-  //     id: 3,
-  //     mode: 'Cycle',
-  //     isSelected: false,
-  //   },
-  //   {
-  //     id: 4,
-  //     mode: 'Taxi',
-  //     isSelected: false,
-  //   },
-  // ]);
-
   const dispatch = useDispatch();
 
   const updatePath = (pathId) => {
-    // setPaths(
-    //   paths.map((p) => {
-    //     if (p.id === pathId) {
-    //       return { ...p, isSelected: true };
-    //     } else {
-    //       return { ...p, isSelected: false };
-    //     }
-    //   })
-    // );
     dispatch(updateViewedPath(pathId));
   };
 
@@ -94,13 +62,18 @@ export const PreviewNavigate = (props: any) => {
 
   useEffect(() => {
     // props.onRender(routes.walk);
+    paths.forEach((path) => {
+      if (path.isViewed) {
+        props.onRender(path.modePathList);
+      }
+    });
   });
 
   return (
     <Box>
       <HStack justifyContent="space-between" alignItems="center" p="$4">
         <Heading size="xl" pb="$3">
-          Routes
+          Your Options
         </Heading>
         <Button
           size="md"
@@ -136,6 +109,7 @@ export const PreviewNavigate = (props: any) => {
                 space="md"
                 justifyContent="space-between"
                 alignItems="center"
+                flexWrap="wrap"
                 px="$4"
               >
                 <Text

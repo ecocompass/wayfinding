@@ -24,6 +24,12 @@ const customStyle = {
   transform: [{rotateY: '45deg'}],
 };
 
+const pathIdentifiers = {
+  'walk': "#0000ff",
+  'luas': "#00FF00",
+  'bus': "#FFFF00"
+}
+
 function getLine(coordArr: any) {
   return {
       type: "FeatureCollection",
@@ -55,34 +61,37 @@ export function getPointAnnotation(options: any) {
   );
 }
 
-export function getLineAnnotation(route: any) {
-  let temp_route: any = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: route,
+export function getLineAnnotation(routes: any) {
+  return routes.map((route, index) => {
+    let temp_route: any = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: route.pathPointList,
+          },
         },
-      },
-    ],
-  };
-
-  return (
-    <Mapbox.ShapeSource id="shapeSource" shape={temp_route}>
-      <Mapbox.LineLayer
-        id="lineLayer"
-        style={{
-          lineWidth: 3,
-          lineJoin: "round",
-          lineColor: "#0000ff",
-          lineDasharray: route.map(r => 1),
-        }}
-      />
-    </Mapbox.ShapeSource>
-  );
+      ],
+    };
+  
+    return (
+      <Mapbox.ShapeSource key={`line ${index}`} id={`line ${index}`} shape={temp_route}>
+        <Mapbox.LineLayer
+          id={`line ${index}`}
+          style={{
+            lineWidth: 3,
+            lineJoin: "round",
+            lineColor: pathIdentifiers[route.mode],
+            // lineDasharray: route.mode === 'walk'? route.pathPointList.map(r => 1) : [],
+          }}
+        />
+      </Mapbox.ShapeSource>
+    );
+  })
+  
 }
 
 export function getPolyLineAnnotation(options: any) {
