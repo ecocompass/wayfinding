@@ -2,6 +2,8 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/react-in-jsx-scope */
 import { ImageBackground } from "@gluestack-ui/themed";
+import { Icon } from "@gluestack-ui/themed";
+import { Milestone, MapPin } from "lucide-react-native";
 import Mapbox from "@rnmapbox/maps";
 import { View, Image,StyleSheet } from "react-native";
 
@@ -40,14 +42,32 @@ function getLine(coordArr: any) {
           geometry: {
             type: "LineString",
             coordinates: [
-              coordArr
+              coordArr,
             ],
           },
         },
       ],
     };
   }
-
+export function navPointAnnotation(pointArr: any) {
+  return pointArr.map((p, index) => {
+    return (
+      <Mapbox.PointAnnotation
+      id={`nav_${index}`}
+      coordinate={p.coords}
+      key={`nav_${index}`}
+    >
+      <View style={{width: 30,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',}}>
+          <Icon as={Milestone} size="lg" color="red"/>
+        </View>
+      <Mapbox.Callout title={p.name} style={{minWidth: 200}} />
+    </Mapbox.PointAnnotation>
+    );
+  });
+}
 
 export function getPointAnnotation(options: any) {
   return (
@@ -85,13 +105,12 @@ export function getLineAnnotation(routes: any) {
             lineWidth: 3,
             lineJoin: "round",
             lineColor: pathIdentifiers[route.mode],
-            // lineDasharray: route.mode === 'walk'? route.pathPointList.map(r => 1) : [],
+            lineDasharray: route.mode === 'walk'? route.pathPointList.map(r => 1) : [],
           }}
         />
       </Mapbox.ShapeSource>
     );
-  })
-  
+  });
 }
 
 export function getPolyLineAnnotation(options: any) {

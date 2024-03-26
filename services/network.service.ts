@@ -238,6 +238,8 @@ export const getPreference = async () => {
             'Authorization': `Bearer ${token.accessToken}`,
         },
     }).then(response => {
-        return response.json();
+        return {
+            payload: response.json(),
+        };
     }).catch(err => console.log("Error", err))
 }

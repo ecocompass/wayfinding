@@ -13,3 +13,7 @@ export function getTimeFromDistance(distanceArr, modes) {
 
     return String(Math.floor(timeTaken * 60))
 }
+
+export function getTimeFromDistanceSingle(mode, distance) {
+    return String(Math.floor((distance / avg_speeds[mode]) * 60));
+}

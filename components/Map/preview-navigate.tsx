@@ -3,7 +3,6 @@ import {
   HStack,
   ScrollView,
   VStack,
-  Text,
   Heading,
   Pressable,
   Box,
@@ -21,8 +20,9 @@ import {
   AccordionContentText,
   AccordionTrigger,
   Divider,
+  Text,
   Icon,
-} from "@gluestack-ui/themed";
+} from '@gluestack-ui/themed';
 import {
   MoveLeft,
   Play,
@@ -32,17 +32,25 @@ import {
   FootprintsIcon,
   BusIcon,
   TramFrontIcon,
-} from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateViewMode, updateViewedPath } from "../../store/actions/setLocation";
-import { VIEWMODE } from "../../constants";
-import { getTimeFromDistance } from "../../services/time_to_dest";
+} from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  updateViewMode,
+  updateViewedPath,
+} from '../../store/actions/setLocation';
+import { VIEWMODE } from '../../constants';
+import { getTimeFromDistance } from '../../services/time_to_dest';
+import { getPathInstructions } from '../../services/path_processor';
 
 export const PreviewNavigate = (props: any) => {
+  const { onRender, onPointsRender, destinationName } = props;
+
   const paths = useSelector((state) => {
     return state.location.recommendedRoutes.options;
   });
+
+  let [pathInstructions, setPathInstructions] = useState<any>([]);
 
   const iconMap = {
     walk: FootprintsIcon,
@@ -64,10 +72,12 @@ export const PreviewNavigate = (props: any) => {
     // props.onRender(routes.walk);
     paths.forEach((path) => {
       if (path.isViewed) {
-        props.onRender(path.modePathList);
+        onRender(path.modePathList);
+        // onPointsRender(path.modePathList);
+        setPathInstructions(getPathInstructions(path, destinationName));
       }
     });
-  });
+  }, [paths, onRender, onPointsRender, destinationName, setPathInstructions]);
 
   return (
     <Box>
@@ -88,7 +98,7 @@ export const PreviewNavigate = (props: any) => {
         </Button>
       </HStack>
       <FlatList
-        h="$48"
+        h="$50"
         data={paths}
         renderItem={({ item }) => (
           <Pressable
@@ -103,7 +113,7 @@ export const PreviewNavigate = (props: any) => {
               $base-pl={0}
               $base-pr={0}
               py="$4"
-              bg={item.isViewed ? "$primary100" : "transparent"}
+              bg={item.isViewed ? '$primary50' : 'transparent'}
             >
               <HStack
                 space="md"
@@ -132,12 +142,48 @@ export const PreviewNavigate = (props: any) => {
                     }
                   })}
                 </Text>
-                <Text>{getTimeFromDistance(item.pathDistance, item.displayModes)} mins</Text>
-                {/* <Button size="md" variant="solid" action="positive">
-                  <ButtonText>Go </ButtonText>
-                  <ButtonIcon as={Play} />
-                </Button> */}
+                <Text>
+                  {getTimeFromDistance(item.pathDistance, item.displayModes)}{" "}
+                  mins
+                </Text>
+                {/*  */}
               </HStack>
+
+              {item.isViewed ? (
+                <>
+                  <Box
+                    padding="$2"
+                    borderRadius="$md"
+                    borderWidth="$1"
+                    margin="$2"
+                    borderColor="$primary500"
+                    borderStyle="dashed"
+                  >
+                    {pathInstructions.map((inst: any, index) => {
+                      return (
+                        <HStack
+                          key={index}
+                          id={`${index}`}
+                          marginTop="$1"
+                          justifyContent="space-between"
+                        >
+                          <Text> {inst.instruction} </Text>
+                          <Text> {inst.time} </Text>
+                        </HStack>
+                      );
+                    })}
+                  </Box>
+                  <Button
+                    size="md"
+                    variant="solid"
+                    action="positive"
+                    margin="$2"
+                  >
+                    <ButtonText>Let's Go </ButtonText>
+                    <ButtonIcon as={Play} />
+                  </Button>
+                </>
+              ) : null}
             </Box>
           </Pressable>
         )}
