@@ -68,6 +68,12 @@ export const PreviewNavigate = (props: any) => {
     dispatch(updateViewMode(VIEWMODE.search));
   };
 
+  const getArrivalTime = (timeStr) => {
+    let timeInms = +timeStr * 60 * 1000;
+    let arrivalTime = new Date(Date.now() + timeInms).toLocaleTimeString();
+    return arrivalTime;
+  };
+
   useEffect(() => {
     // props.onRender(routes.walk);
     paths.forEach((path) => {
@@ -173,15 +179,20 @@ export const PreviewNavigate = (props: any) => {
                       );
                     })}
                   </Box>
-                  <Button
-                    size="md"
-                    variant="solid"
-                    action="positive"
-                    margin="$2"
-                  >
-                    <ButtonText>Let's Go </ButtonText>
-                    <ButtonIcon as={Play} />
-                  </Button>
+                  <HStack justifyContent='space-between' margin="$2" alignItems='center'>
+                    <Button
+                      size="md"
+                      variant="solid"
+                      action="positive"
+                      width="$1/3"
+                    >
+                      <ButtonText>Let's Go </ButtonText>
+                      <ButtonIcon as={Play} />
+                    </Button>
+                    <Box>
+                      <Text>Arrive By : {getArrivalTime(getTimeFromDistance(item.pathDistance, item.displayModes))}</Text>
+                    </Box>
+                  </HStack>
                 </>
               ) : null}
             </Box>
