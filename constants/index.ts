@@ -4,4 +4,12 @@ export const MAPBOX_PUBLIC_TOKEN =
 export const VIEWMODE = {
     search: "search",
     preview: "preview"
-}
+};
+
+export const status = {
+    ok: 200
+};
+
+export const errorMessage = 'Somethin went wrong!';
+
+export const successMessage= 'Saved successfully!';
