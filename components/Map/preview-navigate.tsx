@@ -70,7 +70,10 @@ export const PreviewNavigate = (props: any) => {
 
   const getArrivalTime = (timeStr) => {
     let timeInms = +timeStr * 60 * 1000;
-    let arrivalTime = new Date(Date.now() + timeInms).toLocaleTimeString();
+    let arrivalTime = new Date(Date.now() + timeInms).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
     return arrivalTime;
   };
 
@@ -179,7 +182,11 @@ export const PreviewNavigate = (props: any) => {
                       );
                     })}
                   </Box>
-                  <HStack justifyContent='space-between' margin="$2" alignItems='center'>
+                  <HStack
+                    justifyContent="space-between"
+                    margin="$2"
+                    alignItems="center"
+                  >
                     <Button
                       size="md"
                       variant="solid"
@@ -190,7 +197,15 @@ export const PreviewNavigate = (props: any) => {
                       <ButtonIcon as={Play} />
                     </Button>
                     <Box>
-                      <Text>Arrive By : {getArrivalTime(getTimeFromDistance(item.pathDistance, item.displayModes))}</Text>
+                      <Text>
+                        Arrive By :{' '}
+                        {getArrivalTime(
+                          getTimeFromDistance(
+                            item.pathDistance,
+                            item.displayModes
+                          )
+                        )}
+                      </Text>
                     </Box>
                   </HStack>
                 </>

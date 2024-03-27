@@ -54,24 +54,26 @@ function* signUpSaga(payload: any): any {
 
 function* loginSaga(payload: any): any {
   yield put(toggleSpinner());
-
   const response = yield userLogin(payload);
-
   yield put(toggleSpinner());
-
-  if (response.access_token) {
+  if (!response) {
+    yield call(handleToast, errorMessage);
+  } else if (response && response.access_token) {
     yield saveToken(response.access_token);
     const res = yield getPreference();
-    if (res.payload) {
-      yield put(prefStore(res.payload));
-      RootNavigation.navigate('Map', {});
+    if (res) {
+      if (res.payload) {
+        yield put(prefStore(res.payload));
+        RootNavigation.navigate('Map', {});
+      } else {
+        RootNavigation.navigate('Preference', {});
+      }
     } else {
-      RootNavigation.navigate('Preference', {});
+      yield call(handleToast, errorMessage);
     }
-  } else {
-    yield call(handleToast, response.message);
   }
 }
+
 function* handleToast(message: string, type = 'info') {
   yield put(showToast(message, type));
   yield delay(2000);
@@ -80,22 +82,26 @@ function* handleToast(message: string, type = 'info') {
 
 function* tokenSaga(): any {
   yield put(toggleSpinner());
-
   const response = yield readToken();
-
   yield put(toggleSpinner());
 
+  console.log(response);
   if (response) {
     let token_time = response.timestamp;
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
     const res = yield getPreference();
     if (res) {
-      yield put(prefStore(res.payload));
-      RootNavigation.navigate('Map', {});
+      if (res.payload) {
+        yield put(prefStore(res.payload));
+        RootNavigation.navigate('Map', {});
+      } else {
+        yield call(handleToast, errorMessage);
+        RootNavigation.navigate('Preference', {});
+      }
     } else {
-      yield call(handleToast, errorMessage);
-      RootNavigation.navigate('Preference', {});
+      yield removeStorageItem('access_token_obj');
+      RootNavigation.navigate('Register', {});
     }
   } else {
     yield removeStorageItem('access_token_obj');
@@ -158,7 +164,6 @@ function* logoutSaga(): any {
   yield put(toggleSpinner());
   const response = yield userLogout();
   yield put(toggleSpinner());
-  console.log(response);
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Register', {});
 }

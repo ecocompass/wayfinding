@@ -4,7 +4,7 @@ import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN, status } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const liveUrl = 'https://core.ecocompass.live/api/'
+const liveUrl = 'https://prod.ecocompass.live/api/';
 const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
     signup: `${liveUrl}auth/signup`,
@@ -76,6 +76,7 @@ export const userSignup = async (payload: any) => {
 export const userLogin = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
+    console.log(payload2);
     return await fetch(endpoint.login, {
         method: 'POST',
         headers: {
@@ -83,8 +84,11 @@ export const userLogin = async (payload: any) => {
             'Content-Length': String(payload2),
         },
         body: payload2,
-    }).then(response => response.json()
-    ).catch(error => console.log("Error", error));
+    }).then(response => {
+        console.log(response.status);
+        return response.json();
+    })
+        .catch(error => console.log("Error", error));
 
 };
 
@@ -238,7 +242,6 @@ export const getPreference = async () => {
             'Authorization': `Bearer ${token.accessToken}`,
         },
     }).then(response => {
-
         return response.status === status.ok ? response.json() : false;
-    }).catch(err => console.log("Error", err))
+    }).catch(err => console.log("Error", err));
 }
