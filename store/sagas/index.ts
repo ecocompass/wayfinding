@@ -14,6 +14,9 @@ import {
   GET_SAVE_LOCATIONS,
   SAVE_LOCATION_STORE,
   PROFILE,
+  GOAL_STORE,
+  SETGOALS,
+  READGOALS,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -29,10 +32,12 @@ import {
   readProfile,
   userPref,
   getPreference,
+  userGoals,
+  readGoals,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE } from "../../constants";
-import { prefStore, storeProfile } from "../actions/user";
+import { goalStore, prefStore, storeProfile } from "../actions/user";
 import { hideToast, showToast } from "../actions/setLocation";
 import { useDispatch } from "react-redux";
 import { toggleSpinner } from "../actions/auth";
@@ -119,7 +124,18 @@ function* prefSaga(payload: any): any {
     RootNavigation.navigate('Map', {});
   }
 }
+function* goalSaga(payload: any): any {
+  yield put(toggleSpinner());
 
+  const response = yield userGoals(payload);
+
+  yield put(toggleSpinner());
+
+  if (response) {
+    yield put({ type: GOAL_STORE, payload: response });
+    RootNavigation.navigate('Map', {});
+  }
+}
 function* getPathSaga(action: any): any {
   yield put(toggleSpinner());
 
@@ -145,7 +161,7 @@ function* saveLocationSaga(action: any): any {
   yield put(hideToast());
 }
 
-function* getSaveLocationSaga() {
+function* getSaveLocationSaga():any {
   const response = yield getSaveLocations();
   yield put({ type: SAVE_LOCATION_STORE, payload: response.saved_locations });
 }
@@ -161,6 +177,11 @@ function* logoutSaga(): any {
 function* ProfileSaga(): any {
   const response = yield readProfile();
   yield put(storeProfile(response));
+}
+
+function* readGoalsSaga(): any {
+  const response = yield readGoals();
+  yield put(goalStore(response));
 }
 
 function* watchGetPath(): SagaIterator {
@@ -186,6 +207,14 @@ function* watchPrefSaga(): SagaIterator {
   yield takeLatest(SETPREFERENCE, prefSaga);
 }
 
+function* watchGoalSaga(): SagaIterator {
+  yield takeLatest(SETGOALS, goalSaga);
+}
+
+function* watchReadGoalSaga(): SagaIterator {
+  yield takeLatest(READGOALS, readGoalsSaga);
+}
+
 function* watchLogoutSaga(): SagaIterator {
   yield takeLatest(LOGOUT, logoutSaga);
 }
@@ -208,6 +237,8 @@ function* appSagas() {
     call(watchLogoutSaga),
     call(watchGetLocationSaga),
     call(watchProfileSaga),
+    call(watchGoalSaga),
+    call(watchReadGoalSaga)
   ]);
 }
 

@@ -13,12 +13,6 @@ useEffect(()=>{
     
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const handleIconPress = () => {
-        console.log("PRessed")
-        setPasswordVisible((state) => { return !state });
-    };
-
-    const passwordText = passwordVisible ? 'Show Password' : 'Password';
     const profile = useSelector((state: any) => { return state.userDetails.profile})
     const username=`${profile.first_name} ${profile.last_name}`;
     const styles = StyleSheet.create({
@@ -46,14 +40,6 @@ useEffect(()=>{
                     <Icon as={PhoneIcon} size="xl" />
                     <Text>+353 213193212</Text>
                 </HStack>
-{/*                 <Divider></Divider>
-                <HStack space="lg" alignItems="center">
-                    <Icon as={!passwordVisible ? EyeIcon : EyeOffIcon} size="xl" />
-                    <Text color="grey" bold={true}>{passwordText}</Text>
-                    <Button onPress={handleIconPress} variant="solid" isDisabled={false} size="md"><ButtonIcon as={RefreshCw} />
-                    </Button>
-                </HStack>
-                <Divider></Divider> */}
             </VStack>
         </View>
 

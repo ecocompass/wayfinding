@@ -6,6 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const liveUrl = 'https://core.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5000/api/';
+const prodUrl = 'https://prod.ecocompass.live/api/'
 const endpoint = {
     signup: `${liveUrl}auth/signup`,
     login: `${liveUrl}auth/login`,
@@ -13,6 +14,7 @@ const endpoint = {
     saveLocation: `${liveUrl}user/savedlocations`,
     pref: `${liveUrl}user/preferences`,
     profile: `${liveUrl}user/profile`,
+    goals: `${liveUrl}user/profile`
 };
 let access_token: any = '';
 
@@ -208,6 +210,45 @@ export const userPref = async (payload: any) => {
         .catch(err => console.log("Error", err));
 };
 
+export const userGoals = async (payload: any) => {
+    let payload2 = payload.payload;
+    var date = new Date();
+    let expiry_date = date.setDate(date.getDate() + 7);
+    let pay = [{
+        "type": "walking",
+        "target": payload2.walking_weight,
+        "created_at": date,
+        "expiry": expiry_date
+    }, {
+        "type": "cycling",
+        "target": payload2.bike_weight,
+        "created_at": date,
+        "expiry": expiry_date,
+    }, {
+        "type": "public_transport",
+        "target": payload2.public_transport,
+        "created_at": date,
+        "expiry": expiry_date,
+    }]
+
+    console.log("Mhaaro Payload", pay)
+    let pay2 = JSON.stringify(pay)
+    let token = await readToken();
+    return await fetch(endpoint.goals, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': pay2,
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+        body: pay2,
+    }).then(response => {
+
+        return response.json();
+    })
+        .catch(err => console.log("Error", err));
+};
+
 
 export const readProfile = async () => {
 
@@ -224,6 +265,23 @@ export const readProfile = async () => {
     })
         .catch(err => console.log("Error", err));
 };
+
+export const readGoals = async () => {
+
+    let token = await readToken();
+    return await fetch(endpoint.goals, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+    }).then(response => {
+
+        return response.json();
+    })
+        .catch(err => console.log("Error", err));
+};
+
 
 export const getPreference = async () => {
     let token = await readToken();
