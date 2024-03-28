@@ -13,6 +13,7 @@ import {
     UPDATEVIEWMODE,
     GET_SAVE_LOCATIONS,
     UPDATEPATHVIEWED,
+    RESETPATHS,
 } from '.';
 
 export const setLocation = (location: any) => {
@@ -87,5 +88,11 @@ export const updateViewedPath = (pathId) => {
     return {
         type: UPDATEPATHVIEWED,
         payload: pathId
+    }
+}
+
+export const resetPaths = () => {
+    return {
+        type: RESETPATHS,
     }
 }

@@ -307,8 +307,8 @@ const Map = ({ route, navigation }: any) => {
             </Button>
           </HStack>
         </Card>) : (<></>)}
-        {(viewMode === VIEWMODE.preview) ? (
-          <PreviewNavigate onRender={onPathRender} onPointsRender={onPointsRender} destinationName={locationData.name}/>
+        {(viewMode === VIEWMODE.preview || viewMode === VIEWMODE.navigate) ? (
+          <PreviewNavigate onRender={onPathRender} onPointsRender={onPointsRender} destinationName={locationData.name} camRef={this.camRef}/>
         ) : (<></>)}
         {locationData.name ? <SavedLocationModal/> : <></>}
       </View>

@@ -84,8 +84,6 @@ function* tokenSaga(): any {
   yield put(toggleSpinner());
   const response = yield readToken();
   yield put(toggleSpinner());
-
-  console.log(response);
   if (response) {
     let token_time = response.timestamp;
     let now = new Date().getTime();
