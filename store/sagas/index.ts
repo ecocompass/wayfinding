@@ -35,6 +35,7 @@ import { VIEWMODE, errorMessage, successMessage } from "../../constants";
 import { prefStore, storeProfile } from "../actions/user";
 import { hideToast, showToast } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
+import { process_path } from "../../services/path_processor";
 
 function* signUpSaga(payload: any): any {
   yield put(toggleSpinner());
@@ -47,30 +48,32 @@ function* signUpSaga(payload: any): any {
     yield saveToken(response.access_token);
     RootNavigation.navigate('Preference', {});
   } else {
-    yield call(handleToast, response.message)
+    yield call(handleToast, response.message);
   }
 }
 
 function* loginSaga(payload: any): any {
   yield put(toggleSpinner());
-
   const response = yield userLogin(payload);
-
   yield put(toggleSpinner());
-
-  if (response.access_token) {
+  if (!response) {
+    yield call(handleToast, errorMessage);
+  } else if (response && response.access_token) {
     yield saveToken(response.access_token);
     const res = yield getPreference();
-    if (res.payload) {
-      yield put(prefStore(res.payload));
-      RootNavigation.navigate('Map', {});
+    if (res) {
+      if (res.payload) {
+        yield put(prefStore(res.payload));
+        RootNavigation.navigate('Map', {});
+      } else {
+        RootNavigation.navigate('Preference', {});
+      }
     } else {
-      RootNavigation.navigate('Preference', {});
+      yield call(handleToast, errorMessage);
     }
-  } else {
-    yield call(handleToast, response.message)
   }
 }
+
 function* handleToast(message: string, type = 'info') {
   yield put(showToast(message, type));
   yield delay(2000);
@@ -79,22 +82,26 @@ function* handleToast(message: string, type = 'info') {
 
 function* tokenSaga(): any {
   yield put(toggleSpinner());
-
   const response = yield readToken();
-
   yield put(toggleSpinner());
 
+  console.log(response);
   if (response) {
     let token_time = response.timestamp;
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
     const res = yield getPreference();
     if (res) {
-      yield put(prefStore(res.payload));
-      RootNavigation.navigate('Map', {});
+      if (res.payload) {
+        yield put(prefStore(res.payload));
+        RootNavigation.navigate('Map', {});
+      } else {
+        yield call(handleToast, errorMessage);
+        RootNavigation.navigate('Preference', {});
+      }
     } else {
-      yield call(handleToast, errorMessage);
-      RootNavigation.navigate('Preference', {});
+      yield removeStorageItem('access_token_obj');
+      RootNavigation.navigate('Register', {});
     }
   } else {
     yield removeStorageItem('access_token_obj');
@@ -112,23 +119,24 @@ function* prefSaga(payload: any): any {
   if (response) {
     yield put({ type: PREF_STORE, payload: response });
     RootNavigation.navigate('Map', {});
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage);
 }
 
 function* getPathSaga(action: any): any {
   yield put(toggleSpinner());
 
   const response = yield getPath(action.payload);
-  yield put(toggleSpinner());
-    yield all([
-      put({
-        type: ROUTES_STORE,
-        payload: { walk: response.shortestPathCoordinates },
-      }),
-      put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview }),
-    ]);
-  
+  let recommendationList = process_path(response);
+  yield all([
+    put(toggleSpinner()),
+    put({
+      type: ROUTES_STORE,
+      payload: { options: recommendationList },
+    }),
+    put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview }),
+  ]);
 }
 
 function* saveLocationSaga(action: any): any {
@@ -137,24 +145,25 @@ function* saveLocationSaga(action: any): any {
   yield put(toggleSpinner());
   // handle response
   if (response) {
-    yield call(handleToast,successMessage , 'success');
+    yield call(handleToast, successMessage, 'success');
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage);
 }
 
 function* getSaveLocationSaga(): any {
   const response = yield getSaveLocations();
   if (response) {
     yield put({ type: SAVE_LOCATION_STORE, payload: response.saved_locations });
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage);
 }
 
 function* logoutSaga(): any {
   yield put(toggleSpinner());
   const response = yield userLogout();
   yield put(toggleSpinner());
-  console.log(response);
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Register', {});
 }
@@ -162,8 +171,9 @@ function* ProfileSaga(): any {
   const response = yield readProfile();
   if (response) {
     yield put(storeProfile(response));
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage)
 }
 
 function* watchGetPath(): SagaIterator {

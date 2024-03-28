@@ -3,7 +3,6 @@ import {
   HStack,
   ScrollView,
   VStack,
-  Text,
   Heading,
   Pressable,
   Box,
@@ -12,69 +11,88 @@ import {
   Button,
   ButtonText,
   ButtonIcon,
-} from "@gluestack-ui/themed";
-import { MoveLeft, Play, X } from "lucide-react-native";
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { updateViewMode } from "../../store/actions/setLocation";
-import { VIEWMODE } from "../../constants";
+  Accordion,
+  AccordionHeader,
+  AccordionIcon,
+  AccordionItem,
+  AccordionTitleText,
+  AccordionContent,
+  AccordionContentText,
+  AccordionTrigger,
+  Divider,
+  Text,
+  Icon,
+} from '@gluestack-ui/themed';
+import {
+  MoveLeft,
+  Play,
+  X,
+  PlusIcon,
+  MinusIcon,
+  FootprintsIcon,
+  BusIcon,
+  TramFrontIcon,
+} from 'lucide-react-native';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  updateViewMode,
+  updateViewedPath,
+} from '../../store/actions/setLocation';
+import { VIEWMODE } from '../../constants';
+import { getTimeFromDistance } from '../../services/time_to_dest';
+import { getPathInstructions } from '../../services/path_processor';
 
 export const PreviewNavigate = (props: any) => {
-  const routes = useSelector((state) => {
-    return state.location.routes;
+  const { onRender, onPointsRender, destinationName } = props;
+
+  const paths = useSelector((state) => {
+    return state.location.recommendedRoutes.options;
   });
 
-  const [paths, setPaths] = useState([
-    {
-      id: 1,
-      mode: 'Walk',
-      isSelected: true,
-    },
-    {
-      id: 2,
-      mode: 'Drive',
-      isSelected: false,
-    },
-    {
-      id: 3,
-      mode: 'Cycle',
-      isSelected: false,
-    },
-    {
-      id: 4,
-      mode: 'Taxi',
-      isSelected: false,
-    },
-  ]);
+  let [pathInstructions, setPathInstructions] = useState<any>([]);
+
+  const iconMap = {
+    walk: FootprintsIcon,
+    bus: BusIcon,
+    luas: TramFrontIcon,
+  };
 
   const dispatch = useDispatch();
 
   const updatePath = (pathId) => {
-    setPaths(
-      paths.map((p) => {
-        if (p.id === pathId) {
-          return { ...p, isSelected: true };
-        } else {
-          return { ...p, isSelected: false };
-        }
-      })
-    );
+    dispatch(updateViewedPath(pathId));
   };
 
   const updateView = () => {
     dispatch(updateViewMode(VIEWMODE.search));
   };
 
-  useEffect(() => {
-    props.onRender(routes.walk);
-  });
+  const getArrivalTime = (timeStr) => {
+    let timeInms = +timeStr * 60 * 1000;
+    let arrivalTime = new Date(Date.now() + timeInms).toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+    return arrivalTime;
+  };
 
+  useEffect(() => {
+    // props.onRender(routes.walk);
+    paths.forEach((path) => {
+      if (path.isViewed) {
+        onRender(path.modePathList);
+        // onPointsRender(path.modePathList);
+        setPathInstructions(getPathInstructions(path, destinationName));
+      }
+    });
+  }, [paths, onRender, onPointsRender, destinationName, setPathInstructions]);
 
   return (
     <Box>
       <HStack justifyContent="space-between" alignItems="center" p="$4">
         <Heading size="xl" pb="$3">
-          Routes
+          Your Options
         </Heading>
         <Button
           size="md"
@@ -89,12 +107,12 @@ export const PreviewNavigate = (props: any) => {
         </Button>
       </HStack>
       <FlatList
-        h="$48"
+        h="$50"
         data={paths}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => {
-              updatePath(item.id);
+              updatePath(item.pathId);
             }}
           >
             <Box
@@ -104,12 +122,13 @@ export const PreviewNavigate = (props: any) => {
               $base-pl={0}
               $base-pr={0}
               py="$4"
-              bg={item.isSelected ? "$primary100" : "transparent"}
+              bg={item.isViewed ? '$primary50' : 'transparent'}
             >
               <HStack
                 space="md"
                 justifyContent="space-between"
                 alignItems="center"
+                flexWrap="wrap"
                 px="$4"
               >
                 <Text
@@ -117,17 +136,84 @@ export const PreviewNavigate = (props: any) => {
                   fontWeight="$bold"
                   $dark-color="$warmGray100"
                 >
-                  {item.mode}
+                  {item.displayModes.map((mode, i) => {
+                    if (mode.length) {
+                      return (
+                        <HStack
+                          space="md"
+                          justifyContent="space-between"
+                          alignItems="center"
+                          key={i}
+                        >
+                          <Icon as={iconMap[mode]} m="$2" size="xl" />
+                        </HStack>
+                      );
+                    }
+                  })}
                 </Text>
-                <Button size="md" variant="solid" action="positive">
-                  <ButtonText>Go </ButtonText>
-                  <ButtonIcon as={Play} />
-                </Button>
+                <Text>
+                  {getTimeFromDistance(item.pathDistance, item.displayModes)}{" "}
+                  mins
+                </Text>
+                {/*  */}
               </HStack>
+
+              {item.isViewed ? (
+                <>
+                  <Box
+                    padding="$2"
+                    borderRadius="$md"
+                    borderWidth="$1"
+                    margin="$2"
+                    borderColor="$primary500"
+                    borderStyle="dashed"
+                  >
+                    {pathInstructions.map((inst: any, index) => {
+                      return (
+                        <HStack
+                          key={index}
+                          id={`${index}`}
+                          marginTop="$1"
+                          justifyContent="space-between"
+                        >
+                          <Text> {inst.instruction} </Text>
+                          <Text> {inst.time} </Text>
+                        </HStack>
+                      );
+                    })}
+                  </Box>
+                  <HStack
+                    justifyContent="space-between"
+                    margin="$2"
+                    alignItems="center"
+                  >
+                    <Button
+                      size="md"
+                      variant="solid"
+                      action="positive"
+                      width="$1/3"
+                    >
+                      <ButtonText>Let's Go </ButtonText>
+                      <ButtonIcon as={Play} />
+                    </Button>
+                    <Box>
+                      <Text>
+                        Arrive By :{' '}
+                        {getArrivalTime(
+                          getTimeFromDistance(
+                            item.pathDistance,
+                            item.displayModes
+                          )
+                        )}
+                      </Text>
+                    </Box>
+                  </HStack>
+                </>
+              ) : null}
             </Box>
           </Pressable>
         )}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.pathId}
       />
     </Box>
   );
