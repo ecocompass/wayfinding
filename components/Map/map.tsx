@@ -15,7 +15,7 @@ import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked } from 'lucide-react-native';
-import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { getRoutes, getSaveLocationsAPI, setCenter, setUserLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
@@ -74,6 +74,10 @@ const Map = ({ route, navigation }: any) => {
     return state.location.userLocation
   }); // Longitude, Latitude
 
+  let isViewUserDirection = useSelector((state: any) => {
+    return state.location.isViewUserDirection;
+  })
+
   let centerLocation = useSelector((state: any) => {
     return state.location.centerLocation
   });
@@ -101,7 +105,7 @@ const Map = ({ route, navigation }: any) => {
     Geolocation.getCurrentPosition(
       (position) => {
         dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
-        dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
+        dispatch(setUserLocation([position.coords.longitude, position.coords.latitude]));
       },
       (error) => {
         console.log(error.code, error.message);
@@ -127,10 +131,11 @@ const Map = ({ route, navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    dispatch(setLocation([0,0]))
+    dispatch(setUserLocation([0,0]))
   };
 
   const userLocationUpdate = (data: any) => {
+    dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
   };
 
   const selectLocation = (data: any) => {
@@ -272,7 +277,7 @@ const Map = ({ route, navigation }: any) => {
           />
           {renderedPoints}
           {/* {navPoints.length ? (navPointAnnotation(navPoints)) : <></> } */}
-          <Mapbox.UserLocation onUpdate={userLocationUpdate} />
+          <Mapbox.UserLocation onUpdate={userLocationUpdate} showsUserHeadingIndicator={isViewUserDirection}/>
           {renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>

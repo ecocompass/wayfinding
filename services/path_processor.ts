@@ -55,3 +55,38 @@ export function getPathInstructions(path: any, destinationName: string) {
 
     return instructionArr;
 }
+
+export const processPathCleared = (pointList, userLocation, userPosition) => {
+
+    if (userPosition + 1 === pointList.length) {
+        return { action: "CHANGESEGMENT" }
+    }
+
+    let d1 = getPointDistance(pointList[userPosition], userLocation)
+    let d2 = getPointDistance(pointList[userPosition + 1], userLocation)
+
+    if (d2 < d1) {
+        return { action: 'UPDATE', payload: userPosition++ };
+    } else {
+        return { action: '' };
+    }
+};
+
+const getPointDistance = (a, b) => {
+    return Math.sqrt(Math.pow((a[0] - b[0]), 2) + Math.pow((a[1] - b[1]), 2))
+}
+
+export const getUserPositionInSegment = (pointList, userLocation) => {
+    let position = 0;
+
+    while (position < pointList.length) {
+        let d1 = getPointDistance(pointList[position], userLocation);
+        let d2 = getPointDistance(pointList[position + 1], userLocation);
+
+        if (d1 < d2) {
+            break;
+        }
+    }
+
+    return position;
+};

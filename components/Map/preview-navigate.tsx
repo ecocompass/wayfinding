@@ -28,16 +28,25 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   resetPaths,
+  updateUserDirectionView,
   updateViewMode,
   updateViewedPath,
 } from '../../store/actions/setLocation';
 import { VIEWMODE } from '../../constants';
 import { getTimeFromDistance } from '../../services/time_to_dest';
-import { getPathInstructions } from '../../services/path_processor';
+import {
+  getPathInstructions,
+  getUserPositionInSegment,
+  processPathCleared,
+} from '../../services/path_processor';
 import { View } from 'react-native';
 
 export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef } = props;
+
+  let currentUserLocation = useSelector((state: any) => {
+    return state.location.userLocation;
+  });
 
   let viewMode = useSelector((state: any) => {
     return state.location.viewMode;
@@ -49,6 +58,8 @@ export const PreviewNavigate = (props: any) => {
 
   let [pathInstructions, setPathInstructions] = useState<any>([]);
   let [pathSegments, setPathSegments] = useState<any>([]);
+  let [activeSegment, setActiveSegment] = useState<any>([]);
+  let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
 
   const iconMap = {
     walk: FootprintsIcon,
@@ -79,18 +90,71 @@ export const PreviewNavigate = (props: any) => {
 
   useEffect(() => {
     // props.onRender(routes.walk);
-    paths.forEach((path) => {
-      if (path.isViewed) {
-        onRender(path.modePathList);
-        // onPointsRender(path.modePathList);
-        setPathInstructions(getPathInstructions(path, destinationName));
-      }
-    });
+    if (viewMode === VIEWMODE.preview) {
+      paths.forEach((path) => {
+        if (path.isViewed) {
+          onRender(path.modePathList);
+          // onPointsRender(path.modePathList);
+          setPathInstructions(getPathInstructions(path, destinationName));
+        }
+      });
+    }
 
     if (viewMode === VIEWMODE.navigate) {
-      setPathOnCam();
+      this.camRef.fitBounds(
+        activeSegment.pathPointList[0],
+        activeSegment.pathPointList[activeSegment.pathPointList.length - 1],
+        [120, 120],
+        500
+      );
+
+      let positionUpdate = processPathCleared(
+        activeSegment.pathPointList,
+        currentUserLocation,
+        userPositionOnPath
+      );
+
+      switch (positionUpdate.action) {
+        case 'UPDATE':
+          setUserPositionOnPath(positionUpdate.payload);
+          break;
+        case 'SEGMENTCHANGE':
+          let currentActiveSegmentIndex = 0;
+          pathSegments.forEach((ps: any, index: number) => {
+            if (ps.isActive) {
+              currentActiveSegmentIndex = index;
+            }
+          });
+          if (currentActiveSegmentIndex === pathSegments.length) {
+            // show end trip button
+            return;
+          }
+
+          let tempPathSegments = pathSegments.map((ps, index) => {
+            return {
+              ...ps,
+              isActive: index === currentActiveSegmentIndex + 1 ? true : false,
+              isCleared: index === currentActiveSegmentIndex ? true : false,
+            };
+          });
+          setPathSegments(tempPathSegments);
+          break;
+        default:
+          return;
+      }
     }
-  }, [paths, onRender, onPointsRender, destinationName, setPathInstructions]);
+  }, [
+    paths,
+    onRender,
+    onPointsRender,
+    destinationName,
+    setPathInstructions,
+    viewMode,
+    activeSegment,
+    currentUserLocation,
+    userPositionOnPath,
+    pathSegments,
+  ]);
 
   const startNavigation = (selectedPath: any) => {
     dispatch(updateViewMode(VIEWMODE.navigate));
@@ -106,20 +170,23 @@ export const PreviewNavigate = (props: any) => {
       });
     });
 
-    setPathSegments(segments);
-  };
+    let tempActiveSegment: any = {};
 
-  const setPathOnCam = () => {
-    pathSegments.forEach((segment: any) => {
+    segments.forEach((segment: any) => {
       if (segment.isActive) {
-        this.camRef.fitBounds(
-          segment.pathPointList[0],
-          segment.pathPointList[segment.pathPointList.length - 1],
-          [120, 120],
-          500
-        );
+        tempActiveSegment = segment;
       }
     });
+
+    let tp = getUserPositionInSegment(
+      tempActiveSegment.pathPointList,
+      currentUserLocation
+    );
+
+    setUserPositionOnPath(tp);
+    setActiveSegment(tempActiveSegment);
+    dispatch(updateUserDirectionView());
+    setPathSegments(segments);
   };
 
   switch (viewMode) {
@@ -326,7 +393,15 @@ export const PreviewNavigate = (props: any) => {
                     <>
                       <Text color="$coolGray100" $dark-color="$warmGray50">
                         {item.instruction}
-                        {item.isCleared ? <Icon as={CheckCircle} size="lg" color="$success500"/> : <></>}
+                        {item.isCleared ? (
+                          <Icon
+                            as={CheckCircle}
+                            size="lg"
+                            color="$success500"
+                          />
+                        ) : (
+                          <></>
+                        )}
                       </Text>
                       <Text>{item.timeTaken}</Text>
                     </>

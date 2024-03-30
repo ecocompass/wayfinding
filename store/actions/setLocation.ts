@@ -14,14 +14,21 @@ import {
     GET_SAVE_LOCATIONS,
     UPDATEPATHVIEWED,
     RESETPATHS,
+    VIEWUSERDIRECTION
 } from '.';
 
-export const setLocation = (location: any) => {
+export const setUserLocation = (location: any) => {
     return {
         type: UPDATEUSERLOCATION,
         payload: location,
     };
 };
+
+export const updateUserDirectionView = () => {
+    return {
+        type: VIEWUSERDIRECTION,
+    }
+}
 
 export const setCenter = (location: any) => {
     return {
