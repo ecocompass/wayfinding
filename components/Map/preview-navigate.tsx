@@ -23,11 +23,13 @@ import {
   BusIcon,
   TramFrontIcon,
   CheckCircle,
+  Check,
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   resetPaths,
+  setCenter,
   updateUserDirectionView,
   updateViewMode,
   updateViewedPath,
@@ -45,6 +47,9 @@ export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef } = props;
 
   let currentUserLocation = useSelector((state: any) => {
+    if (viewMode === VIEWMODE.navigate) {
+      dispatch(setCenter(state.location.userLocation));
+    }
     return state.location.userLocation;
   });
 
@@ -60,6 +65,8 @@ export const PreviewNavigate = (props: any) => {
   let [pathSegments, setPathSegments] = useState<any>([]);
   let [activeSegment, setActiveSegment] = useState<any>([]);
   let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
+  let [showEndTripOption, setShowEndTripOption] = useState<boolean>(false);
+  let [hasTripEnded, setTripEndedFlag] = useState<boolean>(false);
 
   const iconMap = {
     walk: FootprintsIcon,
@@ -101,43 +108,65 @@ export const PreviewNavigate = (props: any) => {
     }
 
     if (viewMode === VIEWMODE.navigate) {
+      let tempActiveSegment: any = {};
+      let isFinalSegment = false;
+
+      pathSegments.forEach((segment: any, index) => {
+        if (segment.isActive) {
+          tempActiveSegment = segment;
+        }
+
+        if (index === pathSegments.length - 1) {
+          isFinalSegment = true;
+        }
+      });
+
       this.camRef.fitBounds(
-        activeSegment.pathPointList[0],
-        activeSegment.pathPointList[activeSegment.pathPointList.length - 1],
+        tempActiveSegment.pathPointList[0],
+        tempActiveSegment.pathPointList[
+          tempActiveSegment.pathPointList.length - 1
+        ],
         [120, 120],
         500
       );
 
       let positionUpdate = processPathCleared(
-        activeSegment.pathPointList,
+        tempActiveSegment.pathPointList,
         currentUserLocation,
-        userPositionOnPath
+        userPositionOnPath,
+        isFinalSegment
       );
 
       switch (positionUpdate.action) {
         case 'UPDATE':
           setUserPositionOnPath(positionUpdate.payload);
           break;
-        case 'SEGMENTCHANGE':
+        case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
           pathSegments.forEach((ps: any, index: number) => {
             if (ps.isActive) {
               currentActiveSegmentIndex = index;
             }
           });
-          if (currentActiveSegmentIndex === pathSegments.length) {
-            // show end trip button
-            return;
-          }
 
           let tempPathSegments = pathSegments.map((ps, index) => {
             return {
               ...ps,
               isActive: index === currentActiveSegmentIndex + 1 ? true : false,
-              isCleared: index === currentActiveSegmentIndex ? true : false,
+              isCleared: ps.isCleared
+                ? true
+                : index === currentActiveSegmentIndex
+                ? true
+                : false,
             };
           });
+
+          setUserPositionOnPath(0);
           setPathSegments(tempPathSegments);
+          break;
+        case 'ENDTRIP':
+          // handle trip end
+          setTripEndedFlag(true);
           break;
         default:
           return;
@@ -150,10 +179,10 @@ export const PreviewNavigate = (props: any) => {
     destinationName,
     setPathInstructions,
     viewMode,
-    activeSegment,
     currentUserLocation,
     userPositionOnPath,
     pathSegments,
+    setTripEndedFlag,
   ]);
 
   const startNavigation = (selectedPath: any) => {
@@ -184,7 +213,6 @@ export const PreviewNavigate = (props: any) => {
     );
 
     setUserPositionOnPath(tp);
-    setActiveSegment(tempActiveSegment);
     dispatch(updateUserDirectionView());
     setPathSegments(segments);
   };
@@ -328,89 +356,107 @@ export const PreviewNavigate = (props: any) => {
     case VIEWMODE.navigate:
       return (
         <Box>
-          <HStack justifyContent="space-between" alignItems="center" p="$4">
-            <Heading size="md" pb="$3">
-              Estimated Arrival : 4:20pm
-            </Heading>
-            <Button
-              size="sm"
-              variant="solid"
-              action="negative"
-              variant="solid"
-              onPress={() => {
-                updateView();
-              }}
-            >
-              <ButtonText> Cancel </ButtonText>
-              <ButtonIcon as={X} />
-            </Button>
-          </HStack>
-          <FlatList
-            h="$50"
-            data={pathSegments}
-            renderItem={({ item }) => (
-              <Box
-                key={item.pathId}
-                borderBottomWidth="$1"
-                borderColor="$trueGray300"
-                $dark-borderColor="$trueGray100"
-                $base-pl={0}
-                $base-pr={0}
-                py="$4"
-                bg={item.isActive ? 'transparent' : "$trueGray300"}
-              >
-                <HStack
-                  space="md"
-                  justifyContent={
-                    item.isActive ? 'space-around' : 'space-between'
-                  }
-                  alignItems="center"
-                  flexWrap="wrap"
-                  px="$4"
+          {hasTripEnded ? (
+            <>
+              <HStack justifyContent="space-between" alignItems="center" p="$4">
+                <Heading size="md" pb="$3">
+                  Estimated Arrival :
+                </Heading>
+                <Button
+                  size="sm"
+                  variant="solid"
+                  action="negative"
+                  onPress={() => {
+                    updateView();
+                  }}
                 >
-                  {item.isActive ? (
+                  <ButtonText> Exit </ButtonText>
+                  <ButtonIcon as={X} />
+                </Button>
+              </HStack>
+              <FlatList
+                h="$48"
+                data={pathSegments}
+                renderItem={({ item }) => (
+                  <Box
+                    key={item.pathId}
+                    borderBottomWidth="$1"
+                    borderColor="$trueGray300"
+                    $dark-borderColor="$trueGray100"
+                    $base-pl={0}
+                    $base-pr={0}
+                    py="$4"
+                    bg={item.isActive ? 'transparent' : "$trueGray300"}
+                  >
                     <HStack
-                      padding="$4"
-                      borderRadius="$md"
-                      borderWidth="$1"
-                      borderColor="$success500"
-                      borderStyle="dashed"
-                      bg="$success100"
-                      w="$5/6"
-                      justifyContent="space-between"
+                      space="md"
+                      justifyContent={
+                        item.isActive ? 'space-around' : 'space-between'
+                      }
+                      alignItems="center"
+                      flexWrap="wrap"
+                      px="$4"
                     >
-                      <Text
-                        color="$coolGray800"
-                        fontWeight="$bold"
-                        $dark-color="$warmGray100"
-                        w="$4/6"
-                      >
-                        {item.instruction}
-                      </Text>
-                      <Text>{item.timeTaken}</Text>
+                      {item.isActive ? (
+                        <HStack
+                          padding="$4"
+                          borderRadius="$md"
+                          borderWidth="$1"
+                          borderColor="$success500"
+                          borderStyle="dashed"
+                          bg="$success100"
+                          w="$5/6"
+                          justifyContent="space-between"
+                        >
+                          <Text
+                            color="$coolGray800"
+                            fontWeight="$bold"
+                            $dark-color="$warmGray100"
+                            w="$4/6"
+                          >
+                            {item.instruction}
+                          </Text>
+                          <Text>{item.timeTaken}</Text>
+                        </HStack>
+                      ) : (
+                        <>
+                          <Text color="$coolGray100" $dark-color="$warmGray50">
+                            {item.instruction}
+                            {item.isCleared ? (
+                              <Icon
+                                as={CheckCircle}
+                                size="lg"
+                                color="$success500"
+                              />
+                            ) : (
+                              <></>
+                            )}
+                          </Text>
+                          <Text>{item.timeTaken}</Text>
+                        </>
+                      )}
                     </HStack>
-                  ) : (
-                    <>
-                      <Text color="$coolGray100" $dark-color="$warmGray50">
-                        {item.instruction}
-                        {item.isCleared ? (
-                          <Icon
-                            as={CheckCircle}
-                            size="lg"
-                            color="$success500"
-                          />
-                        ) : (
-                          <></>
-                        )}
-                      </Text>
-                      <Text>{item.timeTaken}</Text>
-                    </>
-                  )}
-                </HStack>
-              </Box>
-            )}
-            keyExtractor={(item) => item.pathId}
-          />
+                  </Box>
+                )}
+                keyExtractor={(item) => item.pathId}
+              />
+            </>
+          ) : (
+            <HStack justifyContent="space-between" alignItems="center" p="$4">
+              <Heading size="md" pb="$3">
+                You Have Arrived!
+              </Heading>
+              <Button
+                size="sm"
+                variant="solid"
+                action="positive"
+                onPress={() => {}}
+              >
+                <ButtonText> End Trip </ButtonText>
+                <ButtonIcon as={Check} />
+              </Button>
+            </HStack>
+          )}
         </Box>
       );
   }

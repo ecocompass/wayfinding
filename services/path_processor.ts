@@ -56,17 +56,21 @@ export function getPathInstructions(path: any, destinationName: string) {
     return instructionArr;
 }
 
-export const processPathCleared = (pointList, userLocation, userPosition) => {
+export const processPathCleared = (pointList, userLocation, userPosition, isFinalSegment = false) => {
 
     if (userPosition + 1 === pointList.length) {
-        return { action: "CHANGESEGMENT" }
+        if (isFinalSegment) {
+            return { action: "ENDTRIP" }
+        }
+        return { action: "CHANGESEGMENT" };
     }
 
-    let d1 = getPointDistance(pointList[userPosition], userLocation)
-    let d2 = getPointDistance(pointList[userPosition + 1], userLocation)
+    let d1 = getPointDistance(pointList[userPosition], userLocation);
+    let d2 = getPointDistance(pointList[userPosition + 1], userLocation);
+    userPosition = userPosition + 1;
 
     if (d2 < d1) {
-        return { action: 'UPDATE', payload: userPosition++ };
+        return { action: 'UPDATE', payload: userPosition };
     } else {
         return { action: '' };
     }
