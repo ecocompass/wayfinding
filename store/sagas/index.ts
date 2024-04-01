@@ -14,6 +14,7 @@ import {
   GET_SAVE_LOCATIONS,
   SAVE_LOCATION_STORE,
   PROFILE,
+  SETWEATHER,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -29,11 +30,12 @@ import {
   readProfile,
   userPref,
   getPreference,
+  fetchWeather,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
 import { prefStore, storeProfile } from "../actions/user";
-import { hideToast, showToast } from "../actions/setLocation";
+import { getWeather, hideToast, showToast } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 
 function* signUpSaga(payload: any): any {
@@ -159,9 +161,20 @@ function* logoutSaga(): any {
   RootNavigation.navigate('Register', {});
 }
 function* ProfileSaga(): any {
+  yield put(toggleSpinner());
   const response = yield readProfile();
+  yield put(toggleSpinner());
   if (response) {
     yield put(storeProfile(response));
+  }
+  else yield call(handleToast, errorMessage)
+}
+
+function* WeatherSaga(payload:any): any {
+  const response = yield fetchWeather(payload);
+  console.log("response",response)
+  if (response) {
+    yield put(getWeather(response));
   }
   else yield call(handleToast, errorMessage)
 }
@@ -200,6 +213,9 @@ function* watchGetLocationSaga(): SagaIterator {
 function* watchProfileSaga(): SagaIterator {
   yield takeLatest(PROFILE, ProfileSaga);
 }
+function* watchWeatherSaga(): SagaIterator {
+  yield takeLatest(SETWEATHER, WeatherSaga);
+}
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
@@ -211,6 +227,7 @@ function* appSagas() {
     call(watchLogoutSaga),
     call(watchGetLocationSaga),
     call(watchProfileSaga),
+    call(watchWeatherSaga)
   ]);
 }
 

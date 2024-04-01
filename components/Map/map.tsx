@@ -24,6 +24,7 @@ import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import SavedLocationModal from "../Modals/saved_location_modal";
 import { ToggleLocationModal } from "../../store/actions/modal";
 import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
+import WeatherComponent from "../Weather/weather";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -287,8 +288,9 @@ const Map = ({ route, navigation }: any) => {
             <Button py="$2" px="$4" ml="$2" onPress={() => {getPaths()}}>
               <ButtonText size="sm">Directions</ButtonText>
               <ButtonIcon as={Compass} ml="$2"/>
-            </Button>
+            </Button> 
           </HStack>
+          <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]}/>
         </Card>) : (<></>)}
         {(viewMode === VIEWMODE.preview) ? (
           <PreviewNavigate onRender={onPathRender}/>

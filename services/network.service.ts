@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
-import { MAPBOX_PUBLIC_TOKEN, status } from "../constants";
+import { MAPBOX_PUBLIC_TOKEN, status, weather_api_key } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const liveUrl = 'https://core.ecocompass.live/api/'
@@ -13,6 +13,7 @@ const endpoint = {
     saveLocation: `${liveUrl}user/savedlocations`,
     pref: `${liveUrl}user/preferences`,
     profile: `${liveUrl}user/profile`,
+    weather: `https://api.openweathermap.org/data/2.5/weather?`,
 };
 let access_token: any = '';
 
@@ -237,4 +238,21 @@ export const getPreference = async () => {
 
         return response.status === status.ok ? response.json() : false;
     }).catch(err => console.log("Error", err))
+}
+
+
+export const fetchWeather = async (payload: any) => {
+    let api_key = weather_api_key;
+    console.log("Payload", payload)
+    let payload2 = payload.payload
+    let weather = `${endpoint.weather}lat=${encodeURIComponent(payload2.lat)}&lon=${encodeURIComponent(payload2.lon)}&appid=${api_key}&units=metric`
+    console.log("Weather", weather);
+    return await fetch(weather, {
+        method: 'GET'
+
+    }).then(response => {
+        return response.status === status.ok ? response.json() : false;
+    }).catch(
+        err => console.log("error", err)
+    )
 }

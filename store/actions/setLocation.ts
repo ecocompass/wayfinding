@@ -12,6 +12,8 @@ import {
     GETROUTES,
     UPDATEVIEWMODE,
     GET_SAVE_LOCATIONS,
+    SETWEATHER,
+    GETWEATHER,
 } from '.';
 
 export const setLocation = (location: any) => {
@@ -79,5 +81,19 @@ export const saveLocationAPI = (payload: any) => {
 export const getSaveLocationsAPI = () => {
     return {
         type: GET_SAVE_LOCATIONS
+    }
+}
+
+export const setWeather = (location: any) => {
+    return {
+        type: SETWEATHER,
+        payload: location
+    }
+}
+
+export const getWeather = (payload: any) => {
+    return {
+        type: GETWEATHER,
+        payload:payload
     }
 }

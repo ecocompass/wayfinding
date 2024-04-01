@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE } from "../actions";
+import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE, GETWEATHER } from "../actions";
 import { VIEWMODE } from "../../constants";
 import { UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
 
@@ -10,6 +10,7 @@ const initialState = {
     zoomLevel: 14,
     viewMode: VIEWMODE.search,
     routes: {},
+    weather: {}
 };
 
 const locationReducer = (state = initialState, action: any) => {
@@ -30,6 +31,8 @@ const locationReducer = (state = initialState, action: any) => {
             return { ...state, pref: action.payload };
         case ROUTES_STORE:
             return { ...state, routes: action.payload };
+        case GETWEATHER:
+            return { ...state, weather: action.payload };
         default:
             return state;
     }
