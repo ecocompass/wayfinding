@@ -15,6 +15,7 @@ import Profile from "./components/Settings/profile";
 import ToastComponent from "./components/Toast/toast";
 import { SavedLocations } from "./components/Settings/saved_locations";
 import SpinnerComponent from "./components/Spinner/spinner";
+import OfflineMap from "./components/OfflineMap/offline";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -54,6 +55,11 @@ const App = () => {
                 options={{ headerShown: true }}
                 name="Saved Locations"
                 component={SavedLocations}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="OfflineMap"
+                component={OfflineMap}
               />
             </Stack.Navigator>
             <SpinnerComponent />
