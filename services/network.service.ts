@@ -4,7 +4,7 @@ import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN, status, weather_api_key } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const liveUrl = 'https://core.ecocompass.live/api/'
+const liveUrl = 'http://prod.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
     signup: `${liveUrl}auth/signup`,
@@ -243,15 +243,13 @@ export const getPreference = async () => {
 
 export const fetchWeather = async (payload: any) => {
     let api_key = weather_api_key;
-    console.log("Payload", payload)
     let payload2 = payload.payload
     let weather = `${endpoint.weather}lat=${encodeURIComponent(payload2.lat)}&lon=${encodeURIComponent(payload2.lon)}&appid=${api_key}&units=metric`
-    console.log("Weather", weather);
     return await fetch(weather, {
         method: 'GET'
 
     }).then(response => {
-        return response.status === status.ok ? response.json() : false;
+        return response.json()
     }).catch(
         err => console.log("error", err)
     )

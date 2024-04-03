@@ -6,27 +6,35 @@ import { useEffect } from "react";
 
 
 
-const WeatherComponent = (props:any) => {
-  let {lon, lat} = props
-  
+const WeatherComponent = (props:any={}) => {
+
     const dispatch=useDispatch();
     useEffect(() => {
-        dispatch(setWeather({lat:lat,lon:lon}))
+        dispatch(setWeather({lat:props.lat,lon:props.lon}))
+       
       },[]);
-    const weatherData=useSelector((state:any)=>{
-        return state.location.weather
-      })
-
+    let weatherData=useSelector((state:any)=> state.weather?.result) || {}
+     // weatherData=weatherData.result? weatherData.result:false;
       const weatherUrl=weather_url;
+      const temperature = weatherData?.main?.temp ? weatherData.main.temp : 0;
+      const icon = weatherData?.weather[0]?.icon ? weatherData.weather[0].icon : '10d';
+      
+      console.log("weather",weatherData)
     return (
-    <View>
-    <Image
+      <View>
+    {weatherData ? (
+      <>
+       <Image
             size="md"
             source={{
-                uri: `${weatherUrl}${weatherData ? weatherData.weather[0]?.icon : '10d'}@2x.png`,
-            }} /><Text>{weatherData ? (weatherData.main.temp + "C") : "Loading..."}</Text>
-            </View>
+                uri: `${weatherUrl}${icon}@2x.png`,
+            }} />
+        <Text>{temperature}C</Text>
+      </>
+    ) : (
+      <Text>Loading weather data...</Text>
+    )}
+    </View>
     );
-  };
-  
+    }
   export default WeatherComponent;

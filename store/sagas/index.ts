@@ -171,8 +171,12 @@ function* ProfileSaga(): any {
 }
 
 function* WeatherSaga(payload:any): any {
+  yield put(toggleSpinner());
+
   const response = yield fetchWeather(payload);
+  yield put(toggleSpinner());
   console.log("response",response)
+
   if (response) {
     yield put(getWeather(response));
   }
