@@ -12,6 +12,8 @@ import {
     GETROUTES,
     UPDATEVIEWMODE,
     GET_SAVE_LOCATIONS,
+    SETWEATHER,
+    GETWEATHER,
     UPDATEPATHVIEWED,
 } from '.';
 
@@ -83,9 +85,24 @@ export const getSaveLocationsAPI = () => {
     }
 }
 
-export const updateViewedPath = (pathId) => {
+
+export const updateViewedPath = (pathId:any) => {
     return {
         type: UPDATEPATHVIEWED,
         payload: pathId
+    }
+}
+
+export const setWeather = (location: any) => {
+    return {
+        type: SETWEATHER,
+        payload: location
+    }
+}
+
+export const getWeather = (payload: any) => {
+    return {
+        type: GETWEATHER,
+        payload:payload
     }
 }
