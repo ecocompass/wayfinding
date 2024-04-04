@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
-import { MAPBOX_PUBLIC_TOKEN } from "../constants";
+import { MAPBOX_PUBLIC_TOKEN, status, weather_api_key } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const liveUrl = 'http://prod.ecocompass.live/api/'
@@ -14,7 +14,8 @@ const endpoint = {
     saveLocation: `${liveUrl}user/savedlocations`,
     pref: `${liveUrl}user/preferences`,
     profile: `${liveUrl}user/profile`,
-    goals: `${liveUrl}user/goals`
+    goals: `${liveUrl}user/goals`,
+    weather: `https://api.openweathermap.org/data/2.5/weather?`,
 };
 let access_token: any = '';
 
@@ -78,6 +79,7 @@ export const userSignup = async (payload: any) => {
 export const userLogin = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
+    console.log(payload2);
     return await fetch(endpoint.login, {
         method: 'POST',
         headers: {
@@ -85,8 +87,11 @@ export const userLogin = async (payload: any) => {
             'Content-Length': String(payload2),
         },
         body: payload2,
-    }).then(response => response.json()
-    ).catch(error => console.log("Error", error));
+    }).then(response => {
+        console.log(response.status);
+        return response.json();
+    })
+        .catch(error => console.log("Error", error));
 
 };
 
@@ -97,7 +102,8 @@ export const userLogout = async () => {
             'AUTHORIZATION': getTokenString(),
         },
     }).then(response => {
-        return response.json();
+
+        return response.status === status.ok ? response.json() : false;
     }
     ).catch(error => console.log("Error", error));
 };
@@ -141,16 +147,20 @@ export const removeStorageItem = function (key: string) {
     return AsyncStorage.removeItem(key);
 };
 
-export const getPath = function (coordinateObj: any) {
-    return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),
+export const getPath = async function (coordinateObj: any) {
+    const token = await readToken();
+    return fetch(`https://route.ecocompass.live/api/routes2?` + new URLSearchParams(coordinateObj),
         {
             method: 'GET',
             headers: {
-                'Host': '141.148.199.176:8080',
+                'AUTHORIZATION': token,
             },
         })
-        .then((response) => response.json());
-    // .then((res) => res);
+        .then((response) => {
+            console.log(response.status);
+            return response.json();
+        })
+        .catch(e => console.log(e));
 };
 
 export const getSaveLocations = async function () {
@@ -163,11 +173,10 @@ export const getSaveLocations = async function () {
         },
     })
         .then(response => {
-            if (response.status === 200) {
-                return response.json();
-            } else {
-                throw 'error';
-            }
+
+
+            return response.status === status.ok ? response.json() : false;
+
         }).catch(e => console.log(e));
 }
 
@@ -183,8 +192,8 @@ export const saveLocation = async function (data: any) {
         },
         body: data,
     }).then(response => {
-        console.log(response.status);
-        return response.json();
+
+        return response.status === status.ok ? response.json() : false;
     })
         .catch(error => {
             return { error: true, message: error };
@@ -205,8 +214,8 @@ export const userPref = async (payload: any) => {
         },
         body: payload2,
     }).then(response => {
-
-        return response.json();
+        console.log("ResponseUserPref", response)
+        return response.status === status.ok ? response.json() : false;
     })
         .catch(err => console.log("Error", err));
 };
@@ -267,7 +276,7 @@ export const readProfile = async () => {
         },
     }).then(response => {
 
-        return response.json();
+        return response.status === status.ok ? response.json() : false;
     })
         .catch(err => console.log("Error", err));
 };
@@ -299,6 +308,21 @@ export const getPreference = async () => {
             'Authorization': `Bearer ${token.accessToken}`,
         },
     }).then(response => {
-        return response.json();
-    }).catch(err => console.log("Error", err))
+        return response.status === status.ok ? response.json() : false;
+    }).catch(err => console.log("Error", err));
+}
+
+
+export const fetchWeather = async (payload: any) => {
+    let api_key = weather_api_key;
+    let payload2 = payload.payload
+    let weather = `${endpoint.weather}lat=${encodeURIComponent(payload2.lat)}&lon=${encodeURIComponent(payload2.lon)}&appid=${api_key}&units=metric`
+    return await fetch(weather, {
+        method: 'GET'
+
+    }).then(response => {
+        return response.json()
+    }).catch(
+        err => console.log("error", err)
+    )
 }

@@ -9,7 +9,7 @@ import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 
 import Mapbox from "@rnmapbox/maps";
-import { getPointAnnotation, getLineAnnotation } from "../../services";
+import { getPointAnnotation, getLineAnnotation, navPointAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
@@ -24,6 +24,7 @@ import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import SavedLocationModal from "../Modals/saved_location_modal";
 import { ToggleLocationModal } from "../../store/actions/modal";
 import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
+import WeatherComponent from "../Weather/weather";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -95,6 +96,7 @@ const Map = ({ route, navigation }: any) => {
   let [isLocationSelected, setLocationCard] = useState(false)
   let [locationData, setLocationData] = useState<any>({})
   let [renderedRoute, setRenderedRoute] = useState<any>([])
+  let [navPoints, setNavPoints] = useState<any>([]);
   const dispatch = useDispatch();
   const getGeoLocation = () => {
     Geolocation.getCurrentPosition(
@@ -168,6 +170,19 @@ const Map = ({ route, navigation }: any) => {
     //     setRenderedRoute(body.shortestPathCoordinates);
     //     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
     //   })
+  }
+
+  const onPointsRender = (routeArr) => {
+    let navPointArr: any = []
+    routeArr.forEach((route) => {
+      if (route.mode === 'bus' || route.mode === 'luas') {
+        navPointArr.push({
+          coords: route.pathPointList[0],
+          name: route.startStopName,
+        });
+      }
+    });
+    setNavPoints(navPointArr);
   }
 
   const onPathRender = (routeArr) => {
@@ -254,6 +269,8 @@ const Map = ({ route, navigation }: any) => {
         <Mapbox.MapView
           style={styles.map}
           onPress={getClickedPoint}
+          compassEnabled={true}
+          logoEnabled={false}
         >
           <Mapbox.Camera
             ref={(c) => (this.camRef = c)}
@@ -263,6 +280,7 @@ const Map = ({ route, navigation }: any) => {
             animationDuration={1000}
           />
           {renderedPoints}
+          {/* {navPoints.length ? (navPointAnnotation(navPoints)) : <></> } */}
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
           {renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
@@ -297,9 +315,10 @@ const Map = ({ route, navigation }: any) => {
                 <ButtonIcon as={Compass} ml="$2" />
               </Button>
             </HStack>
+            <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]} />
           </Card>) : (<></>)}
         {(viewMode === VIEWMODE.preview) ? (
-          <PreviewNavigate onRender={onPathRender} />
+          <PreviewNavigate onRender={onPathRender} onPointsRender={onPointsRender} destinationName={locationData.name}/>
         ) : (<></>)}
         {locationData.name ? <SavedLocationModal /> : <></>}
       </View>
