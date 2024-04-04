@@ -2,6 +2,8 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react/react-in-jsx-scope */
 import { ImageBackground } from "@gluestack-ui/themed";
+import { Icon } from "@gluestack-ui/themed";
+import { Milestone, MapPin } from "lucide-react-native";
 import Mapbox from "@rnmapbox/maps";
 import { View, Image,StyleSheet } from "react-native";
 
@@ -24,6 +26,12 @@ const customStyle = {
   transform: [{rotateY: '45deg'}],
 };
 
+const pathIdentifiers = {
+  'walk': "#0000ff",
+  'luas': "#00FF00",
+  'bus': "#FFFF00"
+}
+
 function getLine(coordArr: any) {
   return {
       type: "FeatureCollection",
@@ -34,14 +42,32 @@ function getLine(coordArr: any) {
           geometry: {
             type: "LineString",
             coordinates: [
-              coordArr
+              coordArr,
             ],
           },
         },
       ],
     };
   }
-
+export function navPointAnnotation(pointArr: any) {
+  return pointArr.map((p, index) => {
+    return (
+      <Mapbox.PointAnnotation
+      id={`nav_${index}`}
+      coordinate={p.coords}
+      key={`nav_${index}`}
+    >
+      <View style={{width: 30,
+        height: 30,
+        justifyContent: 'center',
+        alignItems: 'center',}}>
+          <Icon as={Milestone} size="lg" color="red"/>
+        </View>
+      <Mapbox.Callout title={p.name} style={{minWidth: 200}} />
+    </Mapbox.PointAnnotation>
+    );
+  });
+}
 
 export function getPointAnnotation(options: any) {
   return (
@@ -55,34 +81,36 @@ export function getPointAnnotation(options: any) {
   );
 }
 
-export function getLineAnnotation(route: any) {
-  let temp_route: any = {
-    type: "FeatureCollection",
-    features: [
-      {
-        type: "Feature",
-        properties: {},
-        geometry: {
-          type: "LineString",
-          coordinates: route,
+export function getLineAnnotation(routes: any) {
+  return routes.map((route, index) => {
+    let temp_route: any = {
+      type: "FeatureCollection",
+      features: [
+        {
+          type: "Feature",
+          properties: {},
+          geometry: {
+            type: "LineString",
+            coordinates: route.pathPointList,
+          },
         },
-      },
-    ],
-  };
-
-  return (
-    <Mapbox.ShapeSource id="shapeSource" shape={temp_route}>
-      <Mapbox.LineLayer
-        id="lineLayer"
-        style={{
-          lineWidth: 3,
-          lineJoin: "round",
-          lineColor: "#0000ff",
-          lineDasharray: route.map(r => 1),
-        }}
-      />
-    </Mapbox.ShapeSource>
-  );
+      ],
+    };
+  
+    return (
+      <Mapbox.ShapeSource key={`line ${index}`} id={`line ${index}`} shape={temp_route}>
+        <Mapbox.LineLayer
+          id={`line ${index}`}
+          style={{
+            lineWidth: 3,
+            lineJoin: "round",
+            lineColor: pathIdentifiers[route.mode],
+            lineDasharray: route.mode === 'walk'? route.pathPointList.map(r => 1) : [],
+          }}
+        />
+      </Mapbox.ShapeSource>
+    );
+  });
 }
 
 export function getPolyLineAnnotation(options: any) {

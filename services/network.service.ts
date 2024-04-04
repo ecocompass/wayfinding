@@ -1,19 +1,25 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
-import { MAPBOX_PUBLIC_TOKEN } from "../constants";
-import * as RootNavigation from '../../wayfinding/components/Navigation/RootNavigator';
-import { useDispatch, useSelector } from "react-redux";
+import { MAPBOX_PUBLIC_TOKEN, status } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { storeToken } from "../store/actions/auth";
 
-const baseUrl = 'http://34.242.139.134:5050/api/';
+const liveUrl = 'https://prod.ecocompass.live/api/';
+const baseUrl = 'http://34.242.139.134:5000/api/';
 const endpoint = {
-    signup: `${baseUrl}auth/signup`,
-    login: `${baseUrl}auth/login`,
-    logout: `${baseUrl}auth/logout`,
-}
+    signup: `${liveUrl}auth/signup`,
+    login: `${liveUrl}auth/login`,
+    logout: `${liveUrl}auth/logout`,
+    saveLocation: `${liveUrl}user/savedlocations`,
+    pref: `${liveUrl}user/preferences`,
+    profile: `${liveUrl}user/profile`,
+};
 let access_token: any = '';
+
+const getTokenString = () => {
+    let access_token_str = `Bearer ${access_token}`;
+    return access_token_str;
+};
 
 export const getLocationData = async (data: any) => {
     try {
@@ -61,12 +67,16 @@ export const userSignup = async (payload: any) => {
         },
         body: payload2,
     }).then(response => response.json()
-    ).catch(error => console.log("Error", error));
+    ).catch(error => {
+
+        console.log("Error", error)
+    });
 };
 
 export const userLogin = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
+    console.log(payload2);
     return await fetch(endpoint.login, {
         method: 'POST',
         headers: {
@@ -74,20 +84,23 @@ export const userLogin = async (payload: any) => {
             'Content-Length': String(payload2),
         },
         body: payload2,
-    }).then(response => response.json()
-    ).catch(error => console.log("Error", error));
+    }).then(response => {
+        console.log(response.status);
+        return response.json();
+    })
+        .catch(error => console.log("Error", error));
 
 };
 
-export const userLogout = async (token: any) => {
+export const userLogout = async () => {
     return await fetch(endpoint.logout, {
         method: 'DELETE',
         headers: {
-            'AUTHORIZATION': token,
-        }
+            'AUTHORIZATION': getTokenString(),
+        },
     }).then(response => {
-        response.json();
-        RootNavigation.navigate('Login', {})
+
+        return response.status === status.ok ? response.json() : false;
     }
     ).catch(error => console.log("Error", error));
 };
@@ -131,14 +144,104 @@ export const removeStorageItem = function (key: string) {
     return AsyncStorage.removeItem(key);
 };
 
-export const getPath = function (coordinateObj: any) {
-    return fetch(`http://141.148.199.176:8080/api/routes?` + new URLSearchParams(coordinateObj),
+export const getPath = async function (coordinateObj: any) {
+    const token = await readToken();
+    return fetch(`https://route.ecocompass.live/api/routes2?` + new URLSearchParams(coordinateObj),
         {
             method: 'GET',
             headers: {
-                'Host': '141.148.199.176:8080',
+                'AUTHORIZATION': token,
             },
         })
-        .then((response) => response.json());
-    // .then((res) => res);
+        .then((response) => {
+            console.log(response.status);
+            return response.json();
+        })
+        .catch(e => console.log(e));
 };
+
+export const getSaveLocations = async function () {
+    const token = await readToken();
+    return await fetch(endpoint.saveLocation, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+
+
+            return response.status === status.ok ? response.json() : false;
+
+        }).catch(e => console.log(e));
+}
+
+export const saveLocation = async function (data: any) {
+    const token = await readToken();
+    let stringData = JSON.stringify(data);
+    return await fetch(endpoint.saveLocation, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+            'Content-Length': stringData,
+        },
+        body: data,
+    }).then(response => {
+
+        return response.status === status.ok ? response.json() : false;
+    })
+        .catch(error => {
+            return { error: true, message: error };
+        });
+};
+
+export const userPref = async (payload: any) => {
+    let payload2 = payload.payload;
+    payload2 = JSON.stringify(payload2);
+    let token = await readToken();
+    return await fetch(endpoint.pref, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': String(payload2),
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+        body: payload2,
+    }).then(response => {
+        console.log("ResponseUserPref", response)
+        return response.status === status.ok ? response.json() : false;
+    })
+        .catch(err => console.log("Error", err));
+};
+
+
+export const readProfile = async () => {
+
+    let token = await readToken();
+    return await fetch(endpoint.profile, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+    }).then(response => {
+
+        return response.status === status.ok ? response.json() : false;
+    })
+        .catch(err => console.log("Error", err));
+};
+
+export const getPreference = async () => {
+    let token = await readToken();
+    return await fetch(endpoint.pref, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+    }).then(response => {
+        return response.status === status.ok ? response.json() : false;
+    }).catch(err => console.log("Error", err));
+}

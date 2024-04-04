@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
+import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE, UPDATEPATHVIEWED } from "../actions";
 import { VIEWMODE } from "../../constants";
-import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
+import { UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
 
 const initialState = {
     centerLocation: [0, 0],
@@ -8,7 +9,7 @@ const initialState = {
     isSearching: false,
     zoomLevel: 14,
     viewMode: VIEWMODE.search,
-    routes: {},
+    recommendedRoutes: {}
 };
 
 const locationReducer = (state = initialState, action: any) => {
@@ -25,8 +26,20 @@ const locationReducer = (state = initialState, action: any) => {
             let zoom_delta = Math.trunc(action.payload / 100);
             let zoom = state.zoomLevel - zoom_delta;
             return { ...state, zoomLevel: zoom };
+        case PREF_STORE:
+            return { ...state, pref: action.payload };
         case ROUTES_STORE:
-            return { ...state, routes: action.payload };
+            return { ...state, recommendedRoutes: action.payload };
+        case UPDATEPATHVIEWED:
+            let updatedRoutes = state.recommendedRoutes.options.map((opt) => {
+                return {
+                    ...opt,
+                    isViewed: (opt.pathId === action.payload) ? true : false,
+                };
+            });
+            return {
+                ...state, recommendedRoutes: { options: updatedRoutes },
+            };
         default:
             return state;
     }

@@ -10,14 +10,17 @@ import {
   ButtonText,
   Card,
   HStack,
-  AlertCircleIcon,
   FormControlHelper,
   FormControlHelperText,
+  FormControlErrorText,
+  FormControlErrorIcon,
+  FormControlError,
+  AlertCircleIcon,
   Icon,
   Center,
 } from '@gluestack-ui/themed';
 import { View } from 'react-native';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { getToken, registerAction } from '../../store/actions/auth';
 const Signup = ({ navigation }: any) => {
   const dispatch = useDispatch();
@@ -25,10 +28,20 @@ const Signup = ({ navigation }: any) => {
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
   const [isEmailValid, setIsEmailValid] = useState(true);
-
+  const [confirmPassword, setConfirmPassword] = React.useState('');
+  const [isPasswordInvalid, setIsPasswordInvalid] = React.useState(false);
+  const [isConfirmPasswordInvalid, setIsConfirmPasswordInvalid] = React.useState(false);
+  const handlePasswordChange = (event: any) => {
+    setPassword(event);
+    setIsPasswordInvalid(event.length < 8); // Check password length on change
+  };
+  const handleConfirmPasswordChange = (event: any) => {
+    setConfirmPassword(event);
+    setIsConfirmPasswordInvalid(password !== event); // Check password match
+  };
   useEffect(() => {
     dispatch(getToken());
-  });
+  },[]);
 
   const validateEmail = (email: string) => {
     const re = /\S+@\S+\.\S+/;
@@ -64,39 +77,51 @@ const Signup = ({ navigation }: any) => {
                 onChangeText={handleEmailChange}
               />
             </Input>
-            {!isEmailValid &&  <FormControlHelper>
+            {!isEmailValid && <FormControlHelper>
                 <Icon as={AlertCircleIcon} size="md" color='red' />
                 <FormControlHelperText color='red'> Invalid Email </FormControlHelperText>
               </FormControlHelper>
                }
             {/* Other input fields */}
             <Text lineHeight="$xs">Password</Text>
-            <Input>
+            <Input isInvalid={isPasswordInvalid} isRequired={true}>
               <InputField
                 type="password"
                 value={password}
-                onChangeText={(event: any) => {
-                  setPassword(event);
-                }}
+                onChangeText={handlePasswordChange}
               />
             </Input>
+            {isPasswordInvalid && (
+              <FormControlHelper>
+                <FormControlHelperText>Password must be at least 8 characters</FormControlHelperText>
+              </FormControlHelper>
+            )}
             <Text lineHeight="$xs">Confirm Password</Text>
-            <Input>
-              <InputField type="password" />
+            <Input isInvalid={isConfirmPasswordInvalid} isRequired={true}>
+              <InputField type="password"
+                value={confirmPassword}
+                onChangeText={handleConfirmPasswordChange} />
             </Input>
+            {isConfirmPasswordInvalid && (
+              <FormControlHelper>
+                <Icon as={AlertCircleIcon} size="md" color='red' />
+                <FormControlHelperText color='red'>Passwords must match</FormControlHelperText>
+              </FormControlHelper>
+            )}
           </VStack>
           <VStack>
             <Button
               onPress={() => {
-              if (isEmailValid) {
+                  if (!isPasswordInvalid && !isConfirmPasswordInvalid &isEmailValid) {
                   dispatch(
-                    registerAction({
-                      email: email,
-                      username: username,
-                      password: password,
-                    })
-                  );
+                      registerAction({
+                        email: email,
+                        username: username,
+                        password: password,
+                      })
+                    );
               }
+                
               }}
             disabled={!isEmailValid}
             >

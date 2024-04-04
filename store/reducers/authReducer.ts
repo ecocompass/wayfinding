@@ -1,4 +1,4 @@
-import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, STORE_TOKEN, TOKEN_STORE } from "../actions";
+import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, TOKEN_STORE } from "../actions";
 const initialState = { username: '', email: '', password: '', token: '' };
 
 
@@ -9,8 +9,6 @@ const authReducer = (state = initialState, action: any) => {
         case LOGIN:
             return [action.payload]
         case REGISTER:
-            return [action.payload];
-        case STORE_TOKEN:
             return [action.payload];
         case SESSION_OK:
             return action.payload;

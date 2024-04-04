@@ -9,16 +9,21 @@ import { StyleSheet, View, PermissionsAndroid, Platform, } from "react-native";
 import Geolocation from "react-native-geolocation-service";
 
 import Mapbox from "@rnmapbox/maps";
-import { getPointAnnotation, getLineAnnotation, getPolyLineAnnotation, revertCoordinates } from "../../services";
+import { getPointAnnotation, getLineAnnotation, navPointAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark } from 'lucide-react-native';
-import { getRoutes, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked } from 'lucide-react-native';
+import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
 import { PreviewNavigate } from "./preview-navigate";
+import * as RootNavigation from '../../components/Navigation/RootNavigator';
+import SavedLocationModal from "../Modals/saved_location_modal";
+import { ToggleLocationModal } from "../../store/actions/modal";
+import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -63,10 +68,11 @@ const requestLocationPermission = async () => {
   }
 };
 
-const Map = ({ navigation }: any) => {
+const Map = ({ route, navigation }: any) => {
   let camRef = null;
   let userLocation = useSelector((state: any) => {
-    return state.location.userLocation}); // Longitude, Latitude
+    return state.location.userLocation
+  }); // Longitude, Latitude
 
   let centerLocation = useSelector((state: any) => {
     return state.location.centerLocation
@@ -89,8 +95,21 @@ const Map = ({ navigation }: any) => {
   let [isLocationSelected, setLocationCard] = useState(false)
   let [locationData, setLocationData] = useState<any>({})
   let [renderedRoute, setRenderedRoute] = useState<any>([])
+  let [navPoints, setNavPoints] = useState<any>([]);
   const dispatch = useDispatch();
-
+  const getGeoLocation = () => {
+    Geolocation.getCurrentPosition(
+      (position) => {
+        dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
+        dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
+      },
+      (error) => {
+        console.log(error.code, error.message);
+        setDefaultLocation();
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+    );
+  }
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
   const [renderedPoints, setRenderedPoints] = useState<any>([])
@@ -99,21 +118,11 @@ const Map = ({ navigation }: any) => {
     if (Platform.OS === "android") {
       const result = requestLocationPermission().then((res) => {
         if (res) {
-          Geolocation.getCurrentPosition(
-            (position) => {
-              dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
-              dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
-            },
-            (error) => {
-              console.log(error.code, error.message);
-              setDefaultLocation();
-            },
-            { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-          );
+          getGeoLocation();
         }
       });
     } else {
-      setDefaultLocation();
+      getGeoLocation();
     }
   }, []);
 
@@ -125,16 +134,22 @@ const Map = ({ navigation }: any) => {
   };
 
   const selectLocation = (data: any) => {
+    console.log(data);
     setPointViewed(data.center);
     this.camRef.flyTo(data.center, 500);
     setLocationData(data);
     dispatch(setSearchStatus(false))
-    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: data.center})])
+    setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: data.center })])
   }
 
-  const fetchLocationDetails = async (coordinateArr: any) => {
+  const fetchLocationDetails = async (coordinateArr: any, isFromSaved: boolean = false) => {
     const response = await geoCodeApi(coordinateArr.join(','))
-    setLocationData({name: response.features[0].text, address: response.features[0].place_name})
+    setLocationData({name: response.features[0].text, address: response.features[0].place_name, coordinates: response.features[0].center, isFromSaved});
+    if (isFromSaved) {
+      setPointViewed(route.params.locData);
+      this.camRef.flyTo(route.params.locData, 500);
+      setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: route.params.locData })])
+    }
   }
 
   const getClickedPoint = (feature: any) => {
@@ -143,7 +158,7 @@ const Map = ({ navigation }: any) => {
     setPointViewed(feature.geometry.coordinates);
     this.camRef.flyTo(feature.geometry.coordinates, 500)
     setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
-    fetchLocationDetails(feature.geometry.coordinates)
+    fetchLocationDetails(feature.geometry.coordinates);
   }
 
   const getPaths = () => {
@@ -156,9 +171,26 @@ const Map = ({ navigation }: any) => {
     //   })
   }
 
+  const onPointsRender = (routeArr) => {
+    let navPointArr: any = []
+    routeArr.forEach((route) => {
+      if (route.mode === 'bus' || route.mode === 'luas') {
+        navPointArr.push({
+          coords: route.pathPointList[0],
+          name: route.startStopName,
+        });
+      }
+    });
+    setNavPoints(navPointArr);
+  }
+
   const onPathRender = (routeArr) => {
     setRenderedRoute(routeArr);
     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
+  }
+
+  const onLogout = () => {
+    dispatch(logoutAction())
   }
 
   const cancelSearch = () => {
@@ -178,6 +210,19 @@ const Map = ({ navigation }: any) => {
     })
   }
 
+  const openSaveLocationModal = (locationData:any) => {
+    // open modal
+    dispatch(ToggleLocationModal({visibility: true, data: locationData}))
+
+  }
+
+  useFocusEffect(() => {
+    if (route?.params.isFromSaved) {
+      fetchLocationDetails(route.params.locData, true)
+      navigation.setParams({isFromSaved: false});
+    }
+  })
+
   return (
     <View style={styles.page}>
       <View style={styles.container}>
@@ -192,11 +237,14 @@ const Map = ({ navigation }: any) => {
           )
         }}
       >
-        <MenuItem key="profile" textValue="profile">
+        <MenuItem key="profile" textValue="profile"  onPress={()=>{ RootNavigation.navigate('Profile', {})}}>
           <Icon as={CircleUser} size="md" mr="$2" />
           <MenuItemLabel size="md">Profile</MenuItemLabel>
         </MenuItem>
-        <MenuItem key="locs" textValue="locs">
+        <MenuItem key="locs" textValue="locs" onPress={() => {
+          dispatch(getSaveLocationsAPI());
+          navigation.navigate('Saved Locations')
+          }}>
           <Icon as={BookmarkCheck} size="md" mr="$2" />
           <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
         </MenuItem>
@@ -204,7 +252,7 @@ const Map = ({ navigation }: any) => {
           <Icon as={Car} size="md" mr="$2" />
           <MenuItemLabel size="md">Your Trips</MenuItemLabel>
         </MenuItem>
-        <MenuItem key="logout" textValue="logout">
+        <MenuItem key="logout" textValue="logout" onPress={() => {onLogout()}}>
           <Icon as={LogOut} size="md" mr="$2" />
           <MenuItemLabel size="md">Logout</MenuItemLabel>
         </MenuItem>
@@ -212,6 +260,8 @@ const Map = ({ navigation }: any) => {
         <Mapbox.MapView
           style={styles.map}
           onPress={getClickedPoint}
+          compassEnabled={true}
+          logoEnabled={false}
         >
           <Mapbox.Camera
             ref={(c) => (this.camRef = c)}
@@ -221,8 +271,9 @@ const Map = ({ navigation }: any) => {
             animationDuration={1000}
           />
           {renderedPoints}
+          {/* {navPoints.length ? (navPointAnnotation(navPoints)) : <></> } */}
           <Mapbox.UserLocation onUpdate={userLocationUpdate} />
-          { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
+          {renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
           <Fab size="lg" placement="bottom right" onPress={() => {
@@ -238,9 +289,11 @@ const Map = ({ navigation }: any) => {
             <Heading mb="$1" size="md">
               {locationData.name}
             </Heading>
-            <Button onPress={() => {}}  variant="outline" borderColor="transparent">
+            {(!locationData.isFromSaved)? (<Button onPress={() => {openSaveLocationModal(locationData)}}  variant="outline" borderColor="transparent">
                 <ButtonIcon as={Bookmark}/>
-              </Button>
+              </Button>) : (<Button  variant="outline" borderColor="transparent">
+                <ButtonIcon as={BookMarked}/>
+              </Button>)}
           </HStack>
           <Text size="sm" mb="$5">{locationData.address}</Text>
           <HStack>
@@ -255,8 +308,9 @@ const Map = ({ navigation }: any) => {
           </HStack>
         </Card>) : (<></>)}
         {(viewMode === VIEWMODE.preview) ? (
-          <PreviewNavigate onRender={onPathRender}/>
+          <PreviewNavigate onRender={onPathRender} onPointsRender={onPointsRender} destinationName={locationData.name}/>
         ) : (<></>)}
+        {locationData.name ? <SavedLocationModal/> : <></>}
       </View>
     </View>
   );
