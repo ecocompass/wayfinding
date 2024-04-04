@@ -119,7 +119,7 @@ const ReadGoals = ({ navigation }: any) => {
 
               <Center w="$48" key={goal.name}>
                 <Text size='lg' textAlign='left'>{goal.name}</Text>
-                <Text>{goal.value + 'km'}</Text>
+                <Text>{goal.value + ' km'}</Text>
                 <HStack space="4xl">
                   <Text size="md">0 km</Text>
 
