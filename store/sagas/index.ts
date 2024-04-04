@@ -37,6 +37,7 @@ import { VIEWMODE, errorMessage, successMessage } from "../../constants";
 import { prefStore, storeProfile } from "../actions/user";
 import { getWeather, hideToast, showToast } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
+import { process_path } from "../../services/path_processor";
 
 function* signUpSaga(payload: any): any {
   yield put(toggleSpinner());
