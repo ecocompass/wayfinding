@@ -1,5 +1,15 @@
-import { GETWEATHER,  SETWEATHER } from "../actions";
-const initialState = { lat:0,lon:0,result:{}};
+import { GETWEATHER, SETWEATHER } from "../actions";
+const initialState = {
+    result: {
+        weather: [{
+            icon: '10d'
+        }
+        ],
+        main: {
+            temp: 0
+        }
+    }
+};
 
 
 const weatherReducer = (state = initialState, action: any) => {
@@ -8,7 +18,7 @@ const weatherReducer = (state = initialState, action: any) => {
         case SETWEATHER:
             return [action.payload];
         case GETWEATHER:
-            return {...state,result:action.payload}    
+            return { ...state, result: action.payload }
         default:
             return state;
     }

@@ -4,37 +4,30 @@ import { weather_url } from "../../constants";
 import { setWeather } from "../../store/actions/setLocation";
 import { useEffect } from "react";
 
+const WeatherComponent = (props: any) => {
 
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(setWeather({ lat: props.lat, lon: props.lon }))
 
-const WeatherComponent = (props:any={}) => {
+  }, []);
 
-    const dispatch=useDispatch();
-    useEffect(() => {
-        dispatch(setWeather({lat:props.lat,lon:props.lon}))
-       
-      },[]);
-    let weatherData=useSelector((state:any)=> state.weather?.result) || {}
-     // weatherData=weatherData.result? weatherData.result:false;
-      const weatherUrl=weather_url;
-      const temperature = weatherData?.main?.temp ? weatherData.main.temp : 0;
-      const icon = weatherData?.weather[0]?.icon ? weatherData.weather[0].icon : '10d';
-      
-      console.log("weather",weatherData)
-    return (
-      <View>
-    {weatherData ? (
-      <>
-       <Image
-            size="md"
-            source={{
-                uri: `${weatherUrl}${icon}@2x.png`,
-            }} />
-        <Text>{temperature}C</Text>
-      </>
-    ) : (
-      <Text>Loading weather data...</Text>
-    )}
+  let weather = useSelector((state: any) => state.weather.result);
+  const weatherData = weather;
+  const weatherUrl = weather_url;
+  const temperature = weatherData?.main?.temp || '-';
+  const icon = weatherData?.weather[0]?.icon || '10d';
+
+  return (
+    <View>
+      <Image alt="weather"
+        size="md"
+        source={{
+          uri: `${weatherUrl}${icon}@2x.png`,
+        }} />
+      <Text>{temperature}&deg;C</Text>
     </View>
-    );
-    }
-  export default WeatherComponent;
+  );
+}
+
+export default WeatherComponent;
