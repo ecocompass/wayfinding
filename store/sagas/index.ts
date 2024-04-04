@@ -122,15 +122,15 @@ function* getPathSaga(action: any): any {
   yield put(toggleSpinner());
 
   const response = yield getPath(action.payload);
-  yield put(toggleSpinner());
+  let recommendationList = process_path(response);
   yield all([
+    put(toggleSpinner()),
     put({
       type: ROUTES_STORE,
-      payload: { walk: response.shortestPathCoordinates },
+      payload: { options: recommendationList },
     }),
     put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview }),
   ]);
-
 }
 
 function* saveLocationSaga(action: any): any {
@@ -140,6 +140,8 @@ function* saveLocationSaga(action: any): any {
   // handle response
   if (response) {
     yield call(handleToast, successMessage, 'success');
+  } else {
+    yield call(handleToast, errorMessage);
   }
   else yield call(handleToast, errorMessage);
 }
@@ -166,15 +168,16 @@ function* ProfileSaga(): any {
   yield put(toggleSpinner());
   if (response) {
     yield put(storeProfile(response));
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage)
 }
 
-function* WeatherSaga(payload: any): any {
+function* WeatherSaga(payload:any): any {
   yield put(toggleSpinner());
   const response = yield fetchWeather(payload);
   yield put(toggleSpinner());
-  console.log("response", response)
+  console.log("response",response)
 
   if (response) {
     yield put(getWeather(response));
