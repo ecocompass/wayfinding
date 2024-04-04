@@ -29,16 +29,19 @@ import {
   import { goalAction, prefAction, readGoalAction } from '../../store/actions/user';
   
   const ReadGoals = ({ navigation }: any) => {
-    useEffect(()=>{
-        dispatch(readGoalAction());
-    },[])
+    
     const [allGoals, setGoals] = useState([
       { name: 'Biking', value: 0 },
       { name: 'Walking', value: 0 },
       { name: 'Public Transport', value: 0 },
     ]);
     const dispatch = useDispatch();
-    const userGoals = useSelector((state: any) => { return state.userDetails.goal})
+    useEffect(()=>{
+      dispatch(readGoalAction());
+  },[])
+   const userGoals = useSelector((state: any) => { return state.userDetails.goal})|| []
+   //const userGoals:any=[];
+    console.log("usergoals",userGoals)
     const updateGoalValue = (name: string, value: any) => {
       let newGoals= allGoals.map((goal) =>{
       if(goal.name === name) {
@@ -53,6 +56,7 @@ import {
     cycling:'Cycling',
     walking:'Walking'
   }
+
     return (
       <View
         style={{
@@ -64,7 +68,7 @@ import {
       ><VStack width={390} space="md" marginTop={"$10"} p="$4">
       <HStack space="lg" alignItems="center">
         <Text>Your Current Goals</Text> 
-       { userGoals.map((g)=>(
+       { userGoals && userGoals.map((g)=>(
        /*  <Text>{transports[g.type]+":"+g.target}</Text> */
 
         <VStack space="lg">
@@ -82,14 +86,6 @@ import {
       <HStack space="lg" alignItems="center">
           <Text>+353 213193212</Text>
       </HStack>
-{/*                 <Divider></Divider>
-      <HStack space="lg" alignItems="center">
-          <Icon as={!passwordVisible ? EyeIcon : EyeOffIcon} size="xl" />
-          <Text color="grey" bold={true}>{passwordText}</Text>
-          <Button onPress={handleIconPress} variant="solid" isDisabled={false} size="md"><ButtonIcon as={RefreshCw} />
-          </Button>
-      </HStack>
-      <Divider></Divider> */}
   </VStack>
         <FormControl p="$4">
          <VStack space='4xl'>

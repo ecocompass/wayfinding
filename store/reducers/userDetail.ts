@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { GOAL_STORE, PREF_STORE, READPROFILE, SAVE_LOCATION_STORE } from "../actions";
+import { GOAL_STORE, PREF_STORE, READGOALS, READPROFILE, SAVE_LOCATION_STORE } from "../actions";
 
 const initialState = {
     savedLocations: [],
@@ -18,6 +18,11 @@ const userDetailReducer = (state = initialState, action: any) => {
             return { ...state, profile: action.payload }
         case GOAL_STORE:
             return { ...state, goal: action.payload }
+        case READPROFILE:
+                return {...state, payload: action.payload }
+        case READGOALS:
+                return {...state, payload: action.payload }
+
         default:
             return state;
     }

@@ -121,7 +121,7 @@ function* prefSaga(payload: any): any {
 
   if (response) {
     yield put({ type: PREF_STORE, payload: response });
-    RootNavigation.navigate('Map', {});
+    RootNavigation.navigate('Goals', {});
   }
 }
 function* goalSaga(payload: any): any {
@@ -180,8 +180,20 @@ function* ProfileSaga(): any {
 }
 
 function* readGoalsSaga(): any {
+  yield put(toggleSpinner());
   const response = yield readGoals();
+  console.log("res",response)
+  yield put(toggleSpinner());
+  if(response){
   yield put(goalStore(response));
+  
+
+  }
+  else {
+    yield put(showToast('saved successfully!', 'success'));
+    yield delay(2000);
+    yield put(hideToast());
+  }
 }
 
 function* watchGetPath(): SagaIterator {

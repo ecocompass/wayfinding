@@ -4,7 +4,7 @@ import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const liveUrl = 'https://prod.ecocompass.live/api/'
+const liveUrl = 'http://prod.ecocompass.live/api/'
 const baseUrl = 'http://34.242.139.134:5000/api/';
 const prodUrl = 'https://prod.ecocompass.live/api/'
 const endpoint = {
@@ -14,7 +14,7 @@ const endpoint = {
     saveLocation: `${liveUrl}user/savedlocations`,
     pref: `${liveUrl}user/preferences`,
     profile: `${liveUrl}user/profile`,
-    goals: `${liveUrl}user/profile`
+    goals: `${liveUrl}user/goals`
 };
 let access_token: any = '';
 
@@ -194,6 +194,7 @@ export const saveLocation = async function (data: any) {
 export const userPref = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
+    console.log("Pref",payload2)
     let token = await readToken();
     return await fetch(endpoint.pref, {
         method: 'POST',
@@ -213,32 +214,34 @@ export const userPref = async (payload: any) => {
 export const userGoals = async (payload: any) => {
     let payload2 = payload.payload;
     var date = new Date();
+    let created_date=Date.now();
     let expiry_date = date.setDate(date.getDate() + 7);
     let pay = [{
-        "type": "walking",
-        "target": payload2.walking_weight,
-        "created_at": date,
-        "expiry": expiry_date
+        type: "walking",
+        target: payload2.walking_weight,
+        created_at: created_date,
+        expiry: expiry_date
     }, {
-        "type": "cycling",
-        "target": payload2.bike_weight,
-        "created_at": date,
-        "expiry": expiry_date,
+        type: "cycling",
+        target: payload2.bike_weight,
+        created_at: created_date,
+        expiry: expiry_date,
     }, {
-        "type": "public_transport",
-        "target": payload2.public_transport,
-        "created_at": date,
-        "expiry": expiry_date,
+        type: "public_transport",
+        target: payload2.public_transport,
+        created_at: created_date,
+        expiry: expiry_date,
     }]
 
-    console.log("Mhaaro Payload", pay)
+    
     let pay2 = JSON.stringify(pay)
     let token = await readToken();
+    console.log("Mhaaro Payload", pay2)
     return await fetch(endpoint.goals, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Content-Length': pay2,
+            'Content-Length': String(pay2),
             'Authorization': `Bearer ${token.accessToken}`,
         },
         body: pay2,
