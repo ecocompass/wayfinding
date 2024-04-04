@@ -70,6 +70,7 @@ function* loginSaga(payload: any): any {
   if (response.access_token) {
     yield saveToken(response.access_token);
     const res = yield getPreference();
+    console.log("getpref",response)
     if (res.payload) {
       yield put(prefStore(res.payload));
       RootNavigation.navigate('Map', {});
@@ -132,7 +133,7 @@ function* goalSaga(payload: any): any {
   yield put(toggleSpinner());
 
   if (response) {
-    yield put({ type: GOAL_STORE, payload: response });
+   // yield put({ type: GOAL_STORE, payload: response });
     RootNavigation.navigate('Map', {});
   }
 }
@@ -184,13 +185,11 @@ function* readGoalsSaga(): any {
   const response = yield readGoals();
   console.log("res",response)
   yield put(toggleSpinner());
-  if(response){
-  yield put(goalStore(response));
-  
-
+  if(response.payload){
+  yield put(goalStore(response.payload));
   }
   else {
-    yield put(showToast('saved successfully!', 'success'));
+    yield put(showToast('Something went wrong!' ));
     yield delay(2000);
     yield put(hideToast());
   }

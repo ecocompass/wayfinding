@@ -35,7 +35,7 @@ export const goalAction = (goal: any) => {
     };
 };
 
-export const goalStore = (goal: string) => {
+export const goalStore = (goal: any) => {
     return {
         type: GOAL_STORE,
         payload: goal,

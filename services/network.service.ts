@@ -213,9 +213,11 @@ export const userPref = async (payload: any) => {
 
 export const userGoals = async (payload: any) => {
     let payload2 = payload.payload;
-    var date = new Date();
-    let created_date=Date.now();
-    let expiry_date = date.setDate(date.getDate() + 7);
+    let newDate=new Date();
+    let date= Math.floor( newDate.getTime() / 1000)
+    let created_date=date;
+    let expiry_date = newDate.setDate(newDate.getDate() + 7);
+    expiry_date=Math.floor( new Date(expiry_date).getTime() / 1000)
     let pay = [{
         type: "walking",
         target: payload2.walking_weight,
@@ -236,7 +238,8 @@ export const userGoals = async (payload: any) => {
     
     let pay2 = JSON.stringify(pay)
     let token = await readToken();
-    console.log("Mhaaro Payload", pay2)
+    console.log("token",token)
+    console.log("Mhaaro payload",pay);
     return await fetch(endpoint.goals, {
         method: 'POST',
         headers: {
@@ -272,6 +275,7 @@ export const readProfile = async () => {
 export const readGoals = async () => {
 
     let token = await readToken();
+
     return await fetch(endpoint.goals, {
         method: 'GET',
         headers: {

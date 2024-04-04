@@ -5,3 +5,6 @@ export const VIEWMODE = {
     search: "search",
     preview: "preview"
 }
+
+
+export const errorMessage='Something went wrong!'

@@ -5,7 +5,18 @@ const initialState = {
     savedLocations: [],
     pref: '',
     profile: '',
-    goal: ''
+    goal: [{
+        target: 0,
+        type: "walking"
+    },
+    {
+        target: 0,
+        type: "cycling"
+    },
+    {
+        target: 0,
+        type: "public_transport"
+    }]
 };
 
 const userDetailReducer = (state = initialState, action: any) => {
@@ -19,9 +30,9 @@ const userDetailReducer = (state = initialState, action: any) => {
         case GOAL_STORE:
             return { ...state, goal: action.payload }
         case READPROFILE:
-                return {...state, payload: action.payload }
+            return { ...state, payload: action.payload }
         case READGOALS:
-                return {...state, payload: action.payload }
+            return { ...state, payload: action.payload }
 
         default:
             return state;

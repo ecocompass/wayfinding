@@ -1,29 +1,23 @@
 /* eslint-disable react-native/no-inline-styles */
 import {
-  Input,
   VStack,
   Heading,
-  InputField,
   FormControl,
   Button,
   ButtonText,
-  Card,
   HStack,
-  Box,
   Slider,
   SliderTrack,
   SliderThumb,
   SliderFilledTrack,
   Center,
-  Tooltip,
-  TooltipContent,
+  Text,
 } from '@gluestack-ui/themed';
 
-import { Text } from "../ui/text";
 import React, { useState } from 'react';
 import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { goalAction, prefAction } from '../../store/actions/user';
+import { goalAction } from '../../store/actions/user';
 import { Bike, BusFront, Footprints } from 'lucide-react-native';
 
 const Goals = ({ navigation }: any) => {
@@ -33,7 +27,7 @@ const Goals = ({ navigation }: any) => {
     { name: 'Public Transport', value: 0 },
   ]);
   const dispatch = useDispatch();
-
+  
   const updateGoalValue = (name: string, value: any) => {
     let newGoals = allGoals.map((goal) => {
       if (goal.name === name) {
@@ -58,7 +52,7 @@ const Goals = ({ navigation }: any) => {
           <Heading size="2xl">Set Your Weekly Goals</Heading>
           <VStack space="4xl" rounded="$md" my="$5" style={{ flexWrap: 'wrap' }}>
             {allGoals.map((goal) => (
-              <VStack>
+              <VStack key={goal.name}>
                 <HStack space="4xl" alignItems='center'>
                   {goal.name === 'Biking' && <Bike />}
                   {goal.name === 'Walking' && <Footprints />}
@@ -67,7 +61,7 @@ const Goals = ({ navigation }: any) => {
                 </HStack>
 
                 <Center w="$48" ml="$20" key={goal.name}>
-                  <Text>{goal.value + 'km'}</Text>
+                  <Text>{goal.value + ' km'}</Text>
                   <HStack space="4xl">
                     <Text size="md">0 km</Text>
 
