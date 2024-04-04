@@ -112,7 +112,7 @@ const Signup = ({ navigation }: any) => {
           <VStack>
             <Button
               onPress={() => {
-                  if (!isPasswordInvalid && !isConfirmPasswordInvalid &isEmailValid) {
+                  if (!isPasswordInvalid && !isConfirmPasswordInvalid && isEmailValid) {
                   dispatch(
                       registerAction({
                         email: email,
