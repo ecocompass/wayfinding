@@ -13,8 +13,8 @@ import { getPointAnnotation, getLineAnnotation, navPointAnnotation } from "../..
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
-import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked } from 'lucide-react-native';
+import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon, StarIcon } from "@gluestack-ui/themed";
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical } from 'lucide-react-native';
 import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
@@ -239,23 +239,31 @@ const Map = ({ route, navigation }: any) => {
           }}
         >
           <MenuItem key="profile" textValue="profile" onPress={() => { RootNavigation.navigate('Profile', {}) }}>
-            <Icon as={CircleUser} size="md" mr="$2" />
+            <Icon as={CircleUser} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Profile</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="goals" textValue="goals" onPress={() => { RootNavigation.navigate('ReadGoals', {}) }}>
+            <Icon as={StarIcon} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Your Goals</MenuItemLabel>
           </MenuItem>
           <MenuItem key="locs" textValue="locs" onPress={() => {
             dispatch(getSaveLocationsAPI());
             navigation.navigate('Saved Locations')
           }}>
-            <Icon as={BookmarkCheck} size="md" mr="$2" />
+            <Icon as={BookmarkCheck} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
           </MenuItem>
           <MenuItem key="trips" textValue="trips">
-            <Icon as={Car} size="md" mr="$2" />
+            <Icon as={Car} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Your Trips</MenuItemLabel>
           </MenuItem>
           <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
-            <Icon as={LogOut} size="md" mr="$2" />
+            <Icon as={LogOut} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Logout</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="pref" textValue="preferences" onPress={() => { RootNavigation.navigate('Preference', {}) }}>
+            <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
+            <MenuItemLabel size="md">Preferences</MenuItemLabel>
           </MenuItem>
         </Menu>
         <Mapbox.MapView

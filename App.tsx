@@ -15,6 +15,8 @@ import Profile from "./components/Settings/profile";
 import ToastComponent from "./components/Toast/toast";
 import { SavedLocations } from "./components/Settings/saved_locations";
 import SpinnerComponent from "./components/Spinner/spinner";
+import Goals from "./components/Goals/user-goals";
+import ReadGoals from "./components/Settings/read_goals";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -25,9 +27,15 @@ const App = () => {
           <NavigationContainer ref={navigationRef}>
             <ToastComponent />
             <Stack.Navigator>
+            
               <Stack.Screen
                 name="Register"
                 component={Signup}
+                options={{ headerShown: false }}
+              />
+               <Stack.Screen
+                name="Login"
+                component={Login}
                 options={{ headerShown: false }}
               />
               <Stack.Screen
@@ -36,14 +44,19 @@ const App = () => {
                 component={Profile}
               />
               <Stack.Screen
-                name="Login"
-                component={Login}
                 options={{ headerShown: false }}
+                name="Goals"
+                component={Goals}
               />
               <Stack.Screen
                 options={{ headerShown: false }}
                 name="Preference"
                 component={Preference}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="ReadGoals"
+                component={ReadGoals}
               />
               <Stack.Screen
                 options={{ headerShown: false }}
