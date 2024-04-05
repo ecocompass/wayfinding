@@ -14,9 +14,9 @@ import { getPointAnnotation, getLineAnnotation, navPointAnnotation } from "../..
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
-import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked } from 'lucide-react-native';
-import { getRoutes, getSaveLocationsAPI, setCenter, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView } from "../../store/actions/setLocation";
+import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon, StarIcon } from "@gluestack-ui/themed";
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical } from 'lucide-react-native';
+import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
@@ -25,6 +25,7 @@ import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import SavedLocationModal from "../Modals/saved_location_modal";
 import { ToggleLocationModal } from "../../store/actions/modal";
 import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
+import WeatherComponent from "../Weather/weather";
 
 const simulateUserLoc = [
     [
@@ -329,7 +330,7 @@ const Map = ({ route, navigation }: any) => {
 
   const fetchLocationDetails = async (coordinateArr: any, isFromSaved: boolean = false) => {
     const response = await geoCodeApi(coordinateArr.join(','))
-    setLocationData({name: response.features[0].text, address: response.features[0].place_name, coordinates: response.features[0].center, isFromSaved});
+    setLocationData({ name: response.features[0].text, address: response.features[0].place_name, coordinates: response.features[0].center, isFromSaved });
     if (isFromSaved) {
       setPointViewed(route.params.locData);
       this.camRef.flyTo(route.params.locData, 500);
@@ -342,12 +343,12 @@ const Map = ({ route, navigation }: any) => {
     // dispatch(setCenter(feature.geometry.coordinates));
     setPointViewed(feature.geometry.coordinates);
     this.camRef.flyTo(feature.geometry.coordinates, 500)
-    setRenderedPoints([getPointAnnotation({id: 'abc', coordinates: feature.geometry.coordinates})]);
+    setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: feature.geometry.coordinates })]);
     fetchLocationDetails(feature.geometry.coordinates);
   }
 
   const getPaths = () => {
-    dispatch(getRoutes({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")}))
+    dispatch(getRoutes({ startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",") }))
     // dispatch(updateViewMode(VIEWMODE.preview))
     // getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
     //   .then((body: any) => {
@@ -395,16 +396,16 @@ const Map = ({ route, navigation }: any) => {
     })
   }
 
-  const openSaveLocationModal = (locationData:any) => {
+  const openSaveLocationModal = (locationData: any) => {
     // open modal
-    dispatch(ToggleLocationModal({visibility: true, data: locationData}))
+    dispatch(ToggleLocationModal({ visibility: true, data: locationData }))
 
   }
 
   useFocusEffect(() => {
     if (route?.params.isFromSaved) {
       fetchLocationDetails(route.params.locData, true)
-      navigation.setParams({isFromSaved: false});
+      navigation.setParams({ isFromSaved: false });
     }
   })
 
@@ -432,37 +433,45 @@ const Map = ({ route, navigation }: any) => {
   return (
     <View style={styles.page}>
       <View style={styles.container}>
-      <Menu
-        placement="bottom"
-        $py="$0"
-        trigger={({ ...triggerProps }) => {
-          return (
-            <Fab size="lg" allowAsProps={true} isHovered={false} placement="top left" mt="$20" isPressed={false} {...triggerProps} >
-              <FabIcon as={ Settings } size="xl"/>
-            </Fab>
-          )
-        }}
-      >
-        <MenuItem key="profile" textValue="profile"  onPress={()=>{ RootNavigation.navigate('Profile', {})}}>
-          <Icon as={CircleUser} size="md" mr="$2" />
-          <MenuItemLabel size="md">Profile</MenuItemLabel>
-        </MenuItem>
-        <MenuItem key="locs" textValue="locs" onPress={() => {
-          dispatch(getSaveLocationsAPI());
-          navigation.navigate('Saved Locations')
+        <Menu
+          placement="bottom"
+          $py="$0"
+          trigger={({ ...triggerProps }) => {
+            return (
+              <Fab size="lg" allowAsProps={true} isHovered={false} placement="top left" mt="$20" isPressed={false} {...triggerProps} >
+                <FabIcon as={Settings} size="xl" />
+              </Fab>
+            )
+          }}
+        >
+          <MenuItem key="profile" textValue="profile" onPress={() => { RootNavigation.navigate('Profile', {}) }}>
+            <Icon as={CircleUser} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Profile</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="goals" textValue="goals" onPress={() => { RootNavigation.navigate('ReadGoals', {}) }}>
+            <Icon as={StarIcon} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Your Goals</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="locs" textValue="locs" onPress={() => {
+            dispatch(getSaveLocationsAPI());
+            navigation.navigate('Saved Locations')
           }}>
-          <Icon as={BookmarkCheck} size="md" mr="$2" />
-          <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
-        </MenuItem>
-        <MenuItem key="trips" textValue="trips">
-          <Icon as={Car} size="md" mr="$2" />
-          <MenuItemLabel size="md">Your Trips</MenuItemLabel>
-        </MenuItem>
-        <MenuItem key="logout" textValue="logout" onPress={() => {onLogout()}}>
-          <Icon as={LogOut} size="md" mr="$2" />
-          <MenuItemLabel size="md">Logout</MenuItemLabel>
-        </MenuItem>
-      </Menu>
+            <Icon as={BookmarkCheck} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="trips" textValue="trips">
+            <Icon as={Car} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Your Trips</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
+            <Icon as={LogOut} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Logout</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="pref" textValue="preferences" onPress={() => { RootNavigation.navigate('Preference', {}) }}>
+            <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
+            <MenuItemLabel size="md">Preferences</MenuItemLabel>
+          </MenuItem>
+        </Menu>
         <Mapbox.MapView
           style={styles.map}
           onPress={getClickedPoint}
@@ -486,34 +495,35 @@ const Map = ({ route, navigation }: any) => {
           <Fab size="lg" placement="bottom right" onPress={() => {
             this.camRef.flyTo(centerLocation, 500)
           }}>
-            <FabIcon as={ LocateFixed } size="xl"/>
+            <FabIcon as={LocateFixed} size="xl" />
           </Fab>
         </Box>
-        {(viewMode === VIEWMODE.search) ? (<SearchBox onLocationSelect={selectLocation} camRef={this.camRef}/>) : (<></>)}
+        {(viewMode === VIEWMODE.search) ? (<SearchBox onLocationSelect={selectLocation} camRef={this.camRef} />) : (<></>)}
         {!isSearching && locationData?.name && viewMode === VIEWMODE.search ?
-        (<Card size="md" variant="elevated" m="$2">
-          <HStack space="4xl">
-            <Heading mb="$1" size="md">
-              {locationData.name}
-            </Heading>
-            {(!locationData.isFromSaved)? (<Button onPress={() => {openSaveLocationModal(locationData)}}  variant="outline" borderColor="transparent">
-                <ButtonIcon as={Bookmark}/>
-              </Button>) : (<Button  variant="outline" borderColor="transparent">
-                <ButtonIcon as={BookMarked}/>
+          (<Card size="md" variant="elevated" m="$2">
+            <HStack space="4xl">
+              <Heading mb="$1" size="md">
+                {locationData.name}
+              </Heading>
+              {(!locationData.isFromSaved) ? (<Button onPress={() => { openSaveLocationModal(locationData) }} variant="outline" borderColor="transparent">
+                <ButtonIcon as={Bookmark} />
+              </Button>) : (<Button variant="outline" borderColor="transparent">
+                <ButtonIcon as={BookMarked} />
               </Button>)}
-          </HStack>
-          <Text size="sm" mb="$5">{locationData.address}</Text>
-          <HStack>
-            <Button py="$2" px="$4" action="negative" onPress={() => {cancelSearch()}}>
-              <ButtonText size="sm">Cancel</ButtonText>
-              <ButtonIcon as={CloseIcon} ml="$2"/>
-            </Button>
-            <Button py="$2" px="$4" ml="$2" onPress={() => {getPaths()}}>
-              <ButtonText size="sm">Directions</ButtonText>
-              <ButtonIcon as={Compass} ml="$2"/>
-            </Button>
-          </HStack>
-        </Card>) : (<></>)}
+            </HStack>
+            <Text size="sm" mb="$5">{locationData.address}</Text>
+            <HStack>
+              <Button py="$2" px="$4" action="negative" onPress={() => { cancelSearch() }}>
+                <ButtonText size="sm">Cancel</ButtonText>
+                <ButtonIcon as={CloseIcon} ml="$2" />
+              </Button>
+              <Button py="$2" px="$4" ml="$2" onPress={() => { getPaths() }}>
+                <ButtonText size="sm">Directions</ButtonText>
+                <ButtonIcon as={Compass} ml="$2" />
+              </Button>
+            </HStack>
+            <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]} />
+          </Card>) : (<></>)}
         {(viewMode === VIEWMODE.preview || viewMode === VIEWMODE.navigate || viewMode === VIEWMODE.navigateEnd) ? (
           <PreviewNavigate
             onRender={onPathRender}
@@ -522,7 +532,7 @@ const Map = ({ route, navigation }: any) => {
             camRef={this.camRef}
             onTripStart={tripStart}/>
         ) : (<></>)}
-        {locationData.name ? <SavedLocationModal/> : <></>}
+        {locationData.name ? <SavedLocationModal /> : <></>}
       </View>
     </View>
   );
