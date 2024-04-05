@@ -314,7 +314,6 @@ const Map = ({ route, navigation }: any) => {
   const userLocationUpdate = (data: any) => {
     // dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
     if (viewMode === VIEWMODE.navigate) {
-        console.log(psuedoIndex,simulateUserLoc[psuedoIndex])
         dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
         setPseudoIndex(psuedoIndex + 1);
     }
@@ -420,14 +419,14 @@ const Map = ({ route, navigation }: any) => {
             end: {
                 coordinates: locationData.coordinates,
                 location_name: locationData.name
-            }
+            },
+            startTime: new Date().getTime()
         }
         dispatch(updateUserDirectionView());
         dispatch(updateTripDetails(tripData))
     } catch (err) {
         console.log(err, 'could not fetch loation details')
     }
-    
   }
 
   return (

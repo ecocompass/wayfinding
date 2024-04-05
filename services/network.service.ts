@@ -179,15 +179,15 @@ export const getSaveLocations = async function () {
 };
 
 export const saveTrip = async function (data: any) {
-    const token = await token();
-    let strData = JSON.stringify(data);
+    const token = await readToken();
+    let strData = JSON.stringify({ data });
     return await fetch(endpoint.saveTrip, {
         method: 'POST',
-        body: data,
+        body: { data },
         headers: {
             'Authorization': `Bearer ${token.accessToken}`,
             'Content-Type': 'application/json',
-            'Content-Length': stringData,
+            'Content-Length': strData,
         },
     }).then(response => {
         return response.status === status.ok ? response.json() : false;

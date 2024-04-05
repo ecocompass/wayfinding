@@ -57,7 +57,6 @@ export const PreviewNavigate = (props: any) => {
       // dispatch(setCenter(state.location.userLocation));
       // console.log(state.location.userLocation);
     }
-    console.log('UPDATE LOC')
     return state.location.userLocation;
   });
 
@@ -105,6 +104,19 @@ export const PreviewNavigate = (props: any) => {
     });
     return arrivalTime;
   };
+
+  const formatTime = (end, start) => {
+    let diff = end - start
+    let mins = Math.trunc(diff/1000/60);
+    let hours = 0
+    if(mins < 60) {
+      return `${mins} Mins`;
+    } else {
+      hours = Math.trunc(diff/1000/60/60);
+      mins = Math.trunc(diff%(1000*60*60)/1000/60);
+      return `${hours} Hrs ${mins} Mins`;
+    }
+  }
 
   useEffect(() => {
     if (viewMode === VIEWMODE.preview) {
@@ -203,6 +215,8 @@ export const PreviewNavigate = (props: any) => {
         startLocation: tripDetails.startLocation,
         endLocation: tripDetails.endLocation,
         ...distances,
+        endTime: new Date().getTime(),
+        startTime: tripDetails.startTime,
       };
       this.camRef.fitBounds(
         tripDetails.startLocation.coordinates,
@@ -493,7 +507,11 @@ export const PreviewNavigate = (props: any) => {
           <Card size="md" variant="elevated" m="$2">
             <HStack space="4xl">
               <Heading mb="$1" size="md">
-                {tripDetails.startLocation.location_name} to {tripDetails.endLocation.location_name}
+                {tripDetails.startLocation.location_name} to{" "}
+                {tripDetails.endLocation.location_name}{" "}
+                {tripDetails.endTime
+                  ? `${formatTime(tripDetails.endTime, tripDetails.startTime)}`
+                  : ""}
               </Heading>
             </HStack>
             <Text size="sm" mb="$5"> </Text>
