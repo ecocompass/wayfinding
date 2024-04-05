@@ -14,7 +14,9 @@ import {
     GET_SAVE_LOCATIONS,
     UPDATEPATHVIEWED,
     RESETPATHS,
-    VIEWUSERDIRECTION
+    VIEWUSERDIRECTION,
+    UPDATETRIPSTART,
+    SAVETRIP
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -85,6 +87,13 @@ export const saveLocationAPI = (payload: any) => {
     };
 };
 
+export const saveTripAPI = (payload: any) => {
+    return {
+        type: SAVETRIP,
+        payload
+    }
+}
+
 export const getSaveLocationsAPI = () => {
     return {
         type: GET_SAVE_LOCATIONS
@@ -101,5 +110,12 @@ export const updateViewedPath = (pathId) => {
 export const resetPaths = () => {
     return {
         type: RESETPATHS,
+    }
+}
+
+export const updateTripDetails = (payload) => {
+    return {
+        type: UPDATETRIPSTART,
+        payload,
     }
 }

@@ -4,7 +4,8 @@ export const MAPBOX_PUBLIC_TOKEN =
 export const VIEWMODE = {
     search: "search",
     preview: "preview",
-    navigate: "navigate"
+    navigate: "navigate",
+    navigateEnd: "navigateEnd"
 };
 
 export const status = {

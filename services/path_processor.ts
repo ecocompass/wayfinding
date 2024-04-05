@@ -2,11 +2,13 @@
 
 import { getTimeFromDistanceSingle } from "./time_to_dest";
 
-const mapModeToInstruction: any = {
+export const mapModeToInstruction: any = {
     "walk": 'Walk to ',
     "bus": 'Take bus no. ',
     "luas": 'Take luas ',
-}
+    "car": 'Drive to ',
+    "bike": 'Bike to ',
+};
 
 export function process_path(response: any) {
     let returnRecc: any = [];
@@ -31,7 +33,7 @@ export function getPathInstructions(path: any, destinationName: string) {
     let instructionArr: any = [];
     path.modePathList.forEach((p: any, index) => {
         if (index !== path.modePathList.length - 1) {
-            if (p.mode === 'walk') {
+            if (p.mode === 'walk' || p.mode === 'car' || p.mode === 'bike') {
                 instructionArr.push({
                     instruction: `${mapModeToInstruction[p.mode]} ${path.modePathList[index + 1].startStopName}`,
                     time: `${getTimeFromDistanceSingle(p.mode, p.distance)} mins`,

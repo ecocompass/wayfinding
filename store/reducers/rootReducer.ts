@@ -15,7 +15,7 @@ const rootReducer = combineReducers({
     toast: toastReducer,
     userDetails: userDetailReducer,
     modal: modalReducer,
-    spinner: spinnerReducer
+    spinner: spinnerReducer,
 });
 
 export default rootReducer;

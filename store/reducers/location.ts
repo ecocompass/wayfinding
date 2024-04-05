@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE, UPDATEPATHVIEWED, RESETPATHS, VIEWUSERDIRECTION } from "../actions";
+import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE, UPDATEPATHVIEWED, RESETPATHS, VIEWUSERDIRECTION, UPDATETRIPSTART } from "../actions";
 import { VIEWMODE } from "../../constants";
 import { UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
 
@@ -11,6 +11,7 @@ const initialState = {
     viewMode: VIEWMODE.search,
     recommendedRoutes: {},
     isViewUserDirection: false,
+    tripDetails: {},
 };
 
 const locationReducer = (state = initialState, action: any) => {
@@ -45,6 +46,7 @@ const locationReducer = (state = initialState, action: any) => {
             return {
                 ...state,
                 recommendedRoutes: {},
+                tripDetails: {},
             };
 
         case VIEWUSERDIRECTION:
@@ -52,7 +54,14 @@ const locationReducer = (state = initialState, action: any) => {
                 ...state,
                 isViewUserDirection: !state.isViewUserDirection,
 
-            }
+            };
+
+        case UPDATETRIPSTART:
+            let tripDetailObj = { ...state.tripDetails, startLocation: action.payload.start, endLocation: action.payload.end }
+            return {
+                ...state,
+                tripDetails: tripDetailObj,
+            };
         default:
             return state;
     }

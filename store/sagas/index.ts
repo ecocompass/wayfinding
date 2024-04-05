@@ -14,6 +14,7 @@ import {
   GET_SAVE_LOCATIONS,
   SAVE_LOCATION_STORE,
   PROFILE,
+  SAVETRIP,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -29,6 +30,8 @@ import {
   readProfile,
   userPref,
   getPreference,
+  saveTrip,
+  geoCodeApi,
 } from "../../services/network.service";
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
@@ -137,6 +140,19 @@ function* getPathSaga(action: any): any {
   ]);
 }
 
+function* saveTripSaga(action: any): any {
+  yield put(toggleSpinner());
+  const response = yield saveTrip(action.payload);
+  yield put(toggleSpinner());
+
+  if (!response || !response.error) {
+    yield call(handleToast, 'Trip Completed!', 'success');
+
+  } else {
+    yield call(handleToast, errorMessage);
+  }
+}
+
 function* saveLocationSaga(action: any): any {
   yield put(toggleSpinner());
   const response = yield saveLocation(action.payload);
@@ -172,6 +188,10 @@ function* ProfileSaga(): any {
   } else {
     yield call(handleToast, errorMessage);
   }
+}
+
+function* watchSaveTrip(): SagaIterator {
+  yield takeLatest(SAVETRIP, saveTripSaga);
 }
 
 function* watchGetPath(): SagaIterator {
@@ -219,6 +239,7 @@ function* appSagas() {
     call(watchLogoutSaga),
     call(watchGetLocationSaga),
     call(watchProfileSaga),
+    call(watchSaveTrip),
   ]);
 }
 

@@ -13,6 +13,7 @@ const endpoint = {
     saveLocation: `${liveUrl}user/savedlocations`,
     pref: `${liveUrl}user/preferences`,
     profile: `${liveUrl}user/profile`,
+    saveTrip: `${liveUrl}user/trips`,
 };
 let access_token: any = '';
 
@@ -143,8 +144,9 @@ export const removeStorageItem = function (key: string) {
 };
 
 export const getPath = async function (coordinateObj: any) {
+    console.log(coordinateObj);
     const token = await readToken();
-    return fetch(`https://route.ecocompass.live/api/routes2?` + new URLSearchParams(coordinateObj),
+    return fetch(`http://prod.ecocompass.live/api/routes2?` + new URLSearchParams(coordinateObj),
         {
             method: 'GET',
             headers: {
@@ -152,8 +154,9 @@ export const getPath = async function (coordinateObj: any) {
             },
         })
         .then((response) => {
-            console.log(response.status);
-            return response.json();
+            if (response.status === status.ok) {
+                return response.json();
+            }
         })
         .catch(e => console.log(e));
 };
@@ -173,7 +176,25 @@ export const getSaveLocations = async function () {
             return response.status === status.ok ? response.json() : false;
 
         }).catch(e => console.log(e));
-}
+};
+
+export const saveTrip = async function (data: any) {
+    const token = await token();
+    let strData = JSON.stringify(data);
+    return await fetch(endpoint.saveTrip, {
+        method: 'POST',
+        body: data,
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+            'Content-Length': stringData,
+        },
+    }).then(response => {
+        return response.status === status.ok ? response.json() : false;
+    }).catch(err => {
+        return { error: true, message: err };
+    });
+};
 
 export const saveLocation = async function (data: any) {
     const token = await readToken();

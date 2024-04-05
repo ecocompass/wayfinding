@@ -4,7 +4,7 @@ import { PREF_STORE, READPROFILE, SAVE_LOCATION_STORE } from "../actions";
 const initialState = {
     savedLocations: [],
     pref: '',
-    profile: ''
+    profile: '',
 };
 
 const userDetailReducer = (state = initialState, action: any) => {
@@ -14,7 +14,7 @@ const userDetailReducer = (state = initialState, action: any) => {
         case PREF_STORE:
             return { ...state, pref: action.payload };
         case READPROFILE:
-            return { ...state, profile: action.payload }
+            return { ...state, profile: action.payload };
         default:
             return state;
     }
