@@ -1,3 +1,4 @@
+/* eslint-disable comma-dangle */
 /* eslint-disable prettier/prettier */
 /* eslint-disable semi */
 /* eslint-disable prettier/prettier */
@@ -15,7 +16,7 @@ import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon, StarIcon } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical } from 'lucide-react-native';
-import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setSearchStatus, setZoom, updateViewMode } from "../../store/actions/setLocation";
+import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
@@ -25,6 +26,177 @@ import SavedLocationModal from "../Modals/saved_location_modal";
 import { ToggleLocationModal } from "../../store/actions/modal";
 import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
 import WeatherComponent from "../Weather/weather";
+
+const simulateUserLoc = [
+    [
+        -6.2002511,
+        53.2546028
+    ],
+    [
+        -6.200716,
+        53.2552608
+    ],
+    [
+        -6.2007527,
+        53.2552885
+    ],
+    [
+        -6.2008693,
+        53.2553366
+    ],
+    [
+        -6.2018961,
+        53.2557489
+    ],
+    [
+        -6.2019979,
+        53.2558054
+    ],
+    [
+        -6.2018546,
+        53.2558863
+    ],
+    [
+        -6.2015998,
+        53.2560933
+    ],
+    [
+        -6.2013343,
+        53.2563147
+    ],
+    [
+        -6.2010535,
+        53.2565575
+    ],
+    [
+        -6.2004962,
+        53.2570407
+    ],
+    [
+        -6.2003433,
+        53.2571749
+    ],
+    [
+        -6.2003202,
+        53.2571952
+    ],
+    [
+        -6.2002541,
+        53.2572532
+    ],
+    [
+        -6.2001783,
+        53.2573192
+    ],
+    [
+        -6.1998602,
+        53.2576049
+    ],
+    [
+        -6.1997834,
+        53.257641
+    ],
+    [
+        -6.1997601,
+        53.2576625
+    ],
+    [
+        -6.1994061,
+        53.2579889
+    ],
+    [
+        -6.1993657,
+        53.2580264
+    ],
+    [
+        -6.1993371,
+        53.2580531
+    ],
+    [
+        -6.1992148,
+        53.2582036
+    ],
+    [
+        -6.1992115,
+        53.2582268
+    ],
+    [
+        -6.199139,
+        53.2582039
+    ],
+    [
+        -6.1990881,
+        53.2582138
+    ],
+    [
+        -6.1989936,
+        53.2581854
+    ],
+    [
+        -6.1989224,
+        53.2582692
+    ],
+    [
+        -6.1988729,
+        53.2583322
+    ],
+    [
+        -6.1988905,
+        53.2583626
+    ],
+    [
+        -6.1988768,
+        53.2583846
+    ],
+    [
+        -6.1988541,
+        53.2584161
+    ],
+    [
+        -6.1988369,
+        53.2584396
+    ],
+    [
+        -6.198426,
+        53.258206
+    ],
+    [
+        -6.1992771,
+        53.2585549
+    ],
+    [
+        -6.2007417,
+        53.2591263
+    ],
+    [
+        -6.2023482,
+        53.2597183
+    ],
+    [
+        -6.2034598,
+        53.2601025
+    ],
+    [
+        -6.2050499,
+        53.2608132
+    ],
+    [
+        -6.20587675995805,
+        53.2611212221176
+    ],
+    [
+        -6.205947,
+        53.261063
+    ],
+    [
+        -6.2065607,
+        53.2611842
+    ],
+    [
+        -6.2062495,
+        53.2610679
+    ]
+]
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -75,6 +247,10 @@ const Map = ({ route, navigation }: any) => {
     return state.location.userLocation
   }); // Longitude, Latitude
 
+  let isViewUserDirection = useSelector((state: any) => {
+    return state.location.isViewUserDirection;
+  })
+
   let centerLocation = useSelector((state: any) => {
     return state.location.centerLocation
   });
@@ -91,6 +267,10 @@ const Map = ({ route, navigation }: any) => {
     return state.location.viewMode
   });
 
+  let userPrefs = useSelector((state: any) => {
+    return state.userDetails.pref
+  })
+
   let [pointViewed, setPointViewed] = useState([])
 
   let [isLocationSelected, setLocationCard] = useState(false)
@@ -102,7 +282,7 @@ const Map = ({ route, navigation }: any) => {
     Geolocation.getCurrentPosition(
       (position) => {
         dispatch(setCenter([position.coords.longitude, position.coords.latitude]));
-        dispatch(setLocation([position.coords.longitude, position.coords.latitude]));
+        dispatch(setUserLocation([position.coords.longitude, position.coords.latitude]));
       },
       (error) => {
         console.log(error.code, error.message);
@@ -114,6 +294,7 @@ const Map = ({ route, navigation }: any) => {
   //   let startingPoint = [-6.2653554, 53.324153];
   let destinationPoint = [-6.2650513, 53.3256942];
   const [renderedPoints, setRenderedPoints] = useState<any>([])
+  const [psuedoIndex, setPseudoIndex] = useState<any>(0)
 
   useEffect(() => {
     if (Platform.OS === "android") {
@@ -128,14 +309,18 @@ const Map = ({ route, navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    dispatch(setLocation([0, 0]))
+    dispatch(setUserLocation([0,0]))
   };
 
   const userLocationUpdate = (data: any) => {
+    // dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
+    if (viewMode === VIEWMODE.navigate) {
+        dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
+        setPseudoIndex(psuedoIndex + 1);
+    }
   };
 
   const selectLocation = (data: any) => {
-    console.log(data);
     setPointViewed(data.center);
     this.camRef.flyTo(data.center, 500);
     setLocationData(data);
@@ -224,6 +409,27 @@ const Map = ({ route, navigation }: any) => {
     }
   })
 
+  const tripStart = async (startLocation: any) => {
+    try {
+        const response = await geoCodeApi(startLocation.join(','))
+        let tripData = {
+            start: {
+                coordinates: response.features[0].center,
+                location_name: response.features[0].text
+            },
+            end: {
+                coordinates: locationData.coordinates,
+                location_name: locationData.name
+            },
+            startTime: new Date().getTime()
+        }
+        dispatch(updateUserDirectionView());
+        dispatch(updateTripDetails(tripData))
+    } catch (err) {
+        console.log(err, 'could not fetch loation details')
+    }
+  }
+
   return (
     <View style={styles.page}>
       <View style={styles.container}>
@@ -278,11 +484,12 @@ const Map = ({ route, navigation }: any) => {
             centerCoordinate={centerLocation}
             animationMode={"flyTo"}
             animationDuration={1000}
+            // followUserLocation={viewMode === VIEWMODE.navigate}
           />
           {renderedPoints}
           {/* {navPoints.length ? (navPointAnnotation(navPoints)) : <></> } */}
-          <Mapbox.UserLocation onUpdate={userLocationUpdate} />
-          {renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
+          <Mapbox.UserLocation onUpdate={userLocationUpdate} showsUserHeadingIndicator={isViewUserDirection}/>
+          { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
           <Fab size="lg" placement="bottom right" onPress={() => {
@@ -317,8 +524,13 @@ const Map = ({ route, navigation }: any) => {
             </HStack>
             <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]} />
           </Card>) : (<></>)}
-        {(viewMode === VIEWMODE.preview) ? (
-          <PreviewNavigate onRender={onPathRender} onPointsRender={onPointsRender} destinationName={locationData.name}/>
+        {(viewMode === VIEWMODE.preview || viewMode === VIEWMODE.navigate || viewMode === VIEWMODE.navigateEnd) ? (
+          <PreviewNavigate
+            onRender={onPathRender}
+            onPointsRender={onPointsRender}
+            destinationName={locationData.name}
+            camRef={this.camRef}
+            onTripStart={tripStart}/>
         ) : (<></>)}
         {locationData.name ? <SavedLocationModal /> : <></>}
       </View>

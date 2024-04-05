@@ -26,13 +26,13 @@ const userDetailReducer = (state = initialState, action: any) => {
         case PREF_STORE:
             return { ...state, pref: action.payload };
         case READPROFILE:
-            return { ...state, profile: action.payload }
+            return { ...state, profile: action.payload };
         case GOAL_STORE:
-            return { ...state, goal: action.payload }
+            return { ...state, goal: action.payload };
         case READPROFILE:
-            return { ...state, payload: action.payload }
+            return { ...state, payload: action.payload };
         case READGOALS:
-            return { ...state, payload: action.payload }
+            return { ...state, payload: action.payload };
 
         default:
             return state;

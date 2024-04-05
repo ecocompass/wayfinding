@@ -17,7 +17,7 @@ const rootReducer = combineReducers({
     userDetails: userDetailReducer,
     modal: modalReducer,
     spinner: spinnerReducer,
-    weather:weatherReducer
+    weather: weatherReducer,
 });
 
 export default rootReducer;
