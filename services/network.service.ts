@@ -17,6 +17,7 @@ const endpoint = {
     saveTrip: `${liveUrl}user/trips`,
     goals: `${liveUrl}user/goals`,
     weather: `https://api.openweathermap.org/data/2.5/weather?`,
+    feedback:`${liveUrl}trips/feedback`
 };
 let access_token: any = '';
 
@@ -225,6 +226,24 @@ export const userPref = async (payload: any) => {
     console.log("Pref", payload2)
     let token = await readToken();
     return await fetch(endpoint.pref, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': String(payload2),
+            'Authorization': `Bearer ${token.accessToken}`,
+        },
+        body: payload2,
+    }).then(response => {
+        return response.status === status.ok ? response.json() : false;
+    })
+        .catch(err => console.log("Error", err));
+};
+export const userFeedback = async (payload: any) => {
+    let payload2 = payload.payload;
+    payload2 = JSON.stringify(payload2);
+    console.log("Feedback", payload2)
+    let token = await readToken();
+    return await fetch(endpoint.feedback, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

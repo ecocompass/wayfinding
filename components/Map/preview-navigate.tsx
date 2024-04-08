@@ -33,6 +33,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  setFeedback,
   resetPaths,
   saveTripAPI,
   setCenter,
@@ -48,6 +49,8 @@ import {
   processPathCleared,
 } from '../../services/path_processor';
 import { View } from 'react-native';
+import FeedbackModal from '../Modals/feedback_modal';
+import AwardModal from '../Modals/award_modal';
 
 export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef } = props;
@@ -75,7 +78,8 @@ export const PreviewNavigate = (props: any) => {
   let [pathInstructions, setPathInstructions] = useState<any>([]);
   let [pathSegments, setPathSegments] = useState<any>([]);
   let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
-
+  let [feedbackModal,setFeedbackModal]=useState(false);
+  const awards= useSelector((state:any)=>{return state.location.awards})
   const iconMap = {
     walk: FootprintsIcon,
     bus: BusIcon,
@@ -498,6 +502,7 @@ export const PreviewNavigate = (props: any) => {
       );
     case VIEWMODE.navigateEnd:
       return (
+     <> 
         <Box>
           <HStack justifyContent="space-between" alignItems="center" p="$4">
             <Heading size="md" pb="$3">
@@ -520,13 +525,20 @@ export const PreviewNavigate = (props: any) => {
                 <ButtonText size="sm">Okay</ButtonText>
                 <ButtonIcon as={CheckCircleIcon} ml="$2"/>
               </Button>
-              <Button py="$2" px="$4" ml="$2" onPress={() => {}}>
+              <Button py="$2" px="$4" ml="$2" onPress={() => {
+                setFeedbackModal(true)
+              }}>
                 <ButtonText size="sm">Feedback</ButtonText>
                 <ButtonIcon as={ReplyIcon} ml="$2"/>
               </Button>
             </HStack>
           </Card>
         </Box>
+        {!feedbackModal?<FeedbackModal trip_id={awards}/>
+            :<></>}
+                    {awards?<AwardModal award={awards}/>
+            :<></>}
+            </>
       );
   }
 };

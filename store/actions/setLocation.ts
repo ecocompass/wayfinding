@@ -18,7 +18,9 @@ import {
     RESETPATHS,
     VIEWUSERDIRECTION,
     UPDATETRIPSTART,
-    SAVETRIP
+    SAVETRIP,
+    SETAWARDS,
+    SETFEEDBACK
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -134,4 +136,16 @@ export const getWeather = (payload: any) => {
         type: GETWEATHER,
         payload: payload
     }
+}
+export const setAwards=(payload:any)=>{
+    return {
+        type: SETAWARDS,
+        payload:payload
+    }  
+}
+export const setFeedback=(payload:any)=>{
+    return {
+        type: SETFEEDBACK,
+        payload:payload
+    }  
 }

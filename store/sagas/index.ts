@@ -19,6 +19,7 @@ import {
   SETGOALS,
   READGOALS,
   SETWEATHER,
+  SETFEEDBACK,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -38,14 +39,15 @@ import {
   geoCodeApi,
   userGoals,
   readGoals,
-  fetchWeather
+  fetchWeather,
+  userFeedback
 } from "../../services/network.service";
 
 import { goalStore, prefStore, storeProfile } from "../actions/user";
 
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
-import { getWeather, hideToast, showToast } from "../actions/setLocation";
+import { getWeather, hideToast, setAwards, showToast } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
 
@@ -160,7 +162,9 @@ function* saveTripSaga(action: any): any {
   yield put(toggleSpinner());
   const response = yield saveTrip(action.payload);
   yield put(toggleSpinner());
-
+  if(response.payload){
+    console.log("response save trip",response)
+    yield put(setAwards(response.payload))}
   if (!response || !response.error) {
     yield call(handleToast, 'Trip Completed!', 'success');
 
@@ -235,6 +239,19 @@ function* readGoalsSaga(): any {
   }
 }
 
+function* feedbackSaga(payload:any): any {
+  yield put(toggleSpinner());
+  const response = yield userFeedback(payload);
+  console.log("res", response)
+  yield put(toggleSpinner());
+  if (response.payload) {
+    yield call(handleToast,successMessage)
+  }
+  else {
+    yield call(handleToast,errorMessage)
+  }
+}
+
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -284,6 +301,10 @@ function* watchProfileSaga(): SagaIterator {
 function* watchWeatherSaga(): SagaIterator {
   yield takeLatest(SETWEATHER, WeatherSaga);
 }
+
+function* watchFeedbackSaga(): SagaIterator {
+  yield takeLatest(SETFEEDBACK, feedbackSaga);
+}
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
@@ -299,6 +320,7 @@ function* appSagas() {
     call(watchGoalSaga),
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
+    call(watchFeedbackSaga)
   ]);
 }
 
