@@ -1,4 +1,5 @@
 const OfflineMap=()=>{
+    console.log("offline map?")
     return null;
 }
 

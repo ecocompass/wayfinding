@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE, UPDATEPATHVIEWED } from "../actions";
+import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, PREF_STORE, UPDATEPATHVIEWED, RESETPATHS, VIEWUSERDIRECTION, UPDATETRIPSTART, UPDATETRIPEND } from "../actions";
 import { VIEWMODE } from "../../constants";
 import { UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
 
@@ -9,7 +9,10 @@ const initialState = {
     isSearching: false,
     zoomLevel: 14,
     viewMode: VIEWMODE.search,
-    recommendedRoutes: {}
+    recommendedRoutes: {},
+    isViewUserDirection: false,
+    tripDetails: {},
+    weather: {},
 };
 
 const locationReducer = (state = initialState, action: any) => {
@@ -39,6 +42,40 @@ const locationReducer = (state = initialState, action: any) => {
             });
             return {
                 ...state, recommendedRoutes: { options: updatedRoutes },
+            };
+        case RESETPATHS:
+            return {
+                ...state,
+                recommendedRoutes: {},
+                tripDetails: {},
+            };
+
+        case VIEWUSERDIRECTION:
+            return {
+                ...state,
+                isViewUserDirection: !state.isViewUserDirection,
+
+            };
+
+        case UPDATETRIPSTART:
+            let tripDetailObj = {
+                ...state.tripDetails,
+                startLocation: action.payload.start,
+                endLocation: action.payload.end,
+                startTime: action.payload.startTime,
+            }
+            return {
+                ...state,
+                tripDetails: tripDetailObj,
+            };
+        case UPDATETRIPEND:
+            let tripDetailEndObj: any = {
+                ...state.tripDetails,
+                ...action.payload,
+            };
+            return {
+                ...state,
+                tripDetails: tripDetailEndObj,
             };
         default:
             return state;

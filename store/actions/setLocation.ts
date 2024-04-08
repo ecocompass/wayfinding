@@ -12,15 +12,27 @@ import {
     GETROUTES,
     UPDATEVIEWMODE,
     GET_SAVE_LOCATIONS,
+    SETWEATHER,
+    GETWEATHER,
     UPDATEPATHVIEWED,
+    RESETPATHS,
+    VIEWUSERDIRECTION,
+    UPDATETRIPSTART,
+    SAVETRIP
 } from '.';
 
-export const setLocation = (location: any) => {
+export const setUserLocation = (location: any) => {
     return {
         type: UPDATEUSERLOCATION,
         payload: location,
     };
 };
+
+export const updateUserDirectionView = () => {
+    return {
+        type: VIEWUSERDIRECTION,
+    }
+}
 
 export const setCenter = (location: any) => {
     return {
@@ -77,15 +89,49 @@ export const saveLocationAPI = (payload: any) => {
     };
 };
 
+export const saveTripAPI = (payload: any) => {
+    return {
+        type: SAVETRIP,
+        payload
+    }
+}
+
 export const getSaveLocationsAPI = () => {
     return {
         type: GET_SAVE_LOCATIONS
     }
 }
 
-export const updateViewedPath = (pathId) => {
+
+export const updateViewedPath = (pathId: any) => {
     return {
         type: UPDATEPATHVIEWED,
         payload: pathId
+    }
+}
+
+export const resetPaths = () => {
+    return {
+        type: RESETPATHS,
+    }
+}
+
+export const updateTripDetails = (payload) => {
+    return {
+        type: UPDATETRIPSTART,
+        payload,
+    }
+}
+export const setWeather = (location: any) => {
+    return {
+        type: SETWEATHER,
+        payload: location
+    }
+}
+
+export const getWeather = (payload: any) => {
+    return {
+        type: GETWEATHER,
+        payload: payload
     }
 }

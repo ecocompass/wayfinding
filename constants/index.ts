@@ -3,7 +3,10 @@ export const MAPBOX_PUBLIC_TOKEN =
 
 export const VIEWMODE = {
     search: "search",
-    preview: "preview"
+    preview: "preview",
+    navigate: "navigate",
+    navigateEnd: "navigateEnd",
+    downloadMap: "downloadMap"
 };
 
 export const status = {
@@ -12,4 +15,8 @@ export const status = {
 
 export const errorMessage = 'Somethin went wrong!';
 
-export const successMessage= 'Saved successfully!';
+export const successMessage = 'Saved successfully!';
+
+export const weather_api_key = '299ef29cb04aebf9bfbcd57e4f38bb0a';
+
+export const weather_url = 'https://openweathermap.org/img/wn/'
