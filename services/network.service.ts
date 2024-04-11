@@ -366,6 +366,7 @@ export const fetchWeather = async (payload: any) => {
 }
 export const getTripHistory = async function () {
     const token = await readToken();
+    console.log("Token",token)
     return await fetch(endpoint.saveTrip, {
         method: 'GET',
         headers: {

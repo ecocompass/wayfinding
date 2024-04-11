@@ -65,12 +65,12 @@ const App = () => {
                 component={Map}
               />
               <Stack.Screen
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
                 name="Saved Locations"
                 component={SavedLocations}
               />
                 <Stack.Screen
-                options={{ headerShown: false}}
+                options={{ headerShown: true}}
                 name="TripHistory"
                 component={TripHistory}
               />

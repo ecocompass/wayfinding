@@ -253,8 +253,8 @@ function* tripHistorySaga(): any {
   const response = yield getTripHistory();
   console.log("res", response)
   yield put(toggleSpinner());
-  if (response.payload) {
-    yield put(getTrips(response.payload));
+  if (response.saved_locations) {
+    yield put(getTrips(response.saved_locations));
   }
   else { handleToast(errorMessage) }
 }

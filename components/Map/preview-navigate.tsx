@@ -42,7 +42,7 @@ import {
   updateViewedPath,
 } from '../../store/actions/setLocation';
 import { VIEWMODE } from '../../constants';
-import { getTimeFromDistance } from '../../services/time_to_dest';
+import { formatTime, getTimeFromDistance } from '../../services/time_to_dest';
 import {
   getPathInstructions,
   getUserPositionInSegment,
@@ -114,19 +114,6 @@ export const PreviewNavigate = (props: any) => {
       minute: '2-digit',
     });
     return arrivalTime;
-  };
-
-  const formatTime = (end, start) => {
-    let diff = end - start;
-    let mins = Math.trunc(diff / 1000 / 60);
-    let hours = 0;
-    if (mins < 60) {
-      return `${mins} Mins`;
-    } else {
-      hours = Math.trunc(diff / 1000 / 60 / 60);
-      mins = Math.trunc((diff % (1000 * 60 * 60)) / 1000 / 60);
-      return `${hours} Hrs ${mins} Mins`;
-    }
   };
 
   const openFeedbackModal = () => {
