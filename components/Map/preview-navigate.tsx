@@ -202,9 +202,6 @@ export const PreviewNavigate = (props: any) => {
             }
           );
 
-          // userPositionOnPath[0] = 0;
-          // setUserPositionOnPath(0);
-          // setPathSegments(tempPathSegments);
           setUserPositionAndPathSegment({
             userPosition: 0,
             pathSegments: tempPathSegments,
@@ -444,7 +441,7 @@ export const PreviewNavigate = (props: any) => {
         <Box>
           <HStack justifyContent="space-between" alignItems="center" p="$4">
             <Heading size="md" pb="$3">
-              Estimated Arrival :
+              ETA:
             </Heading>
             <Button
               size="sm"

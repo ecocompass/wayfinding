@@ -81,7 +81,6 @@ function* loginSaga(payload: any): any {
   if (response.access_token) {
     yield saveToken(response.access_token);
     const res = yield getPreference();
-    console.log("getpref", response);
     if (res.payload) {
       yield put(prefStore(res.payload));
       RootNavigation.navigate('Map', {});
@@ -174,13 +173,12 @@ function* saveTripSaga(action: any): any {
   yield put(toggleSpinner());
   const response = yield saveTrip(action.payload);
   yield put(toggleSpinner());
-  console.log(response);
-  if (response && response.payload) {
+  if (response) {
     yield call(handleToast, 'Trip Completed!', 'success');
-    yield put(setAwards(response.payload));
+    // handle awards
+    // yield put(setAwards(response.payload));
   }
   if (!response || response.error) {
-    console.log(response);
     yield call(handleToast, errorMessage);
   }
 }
@@ -210,7 +208,6 @@ function* logoutSaga(): any {
   yield put(toggleSpinner());
   const response = yield userLogout();
   yield put(toggleSpinner());
-  console.log(response);
   yield removeStorageItem('access_token_obj');
   RootNavigation.navigate('Register', {});
 }
@@ -254,7 +251,6 @@ function* readGoalsSaga(): any {
 function* feedbackSaga(payload: any): any {
   yield put(toggleSpinner());
   const response = yield userFeedback(payload);
-  console.log("res", response);
   yield put(toggleSpinner());
   if (response.payload) {
     yield call(handleToast, successMessage);
