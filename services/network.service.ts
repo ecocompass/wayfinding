@@ -17,7 +17,7 @@ const endpoint = {
     saveTrip: `${liveUrl}user/trips`,
     goals: `${liveUrl}user/goals`,
     weather: `https://api.openweathermap.org/data/2.5/weather?`,
-    feedback:`${liveUrl}trips/feedback`
+    feedback: `${liveUrl}trips/feedback`
 };
 let access_token: any = '';
 
@@ -85,7 +85,6 @@ export const userLogin = async (payload: any) => {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Content-Length': String(payload2),
         },
         body: payload2,
     }).then(response => {
@@ -160,9 +159,12 @@ export const getPath = async function (coordinateObj: any) {
         .then((response) => {
             if (response.status === status.ok) {
                 return response.json();
-            }
+            } else return false
         })
-        .catch(e => console.log(e));
+        .catch(e => {
+            console.log(e);
+            return false
+        });
 };
 
 export const getSaveLocations = async function () {
@@ -184,17 +186,22 @@ export const getSaveLocations = async function () {
 
 export const saveTrip = async function (data: any) {
     const token = await readToken();
-    let strData = JSON.stringify({ data });
+    let strData = JSON.stringify(data);
     return await fetch(endpoint.saveTrip, {
         method: 'POST',
-        body: { data },
+        body: strData,
         headers: {
             'Authorization': `Bearer ${token.accessToken}`,
             'Content-Type': 'application/json',
             'Content-Length': strData,
         },
     }).then(response => {
-        return response.status === status.ok ? response.json() : false;
+        if (response.status === status.ok) {
+            return response.json();
+        } else {
+            console.log(response.status)
+            return { error: true, response: response.json() }
+        }
     }).catch(err => {
         return { error: true, message: err };
     });
@@ -202,17 +209,15 @@ export const saveTrip = async function (data: any) {
 
 export const saveLocation = async function (data: any) {
     const token = await readToken();
-    let stringData = JSON.stringify(data);
     return await fetch(endpoint.saveLocation, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${token.accessToken}`,
             'Content-Type': 'application/json',
-            'Content-Length': stringData,
         },
-        body: data,
+        body: JSON.stringify(data),
+        redirect: 'follow',
     }).then(response => {
-
         return response.status === status.ok ? response.json() : false;
     })
         .catch(error => {
@@ -223,7 +228,6 @@ export const saveLocation = async function (data: any) {
 export const userPref = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
-    console.log("Pref", payload2)
     let token = await readToken();
     return await fetch(endpoint.pref, {
         method: 'POST',
@@ -241,7 +245,6 @@ export const userPref = async (payload: any) => {
 export const userFeedback = async (payload: any) => {
     let payload2 = payload.payload;
     payload2 = JSON.stringify(payload2);
-    console.log("Feedback", payload2)
     let token = await readToken();
     return await fetch(endpoint.feedback, {
         method: 'POST',
@@ -282,10 +285,8 @@ export const userGoals = async (payload: any) => {
     }]
 
 
-    let pay2 = JSON.stringify(pay)
+    let pay2 = JSON.stringify(pay);
     let token = await readToken();
-    console.log("token", token)
-    console.log("Mhaaro payload", pay);
     return await fetch(endpoint.goals, {
         method: 'POST',
         headers: {
@@ -352,7 +353,7 @@ export const getPreference = async () => {
 
 export const fetchWeather = async (payload: any) => {
     let api_key = weather_api_key;
-    let payload2 = payload.payload
+    let payload2 = payload.payload;
     let weather = `${endpoint.weather}lat=${encodeURIComponent(payload2.lat)}&lon=${encodeURIComponent(payload2.lon)}&appid=${api_key}&units=metric`
     return await fetch(weather, {
         method: 'GET'

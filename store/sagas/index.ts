@@ -40,14 +40,19 @@ import {
   userGoals,
   readGoals,
   fetchWeather,
-  userFeedback
+  userFeedback,
 } from "../../services/network.service";
 
 import { goalStore, prefStore, storeProfile } from "../actions/user";
 
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
-import { getWeather, hideToast, setAwards, showToast } from "../actions/setLocation";
+import {
+  getWeather,
+  hideToast,
+  setAwards,
+  showToast,
+} from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
 
@@ -62,7 +67,7 @@ function* signUpSaga(payload: any): any {
     yield saveToken(response.access_token);
     RootNavigation.navigate('Preference', {});
   } else {
-    yield call(handleToast, response.message)
+    yield call(handleToast, response.message);
   }
 }
 
@@ -76,7 +81,7 @@ function* loginSaga(payload: any): any {
   if (response.access_token) {
     yield saveToken(response.access_token);
     const res = yield getPreference();
-    console.log("getpref", response)
+    console.log("getpref", response);
     if (res.payload) {
       yield put(prefStore(res.payload));
       RootNavigation.navigate('Map', {});
@@ -84,7 +89,7 @@ function* loginSaga(payload: any): any {
       RootNavigation.navigate('Preference', {});
     }
   } else {
-    yield call(handleToast, response.message)
+    yield call(handleToast, response.message);
   }
 }
 function* handleToast(message: string, type = 'info') {
@@ -105,10 +110,11 @@ function* tokenSaga(): any {
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
     const res = yield getPreference();
-    if (res) {
+
+    if (res && res.payload) {
       yield put(prefStore(res.payload));
       RootNavigation.navigate('Map', {});
-    } else {
+    } else if (res && !res.payload) {
       yield call(handleToast, errorMessage);
       RootNavigation.navigate('Preference', {});
     }
@@ -140,35 +146,41 @@ function* goalSaga(payload: any): any {
   if (response) {
     // yield put({ type: GOAL_STORE, payload: response });
     RootNavigation.navigate('Map', {});
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage);
 }
 function* getPathSaga(action: any): any {
   yield put(toggleSpinner());
 
   const response = yield getPath(action.payload);
   let recommendationList = process_path(response);
-  yield all([
-    put(toggleSpinner()),
-    put({
-      type: ROUTES_STORE,
-      payload: { options: recommendationList },
-    }),
-    put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview }),
-  ]);
+  if (response && !response.error) {
+    yield all([
+      put(toggleSpinner()),
+      put({
+        type: ROUTES_STORE,
+        payload: { options: recommendationList },
+      }),
+      put({ type: UPDATEVIEWMODE, payload: VIEWMODE.preview }),
+    ]);
+  } else {
+    yield put(toggleSpinner());
+    yield call(handleToast, "Something went wrong")
+  }
 }
 
 function* saveTripSaga(action: any): any {
   yield put(toggleSpinner());
   const response = yield saveTrip(action.payload);
   yield put(toggleSpinner());
-  if(response.payload){
-    console.log("response save trip",response)
-    yield put(setAwards(response.payload))}
-  if (!response || !response.error) {
+  console.log(response);
+  if (response && response.payload) {
     yield call(handleToast, 'Trip Completed!', 'success');
-
-  } else {
+    yield put(setAwards(response.payload));
+  }
+  if (!response || response.error) {
+    console.log(response);
     yield call(handleToast, errorMessage);
   }
 }
@@ -189,8 +201,9 @@ function* getSaveLocationSaga(): any {
   const response = yield getSaveLocations();
   if (response) {
     yield put({ type: SAVE_LOCATION_STORE, payload: response.saved_locations });
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage);
 }
 
 function* logoutSaga(): any {
@@ -216,39 +229,37 @@ function* WeatherSaga(payload: any): any {
   yield put(toggleSpinner());
   const response = yield fetchWeather(payload);
   yield put(toggleSpinner());
-  console.log("response", response)
 
   if (response) {
     yield put(getWeather(response));
+  } else {
+    yield call(handleToast, errorMessage);
   }
-  else yield call(handleToast, errorMessage)
 }
 
 function* readGoalsSaga(): any {
   yield put(toggleSpinner());
   const response = yield readGoals();
-  console.log("res", response)
+  console.log("res", response);
   yield put(toggleSpinner());
   if (response.payload) {
     yield put(goalStore(response.payload));
-  }
-  else {
+  } else {
     yield put(showToast('Something went wrong!'));
     yield delay(2000);
     yield put(hideToast());
   }
 }
 
-function* feedbackSaga(payload:any): any {
+function* feedbackSaga(payload: any): any {
   yield put(toggleSpinner());
   const response = yield userFeedback(payload);
-  console.log("res", response)
+  console.log("res", response);
   yield put(toggleSpinner());
   if (response.payload) {
-    yield call(handleToast,successMessage)
-  }
-  else {
-    yield call(handleToast,errorMessage)
+    yield call(handleToast, successMessage);
+  } else {
+    yield call(handleToast, errorMessage);
   }
 }
 
@@ -320,7 +331,7 @@ function* appSagas() {
     call(watchGoalSaga),
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
-    call(watchFeedbackSaga)
+    call(watchFeedbackSaga),
   ]);
 }
 

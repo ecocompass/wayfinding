@@ -51,6 +51,7 @@ import {
 import { View } from 'react-native';
 import FeedbackModal from '../Modals/feedback_modal';
 import AwardModal from '../Modals/award_modal';
+import { ToggleFeedbackModal } from '../../store/actions/modal';
 
 export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef } = props;
@@ -78,8 +79,10 @@ export const PreviewNavigate = (props: any) => {
   let [pathInstructions, setPathInstructions] = useState<any>([]);
   let [pathSegments, setPathSegments] = useState<any>([]);
   let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
-  let [feedbackModal,setFeedbackModal]=useState(false);
-  const awards= useSelector((state:any)=>{return state.location.awards})
+  let [feedbackModal, setFeedbackModal] = useState(false);
+  const awards = useSelector((state: any) => {
+    return state.location.awards;
+  });
   const iconMap = {
     walk: FootprintsIcon,
     bus: BusIcon,
@@ -110,17 +113,21 @@ export const PreviewNavigate = (props: any) => {
   };
 
   const formatTime = (end, start) => {
-    let diff = end - start
-    let mins = Math.trunc(diff/1000/60);
-    let hours = 0
-    if(mins < 60) {
+    let diff = end - start;
+    let mins = Math.trunc(diff / 1000 / 60);
+    let hours = 0;
+    if (mins < 60) {
       return `${mins} Mins`;
     } else {
-      hours = Math.trunc(diff/1000/60/60);
-      mins = Math.trunc(diff%(1000*60*60)/1000/60);
+      hours = Math.trunc(diff / 1000 / 60 / 60);
+      mins = Math.trunc((diff % (1000 * 60 * 60)) / 1000 / 60);
       return `${hours} Hrs ${mins} Mins`;
     }
-  }
+  };
+
+  const openFeedbackModal = () => {
+    dispatch(ToggleFeedbackModal({ visibility: true }));
+  };
 
   useEffect(() => {
     if (viewMode === VIEWMODE.preview) {
@@ -160,7 +167,7 @@ export const PreviewNavigate = (props: any) => {
         userPositionOnPath,
         isFinalSegment
       );
-      console.log(positionUpdate.action)
+      console.log(positionUpdate.action);
       switch (positionUpdate.action) {
         case 'UPDATE':
           setUserPositionOnPath(positionUpdate.payload);
@@ -215,13 +222,14 @@ export const PreviewNavigate = (props: any) => {
       });
 
       let data = {
-        route: pathTaken,
-        startLocation: tripDetails.startLocation,
-        endLocation: tripDetails.endLocation,
+        route: JSON.stringify(pathTaken),
+        start_location: JSON.stringify(tripDetails.startLocation),
+        end_location: JSON.stringify(tripDetails.endLocation),
         ...distances,
-        endTime: new Date().getTime(),
-        startTime: tripDetails.startTime,
+        end_time: Math.trunc(new Date().getTime() / 1000),
+        start_time: Math.trunc(tripDetails.startTime / 1000),
       };
+
       this.camRef.fitBounds(
         tripDetails.startLocation.coordinates,
         tripDetails.endLocation.coordinates,
@@ -273,7 +281,7 @@ export const PreviewNavigate = (props: any) => {
     );
 
     // userPositionOnPath[0] = tp;
-    setUserPositionOnPath(tp)
+    setUserPositionOnPath(tp);
     setPathSegments(segments);
     props.onTripStart(currentUserLocation);
   };
@@ -502,43 +510,58 @@ export const PreviewNavigate = (props: any) => {
       );
     case VIEWMODE.navigateEnd:
       return (
-     <> 
-        <Box>
-          <HStack justifyContent="space-between" alignItems="center" p="$4">
-            <Heading size="md" pb="$3">
-              You Have Arrived!
-            </Heading>
-          </HStack>
-          <Card size="md" variant="elevated" m="$2">
-            <HStack space="4xl">
-              <Heading mb="$1" size="md">
-                {tripDetails.startLocation.location_name} to{" "}
-                {tripDetails.endLocation.location_name}{" "}
-                {tripDetails.endTime
-                  ? `${formatTime(tripDetails.endTime, tripDetails.startTime)}`
-                  : ""}
+        <>
+          <Box>
+            <HStack justifyContent="space-between" alignItems="center" p="$4">
+              <Heading size="md" pb="$3">
+                You Have Arrived!
               </Heading>
             </HStack>
-            <Text size="sm" mb="$5"> </Text>
-            <HStack>
-              <Button py="$2" px="$4" action="secondary" onPress={() => {}}>
-                <ButtonText size="sm">Okay</ButtonText>
-                <ButtonIcon as={CheckCircleIcon} ml="$2"/>
-              </Button>
-              <Button py="$2" px="$4" ml="$2" onPress={() => {
-                setFeedbackModal(true)
-              }}>
-                <ButtonText size="sm">Feedback</ButtonText>
-                <ButtonIcon as={ReplyIcon} ml="$2"/>
-              </Button>
-            </HStack>
-          </Card>
-        </Box>
-        {!feedbackModal?<FeedbackModal trip_id={awards}/>
-            :<></>}
-                    {awards?<AwardModal award={awards}/>
-            :<></>}
-            </>
+            <Card size="md" variant="elevated" m="$2">
+              <HStack space="4xl">
+                <Heading mb="$1" size="md">
+                  {tripDetails.startLocation.location_name} to{" "}
+                  {tripDetails.endLocation.location_name}{" "}
+                  {tripDetails.endTime
+                    ? `${formatTime(
+                        tripDetails.endTime,
+                        tripDetails.startTime
+                      )}`
+                    : ""}
+                </Heading>
+              </HStack>
+              <Text size="sm" mb="$5">
+                {' '}
+              </Text>
+              <HStack>
+                <Button
+                  py="$2"
+                  px="$4"
+                  action="secondary"
+                  onPress={() => {
+                    dispatch(updateViewMode(VIEWMODE.search));
+                  }}
+                >
+                  <ButtonText size="sm">Okay</ButtonText>
+                  <ButtonIcon as={CheckCircleIcon} ml="$2" />
+                </Button>
+                <Button
+                  py="$2"
+                  px="$4"
+                  ml="$2"
+                  onPress={() => {
+                    openFeedbackModal();
+                  }}
+                >
+                  <ButtonText size="sm">Feedback</ButtonText>
+                  <ButtonIcon as={ReplyIcon} ml="$2" />
+                </Button>
+              </HStack>
+            </Card>
+          </Box>
+          <FeedbackModal />
+          {/* {awards ? <AwardModal award={awards} /> : <></>} */}
+        </>
       );
   }
 };
