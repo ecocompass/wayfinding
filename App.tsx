@@ -17,6 +17,7 @@ import { SavedLocations } from "./components/Settings/saved_locations";
 import SpinnerComponent from "./components/Spinner/spinner";
 import Goals from "./components/Goals/user-goals";
 import ReadGoals from "./components/Settings/read_goals";
+import TripHistory from "./components/Settings/triphistory";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -64,9 +65,14 @@ const App = () => {
                 component={Map}
               />
               <Stack.Screen
-                options={{ headerShown: true }}
+                options={{ headerShown: false }}
                 name="Saved Locations"
                 component={SavedLocations}
+              />
+                <Stack.Screen
+                options={{ headerShown: false}}
+                name="TripHistory"
+                component={TripHistory}
               />
             </Stack.Navigator>
             <SpinnerComponent />

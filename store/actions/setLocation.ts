@@ -18,7 +18,10 @@ import {
     RESETPATHS,
     VIEWUSERDIRECTION,
     UPDATETRIPSTART,
-    SAVETRIP
+    SAVETRIP,
+    TRIPHISTORY,
+    SETTRIPHISTORY,
+    GETTRIPHISTORY
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -116,7 +119,7 @@ export const resetPaths = () => {
     }
 }
 
-export const updateTripDetails = (payload) => {
+export const updateTripDetails = (payload:any) => {
     return {
         type: UPDATETRIPSTART,
         payload,
@@ -135,3 +138,16 @@ export const getWeather = (payload: any) => {
         payload: payload
     }
 }
+
+export const setTrips = () => {
+    return {
+        type: SETTRIPHISTORY
+    };
+};
+
+export const getTrips = (payload:any) => {
+    return {
+        type: GETTRIPHISTORY,
+        payload
+    };
+};

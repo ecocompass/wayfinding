@@ -344,3 +344,17 @@ export const fetchWeather = async (payload: any) => {
         err => console.log("error", err)
     )
 }
+export const getTripHistory = async function () {
+    const token = await readToken();
+    return await fetch(endpoint.saveTrip, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${token.accessToken}`,
+            'Content-Type': 'application/json',
+        },
+    }).then(response => {
+        return response.status === status.ok ? response.json() : false;
+    }).catch(err => {
+        return { error: true, message: err };
+    });
+};

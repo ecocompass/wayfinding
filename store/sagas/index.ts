@@ -19,6 +19,8 @@ import {
   SETGOALS,
   READGOALS,
   SETWEATHER,
+  TRIPHISTORY,
+  SETTRIPHISTORY,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -38,14 +40,15 @@ import {
   geoCodeApi,
   userGoals,
   readGoals,
-  fetchWeather
+  fetchWeather,
+  getTripHistory
 } from "../../services/network.service";
 
 import { goalStore, prefStore, storeProfile } from "../actions/user";
 
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
-import { getWeather, hideToast, showToast } from "../actions/setLocation";
+import { getTrips, getWeather, hideToast, setTrips, showToast } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
 
@@ -234,7 +237,16 @@ function* readGoalsSaga(): any {
     yield put(hideToast());
   }
 }
-
+function* tripHistorySaga(): any {
+  yield put(toggleSpinner());
+  const response = yield getTripHistory();
+  console.log("res", response)
+  yield put(toggleSpinner());
+  if (response.payload) {
+    yield put(getTrips(response.payload));
+  }
+  else { handleToast(errorMessage) }
+}
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -284,6 +296,9 @@ function* watchProfileSaga(): SagaIterator {
 function* watchWeatherSaga(): SagaIterator {
   yield takeLatest(SETWEATHER, WeatherSaga);
 }
+function* watchTripHistorySaga(): SagaIterator {
+  yield takeLatest(SETTRIPHISTORY, tripHistorySaga);
+}
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
@@ -299,6 +314,7 @@ function* appSagas() {
     call(watchGoalSaga),
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
+    call(watchTripHistorySaga)
   ]);
 }
 
