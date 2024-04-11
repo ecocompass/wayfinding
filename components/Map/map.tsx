@@ -490,7 +490,9 @@ const Map = ({ route, navigation }: any) => {
             onPointsRender={onPointsRender}
             destinationName={locationData.name}
             camRef={this.camRef}
-            onTripStart={tripStart}/>
+            onTripStart={tripStart}
+            onReroute={getPaths}
+            />
         ) : (<></>)}
         {locationData && locationData.name ? <SavedLocationModal /> : <></>}
       </View>

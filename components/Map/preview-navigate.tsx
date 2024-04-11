@@ -54,7 +54,11 @@ import {
 import { View } from 'react-native';
 import FeedbackModal from '../Modals/feedback_modal';
 import AwardModal from '../Modals/award_modal';
-import { ToggleFeedbackModal } from '../../store/actions/modal';
+import {
+  ToggleFeedbackModal,
+  ToggleRerouteModal,
+} from '../../store/actions/modal';
+import RerouteModal from '../Modals/reroute_modal';
 
 export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef } = props;
@@ -137,6 +141,13 @@ export const PreviewNavigate = (props: any) => {
     dispatch(ToggleFeedbackModal({ visibility: true }));
   };
 
+  const onReRoute = (isIntent) => {
+    updateView();
+    if (isIntent) {
+      props.onReroute();
+    }
+  }
+
   useEffect(() => {
     if (viewMode === VIEWMODE.preview) {
       paths.forEach((path) => {
@@ -147,7 +158,7 @@ export const PreviewNavigate = (props: any) => {
       });
     }
 
-    if (viewMode === VIEWMODE.navigate) {
+    if (viewMode === VIEWMODE.navigate && !hasTripEnded) {
       let tempActiveSegment: any = {};
       let isFinalSegment = false;
 
@@ -175,6 +186,7 @@ export const PreviewNavigate = (props: any) => {
         userPositionAndPath.userPosition,
         isFinalSegment
       );
+
       switch (positionUpdate.action) {
         case 'UPDATE':
           let isActiveEncountered = false;
@@ -225,9 +237,14 @@ export const PreviewNavigate = (props: any) => {
           );
 
           setUserPositionAndPathSegment({
+            ...userPositionAndPath,
             userPosition: 0,
             pathSegments: tempPathSegments,
           });
+          break;
+        case 'REROUTE':
+          dispatch(ToggleRerouteModal({ visibility: true }));
+          setHasTripEnded(true);
           break;
         case 'ENDTRIP':
           dispatch(updateViewMode(VIEWMODE.navigateEnd));
@@ -315,9 +332,6 @@ export const PreviewNavigate = (props: any) => {
       currentUserLocation
     );
 
-    // userPositionOnPath[0] = tp;
-    // setUserPositionOnPath(tp);
-    // setPathSegments(segments);
     setUserPositionAndPathSegment({
       userPosition: tp,
       pathSegments: segments,
@@ -463,90 +477,93 @@ export const PreviewNavigate = (props: any) => {
       );
     case VIEWMODE.navigate:
       return (
-        <Box>
-          <HStack justifyContent="space-between" alignItems="center" p="$4">
-            <Heading size="md" pb="$3">
-              ETA: {userPositionAndPath.eta}
-            </Heading>
-            <Button
-              size="sm"
-              variant="solid"
-              action="negative"
-              onPress={() => {
-                updateView();
-              }}
-            >
-              <ButtonText> Exit </ButtonText>
-              <ButtonIcon as={X} />
-            </Button>
-          </HStack>
-          <FlatList
-            h="$48"
-            data={userPositionAndPath.pathSegments}
-            renderItem={({ item }) => (
-              <Box
-                key={item.pathId}
-                borderBottomWidth="$1"
-                borderColor="$trueGray300"
-                $dark-borderColor="$trueGray100"
-                $base-pl={0}
-                $base-pr={0}
-                py="$4"
-                bg={item.isActive ? 'transparent' : "$trueGray300"}
+        <>
+          <Box>
+            <HStack justifyContent="space-between" alignItems="center" p="$4">
+              <Heading size="md" pb="$3">
+                ETA: {userPositionAndPath.eta}
+              </Heading>
+              <Button
+                size="sm"
+                variant="solid"
+                action="negative"
+                onPress={() => {
+                  updateView();
+                }}
               >
-                <HStack
-                  space="md"
-                  justifyContent={
-                    item.isActive ? 'space-around' : 'space-between'
-                  }
-                  alignItems="center"
-                  flexWrap="wrap"
-                  px="$4"
+                <ButtonText> Exit </ButtonText>
+                <ButtonIcon as={X} />
+              </Button>
+            </HStack>
+            <FlatList
+              h="$48"
+              data={userPositionAndPath.pathSegments}
+              renderItem={({ item }) => (
+                <Box
+                  key={item.pathId}
+                  borderBottomWidth="$1"
+                  borderColor="$trueGray300"
+                  $dark-borderColor="$trueGray100"
+                  $base-pl={0}
+                  $base-pr={0}
+                  py="$4"
+                  bg={item.isActive ? 'transparent' : "$trueGray300"}
                 >
-                  {item.isActive ? (
-                    <HStack
-                      padding="$4"
-                      borderRadius="$md"
-                      borderWidth="$1"
-                      borderColor="$success500"
-                      borderStyle="dashed"
-                      bg="$success100"
-                      w="$5/6"
-                      justifyContent="space-between"
-                    >
-                      <Text
-                        color="$coolGray800"
-                        fontWeight="$bold"
-                        $dark-color="$warmGray100"
-                        w="$4/6"
+                  <HStack
+                    space="md"
+                    justifyContent={
+                      item.isActive ? 'space-around' : 'space-between'
+                    }
+                    alignItems="center"
+                    flexWrap="wrap"
+                    px="$4"
+                  >
+                    {item.isActive ? (
+                      <HStack
+                        padding="$4"
+                        borderRadius="$md"
+                        borderWidth="$1"
+                        borderColor="$success500"
+                        borderStyle="dashed"
+                        bg="$success100"
+                        w="$5/6"
+                        justifyContent="space-between"
                       >
-                        {item.instruction}
-                      </Text>
-                      <Text>{item.timeTaken}</Text>
-                    </HStack>
-                  ) : (
-                    <>
-                      <Text color="$coolGray100" $dark-color="$warmGray50">
-                        {item.instruction}
-                        {item.isCleared ? (
-                          <Icon
-                            as={CheckCircle}
-                            size="lg"
-                            color="$success500"
-                          />
-                        ) : (
-                          <></>
-                        )}
-                      </Text>
-                      <Text>{item.timeTaken}</Text>
-                    </>
-                  )}
-                </HStack>
-              </Box>
-            )}
-            keyExtractor={(item) => item.pathId}
-          />
-        </Box>
+                        <Text
+                          color="$coolGray800"
+                          fontWeight="$bold"
+                          $dark-color="$warmGray100"
+                          w="$4/6"
+                        >
+                          {item.instruction}
+                        </Text>
+                        <Text>{item.timeTaken}</Text>
+                      </HStack>
+                    ) : (
+                      <>
+                        <Text color="$coolGray100" $dark-color="$warmGray50">
+                          {item.instruction}
+                          {item.isCleared ? (
+                            <Icon
+                              as={CheckCircle}
+                              size="lg"
+                              color="$success500"
+                            />
+                          ) : (
+                            <></>
+                          )}
+                        </Text>
+                        <Text>{item.timeTaken}</Text>
+                      </>
+                    )}
+                  </HStack>
+                </Box>
+              )}
+              keyExtractor={(item) => item.pathId}
+            />
+          </Box>
+          <RerouteModal onShowIntent={onReRoute} />
+        </>
       );
     case VIEWMODE.navigateEnd:
       return (

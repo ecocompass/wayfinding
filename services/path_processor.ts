@@ -70,6 +70,12 @@ export const processPathCleared = (pointList, userLocation, userPosition, isFina
         return { action: "CHANGESEGMENT" };
     }
 
+    let pathLineDist = getPointLineDistance(pointList[userPosition], pointList[userPosition + 1], userLocation);
+    console.log(pathLineDist);
+    if (pathLineDist > 0.001) {
+        return { action: 'REROUTE' };
+    }
+
     let d1 = getPointDistance(pointList[userPosition], userLocation);
     let d2 = getPointDistance(pointList[userPosition + 1], userLocation);
     userPosition = userPosition + 1;
@@ -83,6 +89,10 @@ export const processPathCleared = (pointList, userLocation, userPosition, isFina
 
 const getPointDistance = (a, b) => {
     return Math.sqrt(Math.pow((a[0] - b[0]), 2) + Math.pow((a[1] - b[1]), 2))
+}
+
+const getPointLineDistance = (a, b, c) => {
+    return Math.abs(((a[0] - b[0]) * (c[1] - a[1])) - ((b[1] - a[1]) * (c[0] - a[0]))) / getPointDistance(a, b)
 }
 
 export const getUserPositionInSegment = (pointList, userLocation) => {
