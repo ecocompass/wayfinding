@@ -77,9 +77,13 @@ export const PreviewNavigate = (props: any) => {
   });
 
   let [pathInstructions, setPathInstructions] = useState<any>([]);
-  let [pathSegments, setPathSegments] = useState<any>([]);
-  let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
-  let [feedbackModal, setFeedbackModal] = useState(false);
+  // let [pathSegments, setPathSegments] = useState<any>([]);
+  // let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
+  let [userPositionAndPath, setUserPositionAndPathSegment] = useState<any>({
+    userPosition: 0,
+    pathSegments: [],
+  });
+  let [hasTripEnded, setHasTripEnded] = useState(false);
   const awards = useSelector((state: any) => {
     return state.location.awards;
   });
@@ -143,10 +147,10 @@ export const PreviewNavigate = (props: any) => {
       let tempActiveSegment: any = {};
       let isFinalSegment = false;
 
-      pathSegments.forEach((segment: any, index) => {
+      userPositionAndPath.pathSegments.forEach((segment: any, index) => {
         if (segment.isActive) {
           tempActiveSegment = segment;
-          if (index === pathSegments.length - 1) {
+          if (index === userPositionAndPath.pathSegments.length - 1) {
             isFinalSegment = true;
           }
         }
@@ -164,37 +168,47 @@ export const PreviewNavigate = (props: any) => {
       let positionUpdate = processPathCleared(
         tempActiveSegment.pathPointList,
         currentUserLocation,
-        userPositionOnPath,
+        userPositionAndPath.userPosition,
         isFinalSegment
       );
       console.log(positionUpdate.action);
       switch (positionUpdate.action) {
         case 'UPDATE':
-          setUserPositionOnPath(positionUpdate.payload);
+          setUserPositionAndPathSegment({
+            ...userPositionAndPath,
+            userPosition: positionUpdate.payload,
+          });
           break;
         case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
-          pathSegments.forEach((ps: any, index: number) => {
+          userPositionAndPath.pathSegments.forEach((ps: any, index: number) => {
             if (ps.isActive) {
               currentActiveSegmentIndex = index;
             }
           });
 
-          let tempPathSegments = pathSegments.map((ps, index) => {
-            return {
-              ...ps,
-              isActive: index === currentActiveSegmentIndex + 1 ? true : false,
-              isCleared: ps.isCleared
-                ? true
-                : index === currentActiveSegmentIndex
-                ? true
-                : false,
-            };
-          });
+          let tempPathSegments = userPositionAndPath.pathSegments.map(
+            (ps, index) => {
+              return {
+                ...ps,
+                isActive:
+                  index === currentActiveSegmentIndex + 1 ? true : false,
+                isCleared: ps.isCleared
+                  ? true
+                  : index === currentActiveSegmentIndex
+                  ? true
+                  : false,
+              };
+            }
+          );
 
           // userPositionOnPath[0] = 0;
-          setUserPositionOnPath(0);
-          setPathSegments(tempPathSegments);
+          // setUserPositionOnPath(0);
+          // setPathSegments(tempPathSegments);
+          setUserPositionAndPathSegment({
+            userPosition: 0,
+            pathSegments: tempPathSegments,
+          });
           break;
         case 'ENDTRIP':
           dispatch(updateViewMode(VIEWMODE.navigateEnd));
@@ -204,7 +218,7 @@ export const PreviewNavigate = (props: any) => {
       }
     }
 
-    if (viewMode === VIEWMODE.navigateEnd) {
+    if (viewMode === VIEWMODE.navigateEnd && !hasTripEnded) {
       // handleEndTrip();
       let pathTaken: any = {};
       paths.forEach((p: any) => {
@@ -237,6 +251,7 @@ export const PreviewNavigate = (props: any) => {
         500
       );
       dispatch(saveTripAPI(data));
+      setHasTripEnded(true);
     }
   }, [
     paths,
@@ -246,11 +261,10 @@ export const PreviewNavigate = (props: any) => {
     setPathInstructions,
     viewMode,
     currentUserLocation,
-    userPositionOnPath,
-    setUserPositionOnPath,
-    pathSegments,
+    userPositionAndPath,
     dispatch,
     tripDetails,
+    hasTripEnded,
   ]);
 
   const startNavigation = (selectedPath: any) => {
@@ -281,8 +295,12 @@ export const PreviewNavigate = (props: any) => {
     );
 
     // userPositionOnPath[0] = tp;
-    setUserPositionOnPath(tp);
-    setPathSegments(segments);
+    // setUserPositionOnPath(tp);
+    // setPathSegments(segments);
+    setUserPositionAndPathSegment({
+      userPosition: tp,
+      pathSegments: segments,
+    });
     props.onTripStart(currentUserLocation);
   };
 
@@ -442,7 +460,7 @@ export const PreviewNavigate = (props: any) => {
           </HStack>
           <FlatList
             h="$48"
-            data={pathSegments}
+            data={userPositionAndPath.pathSegments}
             renderItem={({ item }) => (
               <Box
                 key={item.pathId}
