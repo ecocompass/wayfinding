@@ -38,6 +38,7 @@ const Auth = ({ navigation }: any) => {
             <Input>
               <InputField
                 type="text" value={email}
+                placeholder="Email"
                 onChangeText={(event: any) => {
                   setEmail(event)
                 }}
@@ -49,7 +50,7 @@ const Auth = ({ navigation }: any) => {
               Password
             </Text>
             <Input>
-              <InputField
+              <InputField id="password" testID="password"
                 type={showPassword ? 'text' : 'password'} value={password}
                 onChangeText={(event: any) => {
                   setPassword(event);
@@ -60,7 +61,7 @@ const Auth = ({ navigation }: any) => {
               </InputSlot>
             </Input>
           </VStack>
-          <Button title="Login"
+          <Button title="Login" testID="Login"
             onPress={()=>{
              dispatch(loginAction({ email: email, password: password}));
             }}
