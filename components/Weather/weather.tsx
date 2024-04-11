@@ -1,4 +1,4 @@
-import { Image, Text, View } from "@gluestack-ui/themed";
+import { Image, Text, View, HStack } from "@gluestack-ui/themed";
 import { useDispatch, useSelector } from "react-redux";
 import { weather_url } from "../../constants";
 import { setWeather } from "../../store/actions/setLocation";
@@ -19,14 +19,14 @@ const WeatherComponent = (props: any) => {
   const icon = weatherData?.weather[0]?.icon || '10d';
 
   return (
-    <View>
+    <HStack alignItems="center">
       <Image alt="weather"
         size="md"
         source={{
           uri: `${weatherUrl}${icon}@2x.png`,
         }} />
       <Text>{temperature}&deg;C</Text>
-    </View>
+    </HStack>
   );
 }
 

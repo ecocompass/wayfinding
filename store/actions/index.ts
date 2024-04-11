@@ -35,3 +35,7 @@ export const GOAL_STORE = 'GOALSTORE';
 export const READGOALS = "READGOALS";
 export const SETWEATHER = "SETWEATHER";
 export const GETWEATHER = "GETWEATHER";
+export const SETAWARDS = "SETAWARDS";
+export const SETFEEDBACK = "SETFEEDBACK";
+export const FEEDBACKMODAL="FEEDBACKMODAL";
+export const AWARDMODAL="AWARDMODAL"
