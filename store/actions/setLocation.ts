@@ -19,9 +19,10 @@ import {
     VIEWUSERDIRECTION,
     UPDATETRIPSTART,
     SAVETRIP,
-    TRIPHISTORY,
     SETTRIPHISTORY,
-    GETTRIPHISTORY
+    GETTRIPHISTORY,
+    SETAWARDS,
+    SETFEEDBACK
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -151,3 +152,15 @@ export const getTrips = (payload:any) => {
         payload
     };
 };
+export const setAwards=(payload:any)=>{
+    return {
+        type: SETAWARDS,
+        payload:payload
+    }  
+}
+export const setFeedback=(payload:any)=>{
+    return {
+        type: SETFEEDBACK,
+        payload:payload
+    }  
+}

@@ -1,8 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, PREF_STORE, UPDATEPATHVIEWED, RESETPATHS, VIEWUSERDIRECTION, UPDATETRIPSTART, UPDATETRIPEND, TRIPHISTORY, GETTRIPHISTORY } from "../actions";
+import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, PREF_STORE, UPDATEPATHVIEWED, RESETPATHS, VIEWUSERDIRECTION, UPDATETRIPSTART, UPDATETRIPEND, SETAWARDS, GETTRIPHISTORY } from "../actions";
 import { VIEWMODE } from "../../constants";
 import { UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
-import TripHistory from "../../components/Settings/triphistory";
 
 const initialState = {
     centerLocation: [0, 0],
@@ -15,6 +14,7 @@ const initialState = {
     tripDetails: {},
     weather: {},
     tripHistory:[],
+    award:{}
 };
 
 const locationReducer = (state = initialState, action: any) => {
@@ -84,6 +84,11 @@ const locationReducer = (state = initialState, action: any) => {
                 ...state,
                 tripHistory:action.payload
             }    
+        case SETAWARDS:
+            return {
+                ...state,
+                award: action.payload
+            }
         default:
             return state;
     }
