@@ -35,3 +35,6 @@ export const GOAL_STORE = 'GOALSTORE';
 export const READGOALS = "READGOALS";
 export const SETWEATHER = "SETWEATHER";
 export const GETWEATHER = "GETWEATHER";
+export const SETOFFLINE="SETOFFLINE";
+export const GETOFFLINE="GETOFFLINE";
+export const SAVEOFFLINE="SAVEOFFLINE";

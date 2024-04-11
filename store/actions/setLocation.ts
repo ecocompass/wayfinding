@@ -18,7 +18,10 @@ import {
     RESETPATHS,
     VIEWUSERDIRECTION,
     UPDATETRIPSTART,
-    SAVETRIP
+    SAVETRIP,
+    SETOFFLINE,
+    GETOFFLINE,
+    SAVEOFFLINE
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -132,6 +135,27 @@ export const setWeather = (location: any) => {
 export const getWeather = (payload: any) => {
     return {
         type: GETWEATHER,
+        payload: payload
+    }
+}
+
+export const setOffline=(payload:any)=>{
+    return{
+        type:SETOFFLINE,
+        payload:payload
+    }
+}
+
+export const getOffline=()=>{
+    return{
+        type:GETOFFLINE,
+
+    }
+}
+
+export const saveOffline = (payload: string) => {
+    return {
+        type: SAVEOFFLINE,
         payload: payload
     }
 }

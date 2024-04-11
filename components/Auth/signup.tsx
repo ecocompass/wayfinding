@@ -154,10 +154,10 @@ const Signup = ({ navigation }: any) => {
           <Button
             size="md"
             onPress={() => {
-              navigation.navigate('Map', {});
+              navigation.navigate('OfflineMap', {});
             }}
           >
-            <ButtonText>Go Offline</ButtonText>
+            <ButtonText>Load Offline</ButtonText>
           </Button>
         </Center>
       )}

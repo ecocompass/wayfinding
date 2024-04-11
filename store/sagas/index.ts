@@ -19,6 +19,8 @@ import {
   SETGOALS,
   READGOALS,
   SETWEATHER,
+  SETOFFLINE,
+  GETOFFLINE,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -38,14 +40,16 @@ import {
   geoCodeApi,
   userGoals,
   readGoals,
-  fetchWeather
+  fetchWeather,
+  saveMap,
+  readMap
 } from "../../services/network.service";
 
 import { goalStore, prefStore, storeProfile } from "../actions/user";
 
 import { SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
-import { getWeather, hideToast, showToast } from "../actions/setLocation";
+import { getWeather, hideToast, saveOffline, showToast } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
 
@@ -215,7 +219,6 @@ function* WeatherSaga(payload: any): any {
   yield put(toggleSpinner());
   const response = yield fetchWeather(payload);
   yield put(toggleSpinner());
-  console.log("response", response)
 
   if (response) {
     yield put(getWeather(response));
@@ -237,7 +240,16 @@ function* readGoalsSaga(): any {
     yield put(hideToast());
   }
 }
+function* saveOfflineSaga(payload:any):any{
+  yield saveMap(payload);
+}
 
+function* getOfflineSaga(payload:any):any{
+ const response= yield readMap();
+ if(response.payload){
+  yield put(saveOffline(response.payload))
+ }
+}
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -287,6 +299,14 @@ function* watchProfileSaga(): SagaIterator {
 function* watchWeatherSaga(): SagaIterator {
   yield takeLatest(SETWEATHER, WeatherSaga);
 }
+
+function* watchOfflineSaga():SagaIterator{
+  yield takeLatest(SETOFFLINE,saveOfflineSaga)
+}
+
+function* watchMapSaga():SagaIterator{
+  yield takeLatest(GETOFFLINE,getOfflineSaga)
+}
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
@@ -302,6 +322,8 @@ function* appSagas() {
     call(watchGoalSaga),
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
+    call(watchOfflineSaga),
+    call(watchMapSaga)
   ]);
 }
 
