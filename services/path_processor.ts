@@ -37,12 +37,14 @@ export function getPathInstructions(path: any, destinationName: string) {
                 instructionArr.push({
                     instruction: `${mapModeToInstruction[p.mode]} ${path.modePathList[index + 1].startStopName}`,
                     time: `${getTimeFromDistanceSingle(p.mode, p.distance)} mins`,
+                    distance: p.distance,
                     isCleared: false,
                 });
             } else {
                 instructionArr.push({
                     instruction: `${mapModeToInstruction[p.mode]}${p.routeNumber} to ${p.endStopName}`,
                     time: `${getTimeFromDistanceSingle(p.mode, p.distance)} mins`,
+                    distance: p.distance,
                     isCleared: false,
                 });
             }
@@ -50,6 +52,7 @@ export function getPathInstructions(path: any, destinationName: string) {
             instructionArr.push({
                 instruction: `${mapModeToInstruction[p.mode]} ${destinationName}`,
                 time: `${getTimeFromDistanceSingle(p.mode, p.distance)} mins`,
+                distance: p.distance,
                 isCleared: false,
             });
         }

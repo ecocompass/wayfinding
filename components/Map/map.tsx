@@ -162,6 +162,8 @@ const simulateUserLoc = [
   ]
 ]
 
+const simulateDistance = simulateUserLoc.length
+
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
 );
@@ -303,22 +305,16 @@ const Map = ({ route, navigation }: any) => {
   }
 
   const getClickedPoint = (feature: any) => {
-    // use ref for flyto
-    // dispatch(setCenter(feature.geometry.coordinates));
-    setPointViewed(feature.geometry.coordinates);
-    this.camRef.flyTo(feature.geometry.coordinates, 500)
-    setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: feature.geometry.coordinates })]);
-    fetchLocationDetails(feature.geometry.coordinates);
+    if (viewMode !== VIEWMODE.navigate || viewMode !== VIEWMODE) {
+      setPointViewed(feature.geometry.coordinates);
+      this.camRef.flyTo(feature.geometry.coordinates, 500)
+      setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: feature.geometry.coordinates })]);
+      fetchLocationDetails(feature.geometry.coordinates);
+    }
   }
 
   const getPaths = () => {
     dispatch(getRoutes({ startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",") }))
-    // dispatch(updateViewMode(VIEWMODE.preview))
-    // getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
-    //   .then((body: any) => {
-    //     setRenderedRoute(body.shortestPathCoordinates);
-    //     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
-    //   })
   }
 
   const onPointsRender = (routeArr) => {

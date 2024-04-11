@@ -42,7 +42,10 @@ import {
   updateViewedPath,
 } from '../../store/actions/setLocation';
 import { VIEWMODE } from '../../constants';
-import { getTimeFromDistance } from '../../services/time_to_dest';
+import {
+  getTimeFromDistance,
+  getTimeFromDistanceSingle,
+} from '../../services/time_to_dest';
 import {
   getPathInstructions,
   getUserPositionInSegment,
@@ -82,6 +85,7 @@ export const PreviewNavigate = (props: any) => {
   let [userPositionAndPath, setUserPositionAndPathSegment] = useState<any>({
     userPosition: 0,
     pathSegments: [],
+    eta: "",
   });
   let [hasTripEnded, setHasTripEnded] = useState(false);
   const awards = useSelector((state: any) => {
@@ -171,12 +175,30 @@ export const PreviewNavigate = (props: any) => {
         userPositionAndPath.userPosition,
         isFinalSegment
       );
-      console.log(positionUpdate.action);
       switch (positionUpdate.action) {
         case 'UPDATE':
+          let isActiveEncountered = false;
+          let remTime = 0;
+          userPositionAndPath.pathSegments.forEach((ps: any) => {
+            if (isActiveEncountered) {
+              let tempRem = +getTimeFromDistanceSingle(ps.mode, ps.distance);
+              remTime += tempRem;
+            }
+            if (ps.isActive) {
+              isActiveEncountered = true;
+              ps.distance = ps.distance - 4 / 1000; // temp value
+              let remainingTime = +getTimeFromDistanceSingle(
+                ps.mode,
+                ps.distance
+              );
+              remTime += remainingTime;
+            }
+          });
+
           setUserPositionAndPathSegment({
-            ...userPositionAndPath,
+            pathSegments: userPositionAndPath.pathSegments,
             userPosition: positionUpdate.payload,
+            eta: `${remTime} mins`,
           });
           break;
         case 'CHANGESEGMENT':
@@ -275,6 +297,8 @@ export const PreviewNavigate = (props: any) => {
         isCleared: pathInstructions[index].isCleared,
         isActive: index ? false : true,
         pathId: `${index}`,
+        distance: pathInstructions[index].distance,
+        mode: path.mode,
       });
     });
 
@@ -297,6 +321,7 @@ export const PreviewNavigate = (props: any) => {
     setUserPositionAndPathSegment({
       userPosition: tp,
       pathSegments: segments,
+      eta: "",
     });
     props.onTripStart(currentUserLocation);
   };
@@ -441,7 +466,7 @@ export const PreviewNavigate = (props: any) => {
         <Box>
           <HStack justifyContent="space-between" alignItems="center" p="$4">
             <Heading size="md" pb="$3">
-              ETA:
+              ETA: {userPositionAndPath.eta}
             </Heading>
             <Button
               size="sm"
