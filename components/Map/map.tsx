@@ -15,7 +15,7 @@ import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon, StarIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical } from 'lucide-react-native';
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical, HistoryIcon } from 'lucide-react-native';
 import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
@@ -423,13 +423,18 @@ const Map = ({ route, navigation }: any) => {
             <Icon as={Car} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Your Trips</MenuItemLabel>
           </MenuItem>
-          <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
-            <Icon as={LogOut} size="md" mr="$2" color={'black'} />
-            <MenuItemLabel size="md">Logout</MenuItemLabel>
+          <MenuItem key="history" textValue="triphistory" onPress={() => { RootNavigation.navigate('TripHistory', {}) }}>
+          <Icon as={HistoryIcon} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Trips History</MenuItemLabel>
           </MenuItem>
+
           <MenuItem key="pref" textValue="preferences" onPress={() => { RootNavigation.navigate('Preference', {}) }}>
             <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
             <MenuItemLabel size="md">Preferences</MenuItemLabel>
+          </MenuItem>
+          <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
+            <Icon as={LogOut} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Logout</MenuItemLabel>
           </MenuItem>
         </Menu>
         <Mapbox.MapView

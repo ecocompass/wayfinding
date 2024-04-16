@@ -15,10 +15,10 @@ import {
   SAVE_LOCATION_STORE,
   PROFILE,
   SAVETRIP,
-  GOAL_STORE,
   SETGOALS,
   READGOALS,
   SETWEATHER,
+  SETTRIPHISTORY,
   SETFEEDBACK,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
@@ -36,10 +36,10 @@ import {
   userPref,
   getPreference,
   saveTrip,
-  geoCodeApi,
   userGoals,
   readGoals,
   fetchWeather,
+  getTripHistory,
   userFeedback,
 } from "../../services/network.service";
 
@@ -52,6 +52,7 @@ import {
   hideToast,
   setAwards,
   showToast,
+  getTrips
 } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
@@ -247,6 +248,16 @@ function* readGoalsSaga(): any {
     yield put(hideToast());
   }
 }
+function* tripHistorySaga(): any {
+  yield put(toggleSpinner());
+  const response = yield getTripHistory();
+  console.log("res", response)
+  yield put(toggleSpinner());
+  if (response.saved_locations) {
+    yield put(getTrips(response.saved_locations));
+  }
+  else { handleToast(errorMessage) }
+}
 
 function* feedbackSaga(payload: any): any {
   yield put(toggleSpinner());
@@ -308,7 +319,9 @@ function* watchProfileSaga(): SagaIterator {
 function* watchWeatherSaga(): SagaIterator {
   yield takeLatest(SETWEATHER, WeatherSaga);
 }
-
+function* watchTripHistorySaga(): SagaIterator {
+  yield takeLatest(SETTRIPHISTORY, tripHistorySaga);
+}
 function* watchFeedbackSaga(): SagaIterator {
   yield takeLatest(SETFEEDBACK, feedbackSaga);
 }
@@ -327,6 +340,7 @@ function* appSagas() {
     call(watchGoalSaga),
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
+    call(watchTripHistorySaga),
     call(watchFeedbackSaga),
   ]);
 }
