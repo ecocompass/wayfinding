@@ -19,7 +19,6 @@ export function process_path(response: any) {
                 modePathList: recc.modePathList,
                 pathId: index,
                 isViewed: index ? false : true,
-                // isViewed: false,
                 pathDistance: recc.modePathList.map((mode) => {
                     return mode.distance;
                 }),
