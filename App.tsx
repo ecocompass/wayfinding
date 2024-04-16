@@ -70,7 +70,7 @@ const App = () => {
                 component={SavedLocations}
               />
               <Stack.Screen
-                options={{ headerShown: false }}
+                options={{ headerShown: true }}
                 name="OfflineMap"
                 component={OfflineMap}
               />
