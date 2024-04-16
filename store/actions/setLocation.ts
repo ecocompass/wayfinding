@@ -20,7 +20,8 @@ import {
     UPDATETRIPSTART,
     SAVETRIP,
     SETAWARDS,
-    SETFEEDBACK
+    SETFEEDBACK,
+    PINGCURRENTTRAFFIC
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -104,6 +105,15 @@ export const getSaveLocationsAPI = () => {
     }
 }
 
+export const pingCurrentTraficAPI = (id: string) => {
+    return {
+        type: PINGCURRENTTRAFFIC,
+        payload: {
+            recommendationId: id
+        }
+    }
+}
+
 
 export const updateViewedPath = (pathId: any) => {
     return {
@@ -137,15 +147,15 @@ export const getWeather = (payload: any) => {
         payload: payload
     }
 }
-export const setAwards=(payload:any)=>{
+export const setAwards = (payload: any) => {
     return {
         type: SETAWARDS,
-        payload:payload
-    }  
+        payload: payload
+    }
 }
-export const setFeedback=(payload:any)=>{
+export const setFeedback = (payload: any) => {
     return {
         type: SETFEEDBACK,
-        payload:payload
-    }  
+        payload: payload
+    }
 }

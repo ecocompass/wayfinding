@@ -20,6 +20,7 @@ import {
   READGOALS,
   SETWEATHER,
   SETFEEDBACK,
+  PINGCURRENTTRAFFIC,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -41,11 +42,12 @@ import {
   readGoals,
   fetchWeather,
   userFeedback,
+  fetchCurrentIncidents,
 } from "../../services/network.service";
 
 import { goalStore, prefStore, storeProfile } from "../actions/user";
 
-import { SagaIterator } from "redux-saga";
+import { Saga, SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
 import {
   getWeather,
@@ -259,6 +261,13 @@ function* feedbackSaga(payload: any): any {
   }
 }
 
+function* currentTrafficSaga(payload: any): any {
+  const response = yield fetchCurrentIncidents(payload);
+  if (response) {
+    console.log(response);
+  }
+}
+
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -312,6 +321,10 @@ function* watchWeatherSaga(): SagaIterator {
 function* watchFeedbackSaga(): SagaIterator {
   yield takeLatest(SETFEEDBACK, feedbackSaga);
 }
+
+function* watchCurrentTrafficSaga(): SagaIterator {
+  yield takeLatest(PINGCURRENTTRAFFIC, currentTrafficSaga);
+}
 function* appSagas() {
   yield all([
     call(watchSagaRegister),
@@ -328,6 +341,7 @@ function* appSagas() {
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
     call(watchFeedbackSaga),
+    call(watchCurrentTrafficSaga),
   ]);
 }
 

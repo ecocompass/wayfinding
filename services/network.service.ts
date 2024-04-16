@@ -364,3 +364,23 @@ export const fetchWeather = async (payload: any) => {
         err => console.log("error", err)
     )
 }
+
+export const fetchCurrentIncidents = async (params: any) => {
+    const token = await readToken();
+    return fetch(`http://prod.ecocompass.live/api/routes2?` + new URLSearchParams(params),
+        {
+            method: 'GET',
+            headers: {
+                'AUTHORIZATION': token,
+            },
+        })
+        .then((response) => {
+            if (response.status === status.ok) {
+                return response.json();
+            } else return false
+        })
+        .catch(e => {
+            console.log(e);
+            return false
+        });
+}

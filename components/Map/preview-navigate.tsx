@@ -152,6 +152,7 @@ export const PreviewNavigate = (props: any) => {
     if (viewMode === VIEWMODE.preview) {
       paths.forEach((path) => {
         if (path.isViewed) {
+          console.log(path.modePathList);
           onRender(path.modePathList);
           setPathInstructions(getPathInstructions(path, destinationName));
         }
@@ -163,6 +164,7 @@ export const PreviewNavigate = (props: any) => {
       let isFinalSegment = false;
 
       userPositionAndPath.pathSegments.forEach((segment: any, index) => {
+        console.log(segment);
         if (segment.isActive) {
           tempActiveSegment = segment;
           if (index === userPositionAndPath.pathSegments.length - 1) {
@@ -212,6 +214,8 @@ export const PreviewNavigate = (props: any) => {
             userPosition: positionUpdate.payload,
             eta: `${remTime} mins`,
           });
+
+          // dispatch(pingCurrentTraficAPI)
           break;
         case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
