@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getTrips, setTrips } from "../../store/actions/setLocation";
-import { Card, Center, Heading, ScrollView, Text } from "@gluestack-ui/themed";
-import { View } from "react-native";
+import { setTrips } from "../../store/actions/setLocation";
+import { Card, Center, ScrollView, Text } from "@gluestack-ui/themed";
 import { HStack } from "@gluestack-ui/themed";
 import { formatTime } from "../../services/time_to_dest";
 

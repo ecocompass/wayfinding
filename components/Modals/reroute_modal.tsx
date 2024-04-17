@@ -3,7 +3,6 @@ import {
   Modal,
   ModalBackdrop,
   ModalHeader,
-  ModalCloseButton,
   Heading,
   ModalBody,
   Text,
@@ -11,18 +10,11 @@ import {
   ButtonText,
   Button,
   ModalContent,
-  Icon,
-  CloseIcon,
-  Input,
-  InputField,
 } from '@gluestack-ui/themed';
 import { useDispatch, useSelector } from "react-redux";
 import {
-  ToggelRerouteModal,
   ToggleRerouteModal
 } from '../../store/actions/modal';
-import { useState } from 'react';
-import { saveLocationAPI, setFeedback } from '../../store/actions/setLocation';
 
 const RerouteModal = (props: any) => {
   const dispatch = useDispatch();
@@ -35,7 +27,7 @@ const RerouteModal = (props: any) => {
   return (
     <Modal
       isOpen={showModal}
-      onClose={() => {}}
+      onClose={() => { }}
     >
       <ModalBackdrop />
       <ModalContent>

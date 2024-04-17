@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import {
   VStack,
   Heading,
@@ -15,7 +14,6 @@ import {
   ProgressFilledTrack,
   Text,
   Modal,
-  ModalFooter,
   ModalContent,
   ModalBody,
   ModalCloseButton,
@@ -70,7 +68,7 @@ const ReadGoals = ({ navigation }: any) => {
         justifyContent: "center",
       }}
     ><VStack width={390} space="sm" marginTop={"$10"} p="$4">
-        <HStack >
+        <HStack alignItems='center' >
           <Heading>Your Current Goals</Heading>
           <BadgeInfo onPress={() => setShowModal(true)} />
         </HStack>
@@ -102,10 +100,12 @@ const ReadGoals = ({ navigation }: any) => {
 
           <VStack space="lg" key={transports[g.type]}>
             <Heading>{transports[g.type]}</Heading>
-            <Progress value={g.target} w={410} h={8} bg="$lime100">
-              <ProgressFilledTrack h={8} bg="$lime500" />
-            </Progress>
-            <Text size="md">{g.target + ' km'}</Text>
+            <HStack alignItems='center'>
+              <Progress value={g.current} w={310} h={8} bg="$lime100">
+                <ProgressFilledTrack h={8} bg="$lime500" />
+              </Progress>
+              <Text size="md" ml={'$2'}>{g.target + ' km'}</Text>
+            </HStack>
           </VStack>
 
         ))}

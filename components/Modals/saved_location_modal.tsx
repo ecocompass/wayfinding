@@ -20,14 +20,14 @@ import { ToggleLocationModal } from '../../store/actions/modal';
 import { useState } from 'react';
 import { saveLocationAPI } from '../../store/actions/setLocation';
 
-const SavedLocationModal = (props) => {
+const SavedLocationModal = (props: any) => {
   const dispatch = useDispatch();
 
-  let showModal = useSelector((state) => {
+  let showModal = useSelector((state: any) => {
     return state.modal.savedLocationModal.visibility;
   });
 
-  let locationData = useSelector((state) => {
+  let locationData = useSelector((state: any) => {
     return state.modal.savedLocationModal.data;
   });
 
