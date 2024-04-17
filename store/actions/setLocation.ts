@@ -1,10 +1,8 @@
 
 import {
     SAVE_LOCATION,
-    PREF_STORE,
     SHOWTOAST,
     HIDETOAST,
-    SETPREFERENCE,
     UPDATECENTERLOCATION,
     UPDATESEARCHSTATUS,
     UPDATEUSERLOCATION,
@@ -123,7 +121,7 @@ export const resetPaths = () => {
     }
 }
 
-export const updateTripDetails = (payload:any) => {
+export const updateTripDetails = (payload: any) => {
     return {
         type: UPDATETRIPSTART,
         payload,
@@ -169,21 +167,21 @@ export const setTrips = () => {
     };
 };
 
-export const getTrips = (payload:any) => {
+export const getTrips = (payload: any) => {
     return {
         type: GETTRIPHISTORY,
         payload
     };
 };
-export const setAwards=(payload:any)=>{
+export const setAwards = (payload: any) => {
     return {
         type: SETAWARDS,
-        payload:payload
-    }  
+        payload: payload
+    }
 }
-export const setFeedback=(payload:any)=>{
+export const setFeedback = (payload: any) => {
     return {
         type: SETFEEDBACK,
-        payload:payload
-    }  
+        payload: payload
+    }
 }

@@ -1,4 +1,4 @@
-import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, TOKEN_STORE } from "../actions";
+import { LOGIN, REGISTER, SESSION_OK, TOKEN_STORE } from "../actions";
 const initialState = { username: '', email: '', password: '', token: '' };
 
 

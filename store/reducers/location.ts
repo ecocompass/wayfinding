@@ -37,7 +37,7 @@ const locationReducer = (state = initialState, action: any) => {
         case ROUTES_STORE:
             return { ...state, recommendedRoutes: action.payload };
         case UPDATEPATHVIEWED:
-            let updatedRoutes = state.recommendedRoutes.options.map((opt) => {
+            let updatedRoutes = state.recommendedRoutes.options.map((opt:any) => {
                 return {
                     ...opt,
                     isViewed: (opt.pathId === action.payload) ? true : false,
@@ -85,10 +85,10 @@ const locationReducer = (state = initialState, action: any) => {
                 ...state, offline: action.payload
             };
         case GETTRIPHISTORY:
-            return{
+            return {
                 ...state,
-                tripHistory:action.payload
-            }    
+                tripHistory: action.payload
+            }
         case SETAWARDS:
             return {
                 ...state,

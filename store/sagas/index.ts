@@ -6,7 +6,6 @@ import {
   REGISTER,
   ROUTES_STORE,
   SAVE_LOCATION,
-  TOKEN_STORE,
   UPDATEVIEWMODE,
   PREF_STORE,
   SETPREFERENCE,
@@ -54,7 +53,6 @@ import { VIEWMODE, errorMessage, successMessage } from "../../constants";
 import {
   getWeather,
   hideToast,
-  setAwards,
   showToast,
   getTrips,
   saveOffline
@@ -151,7 +149,6 @@ function* goalSaga(payload: any): any {
   yield put(toggleSpinner());
 
   if (response) {
-    // yield put({ type: GOAL_STORE, payload: response });
     RootNavigation.navigate('Map', {});
   } else {
     yield call(handleToast, errorMessage);
@@ -245,7 +242,6 @@ function* WeatherSaga(payload: any): any {
 function* readGoalsSaga(): any {
   yield put(toggleSpinner());
   const response = yield readGoals();
-  console.log("res", response);
   yield put(toggleSpinner());
   if (response.payload) {
     yield put(goalStore(response.payload));
@@ -261,7 +257,6 @@ function* saveOfflineSaga(payload:any):any{
 function* tripHistorySaga(): any {
   yield put(toggleSpinner());
   const response = yield getTripHistory();
-  console.log("res", response)
   yield put(toggleSpinner());
   if (response.saved_locations) {
     yield put(getTrips(response.saved_locations));

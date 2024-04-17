@@ -27,7 +27,7 @@ const Goals = ({ navigation }: any) => {
     { name: 'Public Transport', value: 0 },
   ]);
   const dispatch = useDispatch();
-  
+
   const updateGoalValue = (name: string, value: any) => {
     let newGoals = allGoals.map((goal) => {
       if (goal.name === name) {

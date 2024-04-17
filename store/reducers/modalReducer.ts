@@ -1,8 +1,4 @@
-/* eslint-disable prettier/prettier */
-
-import FeedbackModal from "../../components/Modals/feedback_modal";
 import { AWARDMODAL, FEEDBACKMODAL, REROUTEMODAL, SAVEDLOCATIONMODAL } from "../actions";
-
 
 const initialState = {
     savedLocationModal: false,

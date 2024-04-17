@@ -1,16 +1,12 @@
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable prettier/prettier */
-/* eslint-disable react/react-in-jsx-scope */
-import { ImageBackground } from "@gluestack-ui/themed";
 import { Icon } from "@gluestack-ui/themed";
-import { Milestone, MapPin } from "lucide-react-native";
+import { Milestone } from "lucide-react-native";
 import Mapbox from "@rnmapbox/maps";
-import { View, Image,StyleSheet } from "react-native";
+import { View, Platform } from "react-native";
 
 const defaultPointStyle = {
   height: 20,
   width: 20,
-  backgroundColor: "#00cccc",
+  backgroundColor: "green",
   borderRadius: 15,
   borderColor: "#fff",
   borderWidth: 1,
@@ -22,8 +18,8 @@ const customStyle = {
   backgroundColor: '#a55eea',
   borderRadius: 15,
   borderBottomEndRadius: 0,
-  position:'relative',
-  transform: [{rotateY: '45deg'}],
+  position: 'relative',
+  transform: [{ rotateY: '45deg' }],
 };
 
 const pathIdentifiers: any = {
@@ -36,37 +32,39 @@ const pathIdentifiers: any = {
 
 function getLine(coordArr: any) {
   return {
-      type: "FeatureCollection",
-      features: [
-        {
-          type: "Feature",
-          properties: {},
-          geometry: {
-            type: "LineString",
-            coordinates: [
-              coordArr,
-            ],
-          },
+    type: "FeatureCollection",
+    features: [
+      {
+        type: "Feature",
+        properties: {},
+        geometry: {
+          type: "LineString",
+          coordinates: [
+            coordArr,
+          ],
         },
-      ],
-    };
-  }
+      },
+    ],
+  };
+}
 export function navPointAnnotation(pointArr: any) {
-  return pointArr.map((p, index) => {
+  return pointArr.map((p: any, index: any) => {
     return (
       <Mapbox.PointAnnotation
-      id={`nav_${index}`}
-      coordinate={p.coords}
-      key={`nav_${index}`}
-    >
-      <View style={{width: 30,
-        height: 30,
-        justifyContent: 'center',
-        alignItems: 'center',}}>
-          <Icon as={Milestone} size="lg" color="red"/>
+        id={`nav_${index}`}
+        coordinate={p.coords}
+        key={`nav_${index}`}
+      >
+        <View style={{
+          width: 30,
+          height: 30,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <Icon as={Milestone} size="lg" color="red" />
         </View>
-      <Mapbox.Callout title={p.name} style={{minWidth: 200}} />
-    </Mapbox.PointAnnotation>
+        <Mapbox.Callout title={p.name} style={{ minWidth: 200 }} />
+      </Mapbox.PointAnnotation>
     );
   });
 }
@@ -78,7 +76,8 @@ export function getPointAnnotation(options: any) {
       coordinate={options.coordinates}
       key={options.id}
     >
-      <Mapbox.Callout title={'End'} style={{minWidth: 200}} />
+      {Platform.OS === 'ios' ? (<View style={defaultPointStyle} />) : <></>}
+      <Mapbox.Callout title={'End'} style={{ minWidth: 200 }} />
     </Mapbox.PointAnnotation>
   );
 }
@@ -108,7 +107,7 @@ export function getLineAnnotation(routes: any) {
             lineWidth: 3,
             lineJoin: "round",
             lineColor: pathIdentifiers[route.mode],
-            lineDasharray: (route.mode === 'walk' || route.mode === 'bike')? route.pathPointList.map(r => 1) : [],
+            lineDasharray: (route.mode === 'walk' || route.mode === 'bike') ? route.pathPointList.map(r => 1) : [],
           }}
         />
       </Mapbox.ShapeSource>

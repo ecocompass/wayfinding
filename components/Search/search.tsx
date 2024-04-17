@@ -3,8 +3,6 @@
 /* eslint-disable react/react-in-jsx-scope */
 /* eslint-disable prettier/prettier */
 import {
-    Avatar,
-    AvatarImage,
     Box,
     FlatList,
     HStack,
@@ -22,21 +20,23 @@ import {
   CloseCircleIcon,
   VStack,
   KeyboardAvoidingView,
+
 } from '@gluestack-ui/themed';
 import { useState, useCallback, useEffect } from 'react';
-import {geoCodeApi} from '../../services/network.service'
+import { geoCodeApi } from '../../services/network.service'
 import * as React from "react";
 import { debounce } from 'lodash';
-import { useSelector, useDispatch, UseSelector } from 'react-redux';
+
 import { Platform, Touchable, TouchableOpacity } from 'react-native';
 import { setCenter, setSearchStatus } from '../../store/actions/setLocation';
+import { useSelector, useDispatch } from 'react-redux';
 
 export const SearchBox = (props: any) => {
     const [searchText, setSearchText] = useState('');
     const [searchResult, setSearchResult] = useState([]);
-    let isSearching = useSelector((state: any) => {return state.location.isSearching;});
-    let userLocation = useSelector((state: any) => {return state.location.userLocation;}); // Longitude, Latitude
-    let centerLocation = useSelector((state: any) => {return state.location.centerLocation;});
+    let isSearching = useSelector((state: any) => { return state.location.isSearching; });
+    let userLocation = useSelector((state: any) => { return state.location.userLocation; }); // Longitude, Latitude
+    let centerLocation = useSelector((state: any) => { return state.location.centerLocation; });
 
     const dispatch = useDispatch();
 
