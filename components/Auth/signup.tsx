@@ -7,13 +7,8 @@ import {
   FormControl,
   Button,
   ButtonText,
-  Card,
-  HStack,
   FormControlHelper,
   FormControlHelperText,
-  FormControlErrorText,
-  FormControlErrorIcon,
-  FormControlError,
   AlertCircleIcon,
   Icon,
   Center,
@@ -40,7 +35,7 @@ const Signup = ({ navigation }: any) => {
   };
   useEffect(() => {
     dispatch(getToken());
-  },[]);
+  }, []);
   return (
     <View
       style={{

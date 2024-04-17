@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable prettier/prettier */
 import Toast from "react-native-root-toast";
 import { MAPBOX_PUBLIC_TOKEN, status, weather_api_key } from "../constants";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -39,7 +37,6 @@ export const getLocationData = async (data: any) => {
         Toast.show(json.message, {
             duration: 10000,
         });
-        console.log(json);
     } catch (error) {
     } finally {
     }
@@ -132,16 +129,30 @@ export const readToken = async () => {
         return '';
     }
 };
-
-/*const clearStorage = async () => {
+export const saveGoalToken = async (STORAGE_KEY: any) => {
     try {
-      await AsyncStorage.clear();
-      console.log('Storage successfully cleared!');
+        let token_obj = {
+            goalToken: STORAGE_KEY,
+            timestamp: (new Date()).getTime(),
+        };
+        await AsyncStorage.setItem('goal_token_obj', JSON.stringify(token_obj));
     } catch (e) {
-      console.log('Failed to clear the async storage.');
+        console.log('Failed to save the data to the storage');
     }
-  }; */
+}
+export const readGoalToken = async () => {
+    try {
+        const value = await AsyncStorage.getItem('goal_token_obj');
+        if (value) {
+            let token_obj = JSON.parse(value);
+            return token_obj;
+        }
 
+    } catch (e) {
+        console.log('Failed to save the data to the storage');
+        return '';
+    }
+};
 export const removeStorageItem = function (key: string) {
     return AsyncStorage.removeItem(key);
 };
@@ -265,6 +276,7 @@ export const userGoals = async (payload: any) => {
     let newDate = new Date();
     let date = Math.floor(newDate.getTime() / 1000)
     let created_date = date;
+    saveGoalToken(created_date);
     let expiry_date = newDate.setDate(newDate.getDate() + 7);
     expiry_date = Math.floor(new Date(expiry_date).getTime() / 1000)
     let pay = [{
@@ -322,15 +334,17 @@ export const readProfile = async () => {
 export const readGoals = async () => {
 
     let token = await readToken();
+    let goal = await readGoalToken();
 
-    return await fetch(endpoint.goals, {
+    const endpointGoal= `${endpoint.goals}?start_time=${goal.goalToken}`;
+    console.log("endpoint",endpointGoal)
+    return await fetch(endpointGoal, {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token.accessToken}`,
         },
     }).then(response => {
-
         return response.json();
     })
         .catch(err => console.log("Error", err));
@@ -366,7 +380,7 @@ export const fetchWeather = async (payload: any) => {
 }
 export const getTripHistory = async function () {
     const token = await readToken();
-    console.log("Token",token)
+    console.log("Token", token)
     return await fetch(endpoint.saveTrip, {
         method: 'GET',
         headers: {
