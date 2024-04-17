@@ -251,8 +251,8 @@ export const saveTrip = async function (data: any) {
     })
         .then((response) => {
             if (response.status === status.ok) {
-                return response.json(),
-        } else {
+                return response.json()
+            } else {
                 return { error: true, response: response.json() };
             }
         })

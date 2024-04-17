@@ -486,7 +486,7 @@ const Map = ({ route, navigation }: any) => {
               </Button>)}
             </HStack>
             <Text size="sm" mb="$5">{locationData.address}</Text>
-            <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]} />
+            <WeatherComponent />
             <HStack>
               <Button py="$2" px="$4" action="negative" onPress={() => { cancelSearch() }}>
                 <ButtonText size="sm">Cancel</ButtonText>
