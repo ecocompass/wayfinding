@@ -21,13 +21,14 @@ import {
   ChevronsRightIcon,
   CloseCircleIcon,
   VStack,
+  KeyboardAvoidingView,
 } from '@gluestack-ui/themed';
 import { useState, useCallback, useEffect } from 'react';
 import {geoCodeApi} from '../../services/network.service'
 import * as React from "react";
 import { debounce } from 'lodash';
 import { useSelector, useDispatch, UseSelector } from 'react-redux';
-import { Touchable, TouchableOpacity } from 'react-native';
+import { Platform, Touchable, TouchableOpacity } from 'react-native';
 import { setCenter, setSearchStatus } from '../../store/actions/setLocation';
 
 export const SearchBox = (props: any) => {
@@ -65,6 +66,7 @@ export const SearchBox = (props: any) => {
     const debounced = useCallback(debounce(fetchResult, 500), []);
     return (
         <>
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined}>
         <Input
             variant="underlined"
             size="md"
@@ -88,6 +90,7 @@ export const SearchBox = (props: any) => {
             </InputSlot>
             ) : null}
         </Input>
+        </KeyboardAvoidingView>
         <Box py="$3">
             <FlatList
                 data={searchResult}

@@ -23,4 +23,4 @@ export const weather_url = 'https://openweathermap.org/img/wn/'
 
 export const offlineMessage='Yikes! You are offline';
 
-export const onlineMessage='You are back online!';
+export const onlineMessage='You are online!';
