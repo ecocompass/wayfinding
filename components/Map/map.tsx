@@ -271,7 +271,7 @@ const Map = ({ route, navigation }: any) => {
     NetInfo.addEventListener((state: any) => {
       const connected = state.isConnected;
       if (connected) {
-        dispatch(showToast(onlineMessage));
+        dispatch(showToast(onlineMessage, "success"));
         setTimeout(() => dispatch(hideToast()), 3000);
       }
       if (!connected) {
