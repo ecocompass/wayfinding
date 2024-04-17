@@ -404,7 +404,7 @@ export const PreviewNavigate = (props: any) => {
                           <ButtonText>Let's Go </ButtonText>
                           <ButtonIcon as={Play} />
                         </Button>
-                        <Button
+                     {/*    <Button
                           size="md"
                           variant="solid"
                           action="positive"
@@ -415,7 +415,7 @@ export const PreviewNavigate = (props: any) => {
                         >
                           <ButtonText>Save Trip</ButtonText>
                           <ButtonIcon as={Download} />
-                        </Button>
+                        </Button> */}
                         <Box>
                           <Text>
                             Arrive By :{' '}

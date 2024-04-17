@@ -7,23 +7,16 @@ import {
   FormControl,
   Button,
   ButtonText,
-  Card,
-  HStack,
   FormControlHelper,
   FormControlHelperText,
-  FormControlErrorText,
-  FormControlErrorIcon,
-  FormControlError,
   AlertCircleIcon,
   Icon,
   Center,
 } from '@gluestack-ui/themed';
-import React, { useEffect, useState } from 'react';
-import { Platform, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { getToken, registerAction } from '../../store/actions/auth';
-import { hideToast, showToast } from '../../store/actions/setLocation';
-import NetInfo from '@react-native-community/netinfo';
 const Signup = ({ navigation }: any) => {
   const dispatch = useDispatch();
   const [username, setUsername] = React.useState('');
@@ -42,16 +35,7 @@ const Signup = ({ navigation }: any) => {
     setIsConfirmPasswordInvalid(password !== event); // Check password match
   };
 
-  //const netInfo = useNetInfo();
-  const [connectionStatus, setConnectionStatus] = useState(false);
-  const CheckConnectivity = () => {
-    // const netInfo=useNetInfo()
-    NetInfo.addEventListener((state: any) => {
-      setConnectionStatus(state.isConnected);
-    });
-  };
   useEffect(() => {
-    CheckConnectivity();
     dispatch(getToken());
   }, []);
   return (
@@ -63,104 +47,92 @@ const Signup = ({ navigation }: any) => {
         justifyContent: 'center',
       }}
     >
-      {connectionStatus ? (
-        <FormControl p="$4">
-          <VStack space="xl">
-            <Heading size="5xl">Hello!</Heading>
-            <VStack space="sm">
-              <Text lineHeight="$xs">Name</Text>
-              <Input>
-                <InputField
-                  type="text"
-                  value={username}
-                  onChangeText={(event: any) => {
-                    setUsername(event);
-                  }}
-                />
-              </Input>
-              <Text lineHeight="$xs">Email</Text>
-              <Input>
-                <InputField
-                  type="text"
-                  value={email}
-                  onChangeText={(event: any) => {
-                    setEmail(event);
-                  }}
-                />
-              </Input>
-              <Text lineHeight="$xs">Password</Text>
-              <Input isInvalid={isPasswordInvalid} isRequired={true}>
-                <InputField
-                  type="password"
-                  value={password}
-                  onChangeText={handlePasswordChange}
-                />
-              </Input>
-              {isPasswordInvalid && (
-                <FormControlHelper>
-                  <FormControlHelperText>
-                    Password must be at least 8 characters
-                  </FormControlHelperText>
-                </FormControlHelper>
-              )}
-              <Text lineHeight="$xs">Confirm Password</Text>
-              <Input isInvalid={isConfirmPasswordInvalid} isRequired={true}>
-                <InputField
-                  type="password"
-                  value={confirmPassword}
-                  onChangeText={handleConfirmPasswordChange}
-                />
-              </Input>
-              {isConfirmPasswordInvalid && (
-                <FormControlHelper>
-                  <Icon as={AlertCircleIcon} size="md" color="red" />
-                  <FormControlHelperText color="red">
-                    Passwords must match
-                  </FormControlHelperText>
-                </FormControlHelper>
-              )}
-            </VStack>
-            <VStack>
-              <Button
-                onPress={() => {
-                  if (!isPasswordInvalid && !isConfirmPasswordInvalid) {
-                    dispatch(
-                      registerAction({
-                        email: email,
-                        username: username,
-                        password: password,
-                      })
-                    );
-                  }
+      <FormControl p="$4">
+        <VStack space="xl">
+          <Heading size="5xl">Hello!</Heading>
+          <VStack space="sm">
+            <Text lineHeight="$xs">Name</Text>
+            <Input>
+              <InputField
+                type="text"
+                value={username}
+                onChangeText={(event: any) => {
+                  setUsername(event);
                 }}
-              >
-                <ButtonText color="$white">Register</ButtonText>
-              </Button>
-              <Center h={50}>
-                <Text>OR</Text>
-              </Center>
-              <Button
-                onPress={() => {
-                  navigation.navigate('Login', {});
+              />
+            </Input>
+            <Text lineHeight="$xs">Email</Text>
+            <Input>
+              <InputField
+                type="text"
+                value={email}
+                onChangeText={(event: any) => {
+                  setEmail(event);
                 }}
-              >
-                <ButtonText color="$white">Login</ButtonText>
-              </Button>
-            </VStack>
+              />
+            </Input>
+            <Text lineHeight="$xs">Password</Text>
+            <Input isInvalid={isPasswordInvalid} isRequired={true}>
+              <InputField
+                type="password"
+                value={password}
+                onChangeText={handlePasswordChange}
+              />
+            </Input>
+            {isPasswordInvalid && (
+              <FormControlHelper>
+                <FormControlHelperText>
+                  Password must be at least 8 characters
+                </FormControlHelperText>
+              </FormControlHelper>
+            )}
+            <Text lineHeight="$xs">Confirm Password</Text>
+            <Input isInvalid={isConfirmPasswordInvalid} isRequired={true}>
+              <InputField
+                type="password"
+                value={confirmPassword}
+                onChangeText={handleConfirmPasswordChange}
+              />
+            </Input>
+            {isConfirmPasswordInvalid && (
+              <FormControlHelper>
+                <Icon as={AlertCircleIcon} size="md" color="red" />
+                <FormControlHelperText color="red">
+                  Passwords must match
+                </FormControlHelperText>
+              </FormControlHelper>
+            )}
           </VStack>
-        </FormControl>
-      ) : (
-        <Center h={50}>
-          <Button
-            size="md"
-            onPress={() => {
-              navigation.navigate('OfflineMap', {});
-            }}
-          >
-            <ButtonText>Load Offline</ButtonText>
-          </Button>
-        </Center>
-      )}
+          <VStack>
+            <Button
+              onPress={() => {
+                if (!isPasswordInvalid && !isConfirmPasswordInvalid) {
+                  dispatch(
+                    registerAction({
+                      email: email,
+                      username: username,
+                      password: password,
+                    })
+                  );
+                }
+              }}
+            >
+              <ButtonText color="$white">Register</ButtonText>
+            </Button>
+            <Center h={50}>
+              <Text>OR</Text>
+            </Center>
+            <Button
+              onPress={() => {
+                navigation.navigate('Login', {});
+              }}
+            >
+              <ButtonText color="$white">Login</ButtonText>
+            </Button>
+          </VStack>
+        </VStack>
+      </FormControl>
+
     </View>
   );
 };

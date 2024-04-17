@@ -12,11 +12,11 @@ import Geolocation from "react-native-geolocation-service";
 import Mapbox from "@rnmapbox/maps";
 import { getPointAnnotation, getLineAnnotation, navPointAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
-import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
+import { MAPBOX_PUBLIC_TOKEN, VIEWMODE, offlineMessage, onlineMessage } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, VStack, ButtonIcon, CloseIcon, StarIcon, Center } from "@gluestack-ui/themed";
 import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical, Download, DownloadIcon, Trash2Icon } from 'lucide-react-native';
-import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView, showToast } from "../../store/actions/setLocation";
+import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView, showToast, hideToast } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
@@ -33,7 +33,7 @@ import NetInfo from '@react-native-community/netinfo';
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
 );
-const simulateUserLoc:any=[]
+const simulateUserLoc: any = []
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -75,7 +75,7 @@ const requestLocationPermission = async () => {
 
 const Map = ({ route, navigation }: any) => {
   let camRef = null;
-  let mapRef=null;
+  let mapRef = null;
   let userLocation = useSelector((state: any) => {
     return state.location.userLocation
   }); // Longitude, Latitude
@@ -130,9 +130,19 @@ const Map = ({ route, navigation }: any) => {
   const [renderedPoints, setRenderedPoints] = useState<any>([])
   const [psuedoIndex, setPseudoIndex] = useState<any>(0)
   const [connectionStatus, setConnectionStatus] = useState(false);
+  let flag = false;
   const CheckConnectivity = () => {
-    // const netInfo=useNetInfo()
     NetInfo.addEventListener((state: any) => {
+      const connected = state.isConnected;
+      if (connected) {
+        dispatch(showToast(onlineMessage));
+        setTimeout(() => dispatch(hideToast()), 3000);
+      }
+      if (!connected) {
+        dispatch(showToast(offlineMessage, 'error'));
+        setTimeout(() => dispatch(hideToast()), 3000);
+      }
+      
       setConnectionStatus(state.isConnected);
     });
   };
@@ -150,14 +160,14 @@ const Map = ({ route, navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    dispatch(setUserLocation([0,0]))
+    dispatch(setUserLocation([0, 0]))
   };
 
   const userLocationUpdate = (data: any) => {
     // dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
     if (viewMode === VIEWMODE.navigate) {
-        dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
-        setPseudoIndex(psuedoIndex + 1);
+      dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
+      setPseudoIndex(psuedoIndex + 1);
     }
   };
 
@@ -165,9 +175,9 @@ const Map = ({ route, navigation }: any) => {
     dispatch(updateViewMode(VIEWMODE.downloadMap))
   }
 
-  const onDowloadRegion = async() => {
+  const onDowloadRegion = async () => {
     const progressListener = (offlineRegion, status) => {
-      console.log("success ",offlineRegion, status)
+      console.log("success ", offlineRegion, status)
       if (status.state === 'complete') {
         dispatch(showToast("Region Downloaded Successfully", "success"));
       }
@@ -184,8 +194,8 @@ const Map = ({ route, navigation }: any) => {
     }, progressListener, errorListener)
 
   }
- // const getPack = await offlineManager.getPack('region_1');
-//console.log('getpack',getPack)
+  // const getPack = await offlineManager.getPack('region_1');
+  //console.log('getpack',getPack)
   const onRegionChange = (data) => {
     if (viewMode === VIEWMODE.downloadMap) {
       console.log(data.properties.bounds)
@@ -193,10 +203,10 @@ const Map = ({ route, navigation }: any) => {
     }
   }
 
-  const onOfflineRegionChange = async(data) => {
-    await offlineManager.getPack('region_1').then(res=>{setDownloadBounds(res?.bounds)});
-    }
-  
+  const onOfflineRegionChange = async (data) => {
+    await offlineManager.getPack('region_1').then(res => { setDownloadBounds(res?.bounds) });
+  }
+
   const selectLocation = (data: any) => {
     setPointViewed(data.center);
     this.camRef.flyTo(data.center, 500);
@@ -288,29 +298,28 @@ const Map = ({ route, navigation }: any) => {
 
   const tripStart = async (startLocation: any) => {
     try {
-        const response = await geoCodeApi(startLocation.join(','))
-        let tripData = {
-            start: {
-                coordinates: response.features[0].center,
-                location_name: response.features[0].text
-            },
-            end: {
-                coordinates: locationData.coordinates,
-                location_name: locationData.name
-            },
-            startTime: new Date().getTime()
-        }
-        dispatch(updateUserDirectionView());
-        dispatch(updateTripDetails(tripData))
+      const response = await geoCodeApi(startLocation.join(','))
+      let tripData = {
+        start: {
+          coordinates: response.features[0].center,
+          location_name: response.features[0].text
+        },
+        end: {
+          coordinates: locationData.coordinates,
+          location_name: locationData.name
+        },
+        startTime: new Date().getTime()
+      }
+      dispatch(updateUserDirectionView());
+      dispatch(updateTripDetails(tripData))
     } catch (err) {
-        console.log(err, 'could not fetch loation details')
+      console.log(err, 'could not fetch loation details')
     }
   }
 
   return (
-    
+
     <View style={styles.page}>
-      {connectionStatus?(
       <View style={styles.container}>
         <Menu
           placement="bottom"
@@ -346,10 +355,10 @@ const Map = ({ route, navigation }: any) => {
             <Icon as={AlignStartVertical} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Preferences</MenuItemLabel>
           </MenuItem>
-          <MenuItem key="offlineMap" textValue="offlinemap" onPress={() => { 
-             RootNavigation.navigate('OfflineMap', {})
+          <MenuItem key="offlineMap" textValue="offlinemap" onPress={() => {
+            RootNavigation.navigate('OfflineMap', {})
             //onDownloadMap()
-           }}>
+          }}>
             <Icon as={Download} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Saved Trips</MenuItemLabel>
           </MenuItem>
@@ -364,7 +373,7 @@ const Map = ({ route, navigation }: any) => {
           compassEnabled={true}
           logoEnabled={false}
           onCameraChanged={onRegionChange}
-          ref={(c)=>(this.mapRef=c)}
+          ref={(c) => (this.mapRef = c)}
         >
           <Mapbox.Camera
             ref={(c) => (this.camRef = c)}
@@ -372,11 +381,11 @@ const Map = ({ route, navigation }: any) => {
             centerCoordinate={centerLocation}
             animationMode={"flyTo"}
             animationDuration={1000}
-            // followUserLocation={viewMode === VIEWMODE.navigate}
+          // followUserLocation={viewMode === VIEWMODE.navigate}
           />
           {renderedPoints}
-          <Mapbox.UserLocation onUpdate={userLocationUpdate} showsUserHeadingIndicator={isViewUserDirection}/>
-          { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
+          <Mapbox.UserLocation onUpdate={userLocationUpdate} showsUserHeadingIndicator={isViewUserDirection} />
+          {renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
           <Fab size="lg" placement="bottom right" onPress={() => {
@@ -418,43 +427,33 @@ const Map = ({ route, navigation }: any) => {
             destinationName={locationData.name}
             camRef={this.camRef}
             onTripStart={tripStart}
-            mapRef={this.mapRef}/>
+            mapRef={this.mapRef} />
         ) : (<></>)}
         {locationData.name ? <SavedLocationModal /> : <></>}
         {(viewMode === VIEWMODE.downloadMap) ? (
           <Card size="md" variant="elevated" m="$2">
-          <HStack space="4xl" justifyContent="space-between" >
-            <Heading mb="$1" size="md">
-              Download Map Region
-            </Heading>
-            <Button py="$2" px="$4" action="negative" onPress={() => { dispatch(updateViewMode(VIEWMODE.search)) }}>
+            <HStack space="4xl" justifyContent="space-between" >
+              <Heading mb="$1" size="md">
+                Download Map Region
+              </Heading>
+              <Button py="$2" px="$4" action="negative" onPress={() => { dispatch(updateViewMode(VIEWMODE.search)) }}>
                 <ButtonIcon as={CloseIcon} />
-            </Button>
-          </HStack>
-          <Text size="sm" mb="$4">Adjust the map according to the region that you want to download</Text>
-          <HStack>
-            <Button py="$2" px="$4" action="negative" onPress={async() => {await offlineManager.deletePack('region_1').then(res => {console.log(res)}).catch(err => console.log(err)) }}>
-              <ButtonText size="sm">Delete Maps</ButtonText>
-              <ButtonIcon as={Trash2Icon} ml="$2" />
-            </Button>
-            <Button py="$2" px="$4" ml="$2" onPress={() => { onDowloadRegion() }}>
-              <ButtonText size="sm">Download</ButtonText>
-              <ButtonIcon as={DownloadIcon} ml="$2" />
-            </Button>
-          </HStack> 
-        </Card>
-        ): (<></>)}
+              </Button>
+            </HStack>
+            <Text size="sm" mb="$4">Adjust the map according to the region that you want to download</Text>
+            <HStack>
+              <Button py="$2" px="$4" action="negative" onPress={async () => { await offlineManager.deletePack('region_1').then(res => { console.log(res) }).catch(err => console.log(err)) }}>
+                <ButtonText size="sm">Delete Maps</ButtonText>
+                <ButtonIcon as={Trash2Icon} ml="$2" />
+              </Button>
+              <Button py="$2" px="$4" ml="$2" onPress={() => { onDowloadRegion() }}>
+                <ButtonText size="sm">Download</ButtonText>
+                <ButtonIcon as={DownloadIcon} ml="$2" />
+              </Button>
+            </HStack>
+          </Card>
+        ) : (<></>)}
       </View>
-      ):(  <Center h={50}>
-        <Button
-          size="md"
-          onPress={() => {
-            navigation.navigate('OfflineMap', {});
-          }}
-        >
-          <ButtonText>Load Offline</ButtonText>
-        </Button>
-      </Center>)}
     </View>
   );
 };
