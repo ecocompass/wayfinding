@@ -15,7 +15,7 @@ import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon, StarIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical } from 'lucide-react-native';
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical, MessageCircleWarningIcon } from 'lucide-react-native';
 import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
@@ -23,9 +23,10 @@ import { ZOOMADJUST } from "../../store/actions";
 import { PreviewNavigate } from "./preview-navigate";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import SavedLocationModal from "../Modals/saved_location_modal";
-import { ToggleLocationModal } from "../../store/actions/modal";
+import { ToggleIncidentModal, ToggleLocationModal } from "../../store/actions/modal";
 import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
 import WeatherComponent from "../Weather/weather";
+import IncidentModal from "../Modals/incident_modal";
 
 const simulateUserLoc = [
   [
@@ -93,72 +94,20 @@ const simulateUserLoc = [
       53.3408943
   ],
   [
-      -6.2552213,
-      53.3408024
+      -6.2552254,
+      53.3409048
   ],
   [
-      -6.255331,
-      53.3405832
+      -6.2553135,
+      53.3408192
   ],
   [
-      -6.2554823,
-      53.3402774
+      -6.2554178,
+      53.3408388
   ],
   [
-      -6.2555914,
-      53.3400833
-  ],
-  [
-      -6.2557581,
-      53.339794
-  ],
-  [
-      -6.2557724,
-      53.3397693
-  ],
-  [
-      -6.2557851,
-      53.3397473
-  ],
-  [
-      -6.2558206,
-      53.3396983
-  ],
-  [
-      -6.2560736,
-      53.3393966
-  ],
-  [
-      -6.2561554,
-      53.3394182
-  ],
-  [
-      -6.2564764,
-      53.3390212
-  ],
-  [
-      -6.2565095,
-      53.3389788
-  ],
-  [
-      -6.2565731,
-      53.3389961
-  ],
-  [
-      -6.2565907,
-      53.3389764
-  ],
-  [
-      -6.2566282,
-      53.3389863
-  ],
-  [
-      -6.2566919,
-      53.3388855
-  ],
-  [
-      -6.2567493,
-      53.3388995
+      -6.255456,
+      53.3407618
   ]
 ]
 
@@ -404,7 +353,10 @@ const Map = ({ route, navigation }: any) => {
             )
           }}
         >
-          <MenuItem key="profile" textValue="profile" onPress={() => { RootNavigation.navigate('Profile', {}) }}>
+          {
+          viewMode !== VIEWMODE.navigate ? (
+            <>
+            <MenuItem key="profile" textValue="profile" onPress={() => { RootNavigation.navigate('Profile', {}) }}>
             <Icon as={CircleUser} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Profile</MenuItemLabel>
           </MenuItem>
@@ -423,14 +375,24 @@ const Map = ({ route, navigation }: any) => {
             <Icon as={Car} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Your Trips</MenuItemLabel>
           </MenuItem>
-          <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
-            <Icon as={LogOut} size="md" mr="$2" color={'black'} />
-            <MenuItemLabel size="md">Logout</MenuItemLabel>
-          </MenuItem>
           <MenuItem key="pref" textValue="preferences" onPress={() => { RootNavigation.navigate('Preference', {}) }}>
             <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
             <MenuItemLabel size="md">Preferences</MenuItemLabel>
           </MenuItem>
+          <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
+            <Icon as={LogOut} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Logout</MenuItemLabel>
+          </MenuItem>
+            </>
+          
+          ):(
+            <MenuItem key="incident" textValue="preferences" onPress={() => { dispatch(ToggleIncidentModal({visibility: true})) }}>
+            <Icon as={MessageCircleWarningIcon} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Report Incident</MenuItemLabel>
+          </MenuItem>
+          )}
+          
+          
         </Menu>
         <Mapbox.MapView
           style={styles.map}
@@ -447,7 +409,6 @@ const Map = ({ route, navigation }: any) => {
             // followUserLocation={viewMode === VIEWMODE.navigate}
           />
           {renderedPoints}
-          {/* {navPoints.length ? (navPointAnnotation(navPoints)) : <></> } */}
           <Mapbox.UserLocation onUpdate={userLocationUpdate} showsUserHeadingIndicator={isViewUserDirection}/>
           { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>

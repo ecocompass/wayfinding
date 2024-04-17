@@ -1,4 +1,4 @@
-import { AWARDMODAL, FEEDBACKMODAL, REROUTEMODAL, SAVEDLOCATIONMODAL } from ".";
+import { AWARDMODAL, FEEDBACKMODAL, INCIDENTMODAL, REROUTEMODAL, SAVEDLOCATIONMODAL } from ".";
 
 
 export const ToggleLocationModal = (options: any) => {
@@ -21,6 +21,13 @@ export const ToggleFeedbackModal = (options: any) => {
         payload: options,
     };
 };
+
+export const ToggleIncidentModal = (options: any) => {
+    return {
+        type: INCIDENTMODAL,
+        payload: options
+    }
+}
 
 export const ToggleAwardModal = (options: any) => {
     return {

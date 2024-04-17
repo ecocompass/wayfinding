@@ -367,7 +367,7 @@ export const fetchWeather = async (payload: any) => {
 
 export const fetchCurrentIncidents = async (params: any) => {
     const token = await readToken();
-    return fetch(`http://prod.ecocompass.live/api/routes2?` + new URLSearchParams(params),
+    return fetch(`http://prod.ecocompass.live/api/transit/incidents?` + new URLSearchParams(params),
         {
             method: 'GET',
             headers: {
@@ -382,5 +382,27 @@ export const fetchCurrentIncidents = async (params: any) => {
         .catch(e => {
             console.log(e);
             return false
+        });
+}
+
+export const reportIncident = async (data: any) => {
+    const token = await readToken();
+    let body = JSON.stringify(data);
+    return fetch(`http://prod.ecocompass.live/createIncident?` + new URLSearchParams(params),
+        {
+            method: 'POST',
+            headers: {
+                'AUTHORIZATION': token,
+            },
+            body,
+        })
+        .then((response) => {
+            if (response.status === status.ok) {
+                return response.json();
+            } else return false
+        })
+        .catch(e => {
+            console.log(e);
+            return false;
         });
 }

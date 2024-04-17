@@ -21,6 +21,7 @@ import {
   SETWEATHER,
   SETFEEDBACK,
   PINGCURRENTTRAFFIC,
+  REPORTINCIDENT,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -43,6 +44,7 @@ import {
   fetchWeather,
   userFeedback,
   fetchCurrentIncidents,
+  reportIncident,
 } from "../../services/network.service";
 
 import { goalStore, prefStore, storeProfile } from "../actions/user";
@@ -268,6 +270,18 @@ function* currentTrafficSaga(payload: any): any {
   }
 }
 
+function* reportIncidentSaga(payload: any): any {
+  yield put(toggleSpinner());
+  const response = yield reportIncident(payload);
+  if (response) {
+    yield call(handleToast, "Incident successfully reported!");
+  }
+}
+
+function* watchReportIncidentSaga(): SagaIterator {
+  yield takeLatest(REPORTINCIDENT, reportIncidentSaga);
+}
+
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -342,6 +356,7 @@ function* appSagas() {
     call(watchWeatherSaga),
     call(watchFeedbackSaga),
     call(watchCurrentTrafficSaga),
+    call(watchReportIncidentSaga),
   ]);
 }
 

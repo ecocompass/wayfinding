@@ -40,6 +40,7 @@ import {
   updateUserDirectionView,
   updateViewMode,
   updateViewedPath,
+  pingCurrentTraficAPI,
 } from '../../store/actions/setLocation';
 import { VIEWMODE } from '../../constants';
 import {
@@ -54,6 +55,7 @@ import {
 import { View } from 'react-native';
 import FeedbackModal from '../Modals/feedback_modal';
 import AwardModal from '../Modals/award_modal';
+import IncidentModal from '../Modals/incident_modal';
 import {
   ToggleFeedbackModal,
   ToggleRerouteModal,
@@ -64,10 +66,6 @@ export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef } = props;
 
   let currentUserLocation = useSelector((state: any) => {
-    if (viewMode === VIEWMODE.navigate) {
-      // dispatch(setCenter(state.location.userLocation));
-      // console.log(state.location.userLocation);
-    }
     return state.location.userLocation;
   });
 
@@ -90,6 +88,7 @@ export const PreviewNavigate = (props: any) => {
     userPosition: 0,
     pathSegments: [],
     eta: "",
+    recommendationId: "",
   });
   let [hasTripEnded, setHasTripEnded] = useState(false);
   const awards = useSelector((state: any) => {
@@ -152,7 +151,6 @@ export const PreviewNavigate = (props: any) => {
     if (viewMode === VIEWMODE.preview) {
       paths.forEach((path) => {
         if (path.isViewed) {
-          console.log(path.modePathList);
           onRender(path.modePathList);
           setPathInstructions(getPathInstructions(path, destinationName));
         }
@@ -164,7 +162,6 @@ export const PreviewNavigate = (props: any) => {
       let isFinalSegment = false;
 
       userPositionAndPath.pathSegments.forEach((segment: any, index) => {
-        console.log(segment);
         if (segment.isActive) {
           tempActiveSegment = segment;
           if (index === userPositionAndPath.pathSegments.length - 1) {
@@ -210,12 +207,13 @@ export const PreviewNavigate = (props: any) => {
           });
 
           setUserPositionAndPathSegment({
+            ...userPositionAndPath,
             pathSegments: userPositionAndPath.pathSegments,
             userPosition: positionUpdate.payload,
             eta: `${remTime} mins`,
           });
 
-          // dispatch(pingCurrentTraficAPI)
+          dispatch(pingCurrentTraficAPI(userPositionAndPath.recommendationId));
           break;
         case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
@@ -340,6 +338,7 @@ export const PreviewNavigate = (props: any) => {
       userPosition: tp,
       pathSegments: segments,
       eta: "",
+      recommendationId: selectedPath.recommendationId,
     });
     props.onTripStart(currentUserLocation);
   };
@@ -567,6 +566,7 @@ export const PreviewNavigate = (props: any) => {
             />
           </Box>
           <RerouteModal onShowIntent={onReRoute} />
+          <IncidentModal currentUserLocation={currentUserLocation} />
         </>
       );
     case VIEWMODE.navigateEnd:

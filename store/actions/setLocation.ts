@@ -21,7 +21,8 @@ import {
     SAVETRIP,
     SETAWARDS,
     SETFEEDBACK,
-    PINGCURRENTTRAFFIC
+    PINGCURRENTTRAFFIC,
+    REPORTINCIDENT
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -111,6 +112,14 @@ export const pingCurrentTraficAPI = (id: string) => {
         payload: {
             recommendationId: id
         }
+    }
+}
+
+
+export const reportIncidentAPI = (data: any) => {
+    return {
+        type: REPORTINCIDENT,
+        payload: data
     }
 }
 
