@@ -18,7 +18,6 @@ import {
 } from '@gluestack-ui/themed';
 import { useDispatch, useSelector } from "react-redux";
 import {
-  ToggelRerouteModal,
   ToggleRerouteModal
 } from '../../store/actions/modal';
 import { useState } from 'react';
