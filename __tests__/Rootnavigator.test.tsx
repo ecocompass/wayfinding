@@ -1,4 +1,4 @@
-import * as NavigationService from '../wayfinding/components/Navigation/RootNavigator.tsx'; // Update with the correct path
+import * as NavigationService from 'wayfinding/components/Navigation/RootNavigator.tsx'; // Update with the correct path
 import { createNavigationContainerRef } from '@react-navigation/native';
 
 describe('Navigation Service', () => {
