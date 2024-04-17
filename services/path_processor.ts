@@ -22,6 +22,8 @@ export function process_path(response: any) {
                 pathDistance: recc.modePathList.map((mode) => {
                     return mode.distance;
                 }),
+                recommendationId: recc.recommendationId,
+                trafficSegment: recc.traffic,
             });
         }
     });
@@ -69,17 +71,21 @@ export const processPathCleared = (pointList, userLocation, userPosition, isFina
         return { action: "CHANGESEGMENT" };
     }
 
-    let pathLineDist = getPointLineDistance(pointList[userPosition], pointList[userPosition + 1], userLocation);
-    if (pathLineDist > 0.001) {
-        return { action: 'REROUTE' };
-    }
+    if (pointList[userPosition], pointList[userPosition + 1]) {
+        let pathLineDist = getPointLineDistance(pointList[userPosition], pointList[userPosition + 1], userLocation);
+        if (pathLineDist > 0.001) {
+            return { action: 'REROUTE' };
+        }
 
-    let d1 = getPointDistance(pointList[userPosition], userLocation);
-    let d2 = getPointDistance(pointList[userPosition + 1], userLocation);
-    userPosition = userPosition + 1;
+        let d1 = getPointDistance(pointList[userPosition], userLocation);
+        let d2 = getPointDistance(pointList[userPosition + 1], userLocation);
+        userPosition = userPosition + 1;
 
-    if (d2 < d1) {
-        return { action: 'UPDATE', payload: userPosition };
+        if (d2 < d1) {
+            return { action: 'UPDATE', payload: userPosition };
+        } else {
+            return { action: '' };
+        }
     } else {
         return { action: '' };
     }

@@ -42,6 +42,7 @@ import {
   updateUserDirectionView,
   updateViewMode,
   updateViewedPath,
+  pingCurrentTraficAPI,
 } from '../../store/actions/setLocation';
 import { VIEWMODE } from '../../constants';
 import {
@@ -58,6 +59,7 @@ import { View } from 'react-native';
 import { snapshotManager } from '@rnmapbox/maps';
 import FeedbackModal from '../Modals/feedback_modal';
 import AwardModal from '../Modals/award_modal';
+import IncidentModal from '../Modals/incident_modal';
 import {
   ToggleFeedbackModal,
   ToggleRerouteModal,
@@ -68,10 +70,6 @@ export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef, mapRef } = props;
 
   let currentUserLocation = useSelector((state: any) => {
-    if (viewMode === VIEWMODE.navigate) {
-      // dispatch(setCenter(state.location.userLocation));
-      // console.log(state.location.userLocation);
-    }
     return state.location.userLocation;
   });
 
@@ -94,6 +92,7 @@ export const PreviewNavigate = (props: any) => {
     userPosition: 0,
     pathSegments: [],
     eta: "",
+    recommendationId: "",
   });
   let [hasTripEnded, setHasTripEnded] = useState(false);
   const awards = useSelector((state: any) => {
@@ -199,10 +198,13 @@ export const PreviewNavigate = (props: any) => {
           });
 
           setUserPositionAndPathSegment({
+            ...userPositionAndPath,
             pathSegments: userPositionAndPath.pathSegments,
             userPosition: positionUpdate.payload,
             eta: `${remTime} mins`,
           });
+
+          dispatch(pingCurrentTraficAPI(userPositionAndPath.recommendationId));
           break;
         case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
@@ -327,6 +329,7 @@ export const PreviewNavigate = (props: any) => {
       userPosition: tp,
       pathSegments: segments,
       eta: "",
+      recommendationId: selectedPath.recommendationId,
     });
     props.onTripStart(currentUserLocation);
   };
@@ -579,6 +582,7 @@ export const PreviewNavigate = (props: any) => {
             />
           </Box>
           <RerouteModal onShowIntent={onReRoute} />
+          <IncidentModal currentUserLocation={currentUserLocation} />
         </>
       );
     case VIEWMODE.navigateEnd:

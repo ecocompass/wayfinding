@@ -23,7 +23,9 @@ import {
     SETTRIPHISTORY,
     GETTRIPHISTORY,
     SETAWARDS,
-    SETFEEDBACK
+    SETFEEDBACK,
+    PINGCURRENTTRAFFIC,
+    REPORTINCIDENT
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -107,6 +109,23 @@ export const getSaveLocationsAPI = () => {
     }
 }
 
+export const pingCurrentTraficAPI = (id: string) => {
+    return {
+        type: PINGCURRENTTRAFFIC,
+        payload: {
+            recommendationId: id
+        }
+    }
+}
+
+
+export const reportIncidentAPI = (data: any) => {
+    return {
+        type: REPORTINCIDENT,
+        payload: data
+    }
+}
+
 
 export const updateViewedPath = (pathId: any) => {
     return {
@@ -141,16 +160,16 @@ export const getWeather = (payload: any) => {
     }
 }
 
-export const setOffline=(payload:any)=>{
-    return{
-        type:SETOFFLINE,
-        payload:payload
+export const setOffline = (payload: any) => {
+    return {
+        type: SETOFFLINE,
+        payload: payload
     }
 }
 
-export const getOffline=()=>{
-    return{
-        type:GETOFFLINE,
+export const getOffline = () => {
+    return {
+        type: GETOFFLINE,
 
     }
 }
