@@ -1,4 +1,4 @@
-import { GET_TOKEN, LOGIN, REGISTER, SESSION_OK, STORE_TOKEN, TOKEN_STORE } from ".";
+import {  GET_TOKEN, LOGIN, LOGOUT,REGISTER, SESSION_OK, TOGGLESPINNER, TOKEN_STORE} from ".";
 
 export const loginAction = (login: any) => {
     return {
@@ -20,12 +20,6 @@ export const getToken = () => {
     };
 };
 
-export const storeToken = (token: any) => {
-    return {
-        type: STORE_TOKEN,
-        payload: token,
-    };
-};
 
 export const tokenStore = (token: string) => {
     return {
@@ -41,9 +35,14 @@ export const sessionOK = (bool: any) => {
     };
 };
 
-export const logoutAction = (token: any) => {
+export const logoutAction = () => {
     return {
-        type: logoutAction,
-        payload: token,
+        type: LOGOUT,
     };
 };
+
+
+export const toggleSpinner = () => {
+    return { type: TOGGLESPINNER }
+}
+
