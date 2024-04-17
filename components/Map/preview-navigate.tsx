@@ -34,6 +34,7 @@ import {
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
+  setFeedback,
   resetPaths,
   saveTripAPI,
   setCenter,
@@ -43,7 +44,11 @@ import {
   updateViewedPath,
 } from '../../store/actions/setLocation';
 import { VIEWMODE } from '../../constants';
-import { getTimeFromDistance } from '../../services/time_to_dest';
+import {
+  formatTime,
+  getTimeFromDistance,
+  getTimeFromDistanceSingle,
+} from '../../services/time_to_dest';
 import {
   getPathInstructions,
   getUserPositionInSegment,
@@ -51,6 +56,13 @@ import {
 } from '../../services/path_processor';
 import { View } from 'react-native';
 import { snapshotManager } from '@rnmapbox/maps';
+import FeedbackModal from '../Modals/feedback_modal';
+import AwardModal from '../Modals/award_modal';
+import {
+  ToggleFeedbackModal,
+  ToggleRerouteModal,
+} from '../../store/actions/modal';
+import RerouteModal from '../Modals/reroute_modal';
 
 export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef, mapRef } = props;
@@ -76,9 +88,17 @@ export const PreviewNavigate = (props: any) => {
   });
 
   let [pathInstructions, setPathInstructions] = useState<any>([]);
-  let [pathSegments, setPathSegments] = useState<any>([]);
-  let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
-
+  // let [pathSegments, setPathSegments] = useState<any>([]);
+  // let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
+  let [userPositionAndPath, setUserPositionAndPathSegment] = useState<any>({
+    userPosition: 0,
+    pathSegments: [],
+    eta: "",
+  });
+  let [hasTripEnded, setHasTripEnded] = useState(false);
+  const awards = useSelector((state: any) => {
+    return state.location.awards;
+  });
   const iconMap = {
     walk: FootprintsIcon,
     bus: BusIcon,
@@ -108,16 +128,14 @@ export const PreviewNavigate = (props: any) => {
     return arrivalTime;
   };
 
-  const formatTime = (end, start) => {
-    let diff = end - start
-    let mins = Math.trunc(diff / 1000 / 60);
-    let hours = 0
-    if (mins < 60) {
-      return `${mins} Mins`;
-    } else {
-      hours = Math.trunc(diff / 1000 / 60 / 60);
-      mins = Math.trunc(diff % (1000 * 60 * 60) / 1000 / 60);
-      return `${hours} Hrs ${mins} Mins`;
+  const openFeedbackModal = () => {
+    dispatch(ToggleFeedbackModal({ visibility: true }));
+  };
+
+  const onReRoute = (isIntent) => {
+    updateView();
+    if (isIntent) {
+      props.onReroute();
     }
   }
 
@@ -131,14 +149,14 @@ export const PreviewNavigate = (props: any) => {
       });
     }
 
-    if (viewMode === VIEWMODE.navigate) {
+    if (viewMode === VIEWMODE.navigate && !hasTripEnded) {
       let tempActiveSegment: any = {};
       let isFinalSegment = false;
 
-      pathSegments.forEach((segment: any, index) => {
+      userPositionAndPath.pathSegments.forEach((segment: any, index) => {
         if (segment.isActive) {
           tempActiveSegment = segment;
-          if (index === pathSegments.length - 1) {
+          if (index === userPositionAndPath.pathSegments.length - 1) {
             isFinalSegment = true;
           }
         }
@@ -156,37 +174,68 @@ export const PreviewNavigate = (props: any) => {
       let positionUpdate = processPathCleared(
         tempActiveSegment.pathPointList,
         currentUserLocation,
-        userPositionOnPath,
+        userPositionAndPath.userPosition,
         isFinalSegment
       );
-      console.log(positionUpdate.action)
+
       switch (positionUpdate.action) {
         case 'UPDATE':
-          setUserPositionOnPath(positionUpdate.payload);
+          let isActiveEncountered = false;
+          let remTime = 0;
+          userPositionAndPath.pathSegments.forEach((ps: any) => {
+            if (isActiveEncountered) {
+              let tempRem = +getTimeFromDistanceSingle(ps.mode, ps.distance);
+              remTime += tempRem;
+            }
+            if (ps.isActive) {
+              isActiveEncountered = true;
+              ps.distance = ps.distance - 4 / 1000; // temp value
+              let remainingTime = +getTimeFromDistanceSingle(
+                ps.mode,
+                ps.distance
+              );
+              remTime += remainingTime;
+            }
+          });
+
+          setUserPositionAndPathSegment({
+            pathSegments: userPositionAndPath.pathSegments,
+            userPosition: positionUpdate.payload,
+            eta: `${remTime} mins`,
+          });
           break;
         case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
-          pathSegments.forEach((ps: any, index: number) => {
+          userPositionAndPath.pathSegments.forEach((ps: any, index: number) => {
             if (ps.isActive) {
               currentActiveSegmentIndex = index;
             }
           });
 
-          let tempPathSegments = pathSegments.map((ps, index) => {
-            return {
-              ...ps,
-              isActive: index === currentActiveSegmentIndex + 1 ? true : false,
-              isCleared: ps.isCleared
-                ? true
-                : index === currentActiveSegmentIndex
+          let tempPathSegments = userPositionAndPath.pathSegments.map(
+            (ps, index) => {
+              return {
+                ...ps,
+                isActive:
+                  index === currentActiveSegmentIndex + 1 ? true : false,
+                isCleared: ps.isCleared
+                  ? true
+                  : index === currentActiveSegmentIndex
                   ? true
                   : false,
-            };
-          });
+              };
+            }
+          );
 
-          // userPositionOnPath[0] = 0;
-          setUserPositionOnPath(0);
-          setPathSegments(tempPathSegments);
+          setUserPositionAndPathSegment({
+            ...userPositionAndPath,
+            userPosition: 0,
+            pathSegments: tempPathSegments,
+          });
+          break;
+        case 'REROUTE':
+          dispatch(ToggleRerouteModal({ visibility: true }));
+          setHasTripEnded(true);
           break;
         case 'ENDTRIP':
           dispatch(updateViewMode(VIEWMODE.navigateEnd));
@@ -196,7 +245,7 @@ export const PreviewNavigate = (props: any) => {
       }
     }
 
-    if (viewMode === VIEWMODE.navigateEnd) {
+    if (viewMode === VIEWMODE.navigateEnd && !hasTripEnded) {
       // handleEndTrip();
       let pathTaken: any = {};
       paths.forEach((p: any) => {
@@ -214,13 +263,14 @@ export const PreviewNavigate = (props: any) => {
       });
 
       let data = {
-        route: pathTaken,
-        startLocation: tripDetails.startLocation,
-        endLocation: tripDetails.endLocation,
+        route: JSON.stringify(pathTaken),
+        start_location: JSON.stringify(tripDetails.startLocation),
+        end_location: JSON.stringify(tripDetails.endLocation),
         ...distances,
-        endTime: new Date().getTime(),
-        startTime: tripDetails.startTime,
+        end_time: Math.trunc(new Date().getTime() / 1000),
+        start_time: Math.trunc(tripDetails.startTime / 1000),
       };
+
       this.camRef.fitBounds(
         tripDetails.startLocation.coordinates,
         tripDetails.endLocation.coordinates,
@@ -228,6 +278,7 @@ export const PreviewNavigate = (props: any) => {
         500
       );
       dispatch(saveTripAPI(data));
+      setHasTripEnded(true);
     }
   }, [
     paths,
@@ -237,11 +288,10 @@ export const PreviewNavigate = (props: any) => {
     setPathInstructions,
     viewMode,
     currentUserLocation,
-    userPositionOnPath,
-    setUserPositionOnPath,
-    pathSegments,
+    userPositionAndPath,
     dispatch,
     tripDetails,
+    hasTripEnded,
   ]);
 
   const startNavigation = (selectedPath: any) => {
@@ -255,6 +305,8 @@ export const PreviewNavigate = (props: any) => {
         isCleared: pathInstructions[index].isCleared,
         isActive: index ? false : true,
         pathId: `${index}`,
+        distance: pathInstructions[index].distance,
+        mode: path.mode,
       });
     });
 
@@ -271,9 +323,11 @@ export const PreviewNavigate = (props: any) => {
       currentUserLocation
     );
 
-    // userPositionOnPath[0] = tp;
-    setUserPositionOnPath(tp)
-    setPathSegments(segments);
+    setUserPositionAndPathSegment({
+      userPosition: tp,
+      pathSegments: segments,
+      eta: "",
+    });
     props.onTripStart(currentUserLocation);
   };
   const downloadTrip = async (item: any) => {
@@ -439,122 +493,148 @@ export const PreviewNavigate = (props: any) => {
       );
     case VIEWMODE.navigate:
       return (
-        <Box>
-          <HStack justifyContent="space-between" alignItems="center" p="$4">
-            <Heading size="md" pb="$3">
-              Estimated Arrival :
-            </Heading>
-            <Button
-              size="sm"
-              variant="solid"
-              action="negative"
-              onPress={() => {
-                updateView();
-              }}
-            >
-              <ButtonText> Exit </ButtonText>
-              <ButtonIcon as={X} />
-            </Button>
-          </HStack>
-          <FlatList
-            h="$48"
-            data={pathSegments}
-            renderItem={({ item }) => (
-              <Box
-                key={item.pathId}
-                borderBottomWidth="$1"
-                borderColor="$trueGray300"
-                $dark-borderColor="$trueGray100"
-                $base-pl={0}
-                $base-pr={0}
-                py="$4"
-                bg={item.isActive ? 'transparent' : "$trueGray300"}
+        <>
+          <Box>
+            <HStack justifyContent="space-between" alignItems="center" p="$4">
+              <Heading size="md" pb="$3">
+                ETA: {userPositionAndPath.eta}
+              </Heading>
+              <Button
+                size="sm"
+                variant="solid"
+                action="negative"
+                onPress={() => {
+                  updateView();
+                }}
               >
-                <HStack
-                  space="md"
-                  justifyContent={
-                    item.isActive ? 'space-around' : 'space-between'
-                  }
-                  alignItems="center"
-                  flexWrap="wrap"
-                  px="$4"
+                <ButtonText> Exit </ButtonText>
+                <ButtonIcon as={X} />
+              </Button>
+            </HStack>
+            <FlatList
+              h="$48"
+              data={userPositionAndPath.pathSegments}
+              renderItem={({ item }) => (
+                <Box
+                  key={item.pathId}
+                  borderBottomWidth="$1"
+                  borderColor="$trueGray300"
+                  $dark-borderColor="$trueGray100"
+                  $base-pl={0}
+                  $base-pr={0}
+                  py="$4"
+                  bg={item.isActive ? 'transparent' : "$trueGray300"}
                 >
-                  {item.isActive ? (
-                    <HStack
-                      padding="$4"
-                      borderRadius="$md"
-                      borderWidth="$1"
-                      borderColor="$success500"
-                      borderStyle="dashed"
-                      bg="$success100"
-                      w="$5/6"
-                      justifyContent="space-between"
-                    >
-                      <Text
-                        color="$coolGray800"
-                        fontWeight="$bold"
-                        $dark-color="$warmGray100"
-                        w="$4/6"
+                  <HStack
+                    space="md"
+                    justifyContent={
+                      item.isActive ? 'space-around' : 'space-between'
+                    }
+                    alignItems="center"
+                    flexWrap="wrap"
+                    px="$4"
+                  >
+                    {item.isActive ? (
+                      <HStack
+                        padding="$4"
+                        borderRadius="$md"
+                        borderWidth="$1"
+                        borderColor="$success500"
+                        borderStyle="dashed"
+                        bg="$success100"
+                        w="$5/6"
+                        justifyContent="space-between"
                       >
-                        {item.instruction}
-                      </Text>
-                      <Text>{item.timeTaken}</Text>
-                    </HStack>
-                  ) : (
-                    <>
-                      <Text color="$coolGray100" $dark-color="$warmGray50">
-                        {item.instruction}
-                        {item.isCleared ? (
-                          <Icon
-                            as={CheckCircle}
-                            size="lg"
-                            color="$success500"
-                          />
-                        ) : (
-                          <></>
-                        )}
-                      </Text>
-                      <Text>{item.timeTaken}</Text>
-                    </>
-                  )}
-                </HStack>
-              </Box>
-            )}
-            keyExtractor={(item) => item.pathId}
-          />
-        </Box>
+                        <Text
+                          color="$coolGray800"
+                          fontWeight="$bold"
+                          $dark-color="$warmGray100"
+                          w="$4/6"
+                        >
+                          {item.instruction}
+                        </Text>
+                        <Text>{item.timeTaken}</Text>
+                      </HStack>
+                    ) : (
+                      <>
+                        <Text color="$coolGray100" $dark-color="$warmGray50">
+                          {item.instruction}
+                          {item.isCleared ? (
+                            <Icon
+                              as={CheckCircle}
+                              size="lg"
+                              color="$success500"
+                            />
+                          ) : (
+                            <></>
+                          )}
+                        </Text>
+                        <Text>{item.timeTaken}</Text>
+                      </>
+                    )}
+                  </HStack>
+                </Box>
+              )}
+              keyExtractor={(item) => item.pathId}
+            />
+          </Box>
+          <RerouteModal onShowIntent={onReRoute} />
+        </>
       );
     case VIEWMODE.navigateEnd:
       return (
-        <Box>
-          <HStack justifyContent="space-between" alignItems="center" p="$4">
-            <Heading size="md" pb="$3">
-              You Have Arrived!
-            </Heading>
-          </HStack>
-          <Card size="md" variant="elevated" m="$2">
-            <HStack space="4xl">
-              <Heading mb="$1" size="md">
-                {tripDetails.startLocation.location_name} to{" "}
-                {tripDetails.endLocation.location_name}{" "}
-                {tripDetails.endTime
-                  ? `${formatTime(tripDetails.endTime, tripDetails.startTime)}`
-                  : ""}
+        <>
+          <Box>
+            <HStack justifyContent="space-between" alignItems="center" p="$4">
+              <Heading size="md" pb="$3">
+                You Have Arrived!
               </Heading>
             </HStack>
-            <Text size="sm" mb="$5"> </Text>
-            <HStack>
-              <Button py="$2" px="$4" action="secondary" onPress={() => { }}>
-                <ButtonText size="sm">Okay</ButtonText>
-                <ButtonIcon as={CheckCircleIcon} ml="$2" />
-              </Button>
-              <Button py="$2" px="$4" ml="$2" onPress={() => { }}>
-                <ButtonText size="sm">Feedback</ButtonText>
-                <ButtonIcon as={ReplyIcon} ml="$2" />
-              </Button>
-            </HStack>
-          </Card>
-        </Box>
+            <Card size="md" variant="elevated" m="$2">
+              <HStack space="4xl">
+                <Heading mb="$1" size="md">
+                  {tripDetails.startLocation.location_name} to{" "}
+                  {tripDetails.endLocation.location_name}{" "}
+                  {tripDetails.endTime
+                    ? `${formatTime(
+                        tripDetails.endTime,
+                        tripDetails.startTime
+                      )}`
+                    : ""}
+                </Heading>
+              </HStack>
+              <Text size="sm" mb="$5">
+                {' '}
+              </Text>
+              <HStack>
+                <Button
+                  py="$2"
+                  px="$4"
+                  action="secondary"
+                  onPress={() => {
+                    dispatch(updateViewMode(VIEWMODE.search));
+                  }}
+                >
+                  <ButtonText size="sm">Okay</ButtonText>
+                  <ButtonIcon as={CheckCircleIcon} ml="$2" />
+                </Button>
+                <Button
+                  py="$2"
+                  px="$4"
+                  ml="$2"
+                  onPress={() => {
+                    openFeedbackModal();
+                  }}
+                >
+                  <ButtonText size="sm">Feedback</ButtonText>
+                  <ButtonIcon as={ReplyIcon} ml="$2" />
+                </Button>
+              </HStack>
+            </Card>
+          </Box>
+          <FeedbackModal />
+          {/* {awards ? <AwardModal award={awards} /> : <></>} */}
+        </>
       );
   }
 };

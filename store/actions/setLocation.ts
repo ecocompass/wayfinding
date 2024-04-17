@@ -21,7 +21,11 @@ import {
     SAVETRIP,
     SETOFFLINE,
     GETOFFLINE,
-    SAVEOFFLINE
+    SAVEOFFLINE,
+    SETTRIPHISTORY,
+    GETTRIPHISTORY,
+    SETAWARDS,
+    SETFEEDBACK
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -119,7 +123,7 @@ export const resetPaths = () => {
     }
 }
 
-export const updateTripDetails = (payload) => {
+export const updateTripDetails = (payload:any) => {
     return {
         type: UPDATETRIPSTART,
         payload,
@@ -158,4 +162,28 @@ export const saveOffline = (payload: string) => {
         type: SAVEOFFLINE,
         payload: payload
     }
+}
+export const setTrips = () => {
+    return {
+        type: SETTRIPHISTORY
+    };
+};
+
+export const getTrips = (payload:any) => {
+    return {
+        type: GETTRIPHISTORY,
+        payload
+    };
+};
+export const setAwards=(payload:any)=>{
+    return {
+        type: SETAWARDS,
+        payload:payload
+    }  
+}
+export const setFeedback=(payload:any)=>{
+    return {
+        type: SETFEEDBACK,
+        payload:payload
+    }  
 }

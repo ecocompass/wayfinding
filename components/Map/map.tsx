@@ -14,8 +14,8 @@ import { getPointAnnotation, getLineAnnotation, navPointAnnotation } from "../..
 import { SearchBox } from "../Search/search";
 import { MAPBOX_PUBLIC_TOKEN, VIEWMODE, offlineMessage, onlineMessage } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
-import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, VStack, ButtonIcon, CloseIcon, StarIcon, Center } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical, Download, DownloadIcon, Trash2Icon } from 'lucide-react-native';
+import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon, StarIcon } from "@gluestack-ui/themed";
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical, HistoryIcon } from 'lucide-react-native';
 import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView, showToast, hideToast } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
@@ -29,11 +29,147 @@ import WeatherComponent from "../Weather/weather";
 import { offlineManager } from '@rnmapbox/maps';
 import NetInfo from '@react-native-community/netinfo';
 
+const simulateUserLoc = [
+  [
+      -6.2530686,
+      53.3414913
+  ],
+  [
+      -6.2529774,
+      53.3414625
+  ],
+  [
+      -6.2530577,
+      53.3413376
+  ],
+  [
+      -6.2531049,
+      53.3412537
+  ],
+  [
+      -6.2539325,
+      53.3414201
+  ],
+  [
+      -6.2539452,
+      53.3414438
+  ],
+  [
+      -6.2539178,
+      53.3414968
+  ],
+  [
+      -6.253902,
+      53.3415257
+  ],
+  [
+      -6.2539225,
+      53.3415304
+  ],
+  [
+      -6.2536966,
+      53.341948
+  ],
+  [
+      -6.2544412,
+      53.3421001
+  ],
+  [
+      -6.2545008,
+      53.3421098
+  ],
+  [
+      -6.2549935,
+      53.3412217
+  ],
+  [
+      -6.2550983,
+      53.3410325
+  ],
+  [
+      -6.2551116,
+      53.3410086
+  ],
+  [
+      -6.255175,
+      53.3408943
+  ],
+  [
+      -6.2552213,
+      53.3408024
+  ],
+  [
+      -6.255331,
+      53.3405832
+  ],
+  [
+      -6.2554823,
+      53.3402774
+  ],
+  [
+      -6.2555914,
+      53.3400833
+  ],
+  [
+      -6.2557581,
+      53.339794
+  ],
+  [
+      -6.2557724,
+      53.3397693
+  ],
+  [
+      -6.2557851,
+      53.3397473
+  ],
+  [
+      -6.2558206,
+      53.3396983
+  ],
+  [
+      -6.2560736,
+      53.3393966
+  ],
+  [
+      -6.2561554,
+      53.3394182
+  ],
+  [
+      -6.2564764,
+      53.3390212
+  ],
+  [
+      -6.2565095,
+      53.3389788
+  ],
+  [
+      -6.2565731,
+      53.3389961
+  ],
+  [
+      -6.2565907,
+      53.3389764
+  ],
+  [
+      -6.2566282,
+      53.3389863
+  ],
+  [
+      -6.2566919,
+      53.3388855
+  ],
+  [
+      -6.2567493,
+      53.3388995
+  ]
+]
+
+const simulateDistance = simulateUserLoc.length
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
 );
-const simulateUserLoc: any = []
+//const simulateUserLoc: any = []
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -226,22 +362,16 @@ const Map = ({ route, navigation }: any) => {
   }
   //const deletePack=await offlineManager.deletePack('region_1')
   const getClickedPoint = (feature: any) => {
-    // use ref for flyto
-    // dispatch(setCenter(feature.geometry.coordinates));
-    setPointViewed(feature.geometry.coordinates);
-    this.camRef.flyTo(feature.geometry.coordinates, 500)
-    setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: feature.geometry.coordinates })]);
-    fetchLocationDetails(feature.geometry.coordinates);
+    if (viewMode !== VIEWMODE.navigate || viewMode !== VIEWMODE) {
+      setPointViewed(feature.geometry.coordinates);
+      this.camRef.flyTo(feature.geometry.coordinates, 500)
+      setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: feature.geometry.coordinates })]);
+      fetchLocationDetails(feature.geometry.coordinates);
+    }
   }
 
   const getPaths = () => {
     dispatch(getRoutes({ startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",") }))
-    // dispatch(updateViewMode(VIEWMODE.preview))
-    // getPath({startCoordinates: userLocation.join(','), endCoordinates: pointViewed.join(",")})
-    //   .then((body: any) => {
-    //     setRenderedRoute(body.shortestPathCoordinates);
-    //     this.camRef.fitBounds(userLocation, pointViewed, [120, 120], 500)
-    //   })
   }
 
   const onPointsRender = (routeArr) => {
@@ -268,8 +398,8 @@ const Map = ({ route, navigation }: any) => {
 
   const cancelSearch = () => {
     // null data point.
-    setLocationData(null);
     dispatch(setSearchStatus(false));
+    setLocationData(null);
     setPointViewed([]);
     this.camRef.flyTo(userLocation, 500)
     setRenderedPoints([]);
@@ -351,16 +481,14 @@ const Map = ({ route, navigation }: any) => {
             <Icon as={Car} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Your Trips</MenuItemLabel>
           </MenuItem>
-          <MenuItem key="pref" textValue="preferences" onPress={() => { RootNavigation.navigate('Preference', {}) }}>
-            <Icon as={AlignStartVertical} size="md" mr="$2" color={'black'} />
-            <MenuItemLabel size="md">Preferences</MenuItemLabel>
+          <MenuItem key="history" textValue="triphistory" onPress={() => { RootNavigation.navigate('TripHistory', {}) }}>
+          <Icon as={HistoryIcon} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Trips History</MenuItemLabel>
           </MenuItem>
-          <MenuItem key="offlineMap" textValue="offlinemap" onPress={() => {
-            RootNavigation.navigate('OfflineMap', {})
-            //onDownloadMap()
-          }}>
-            <Icon as={Download} size="md" mr="$2" color={'black'} />
-            <MenuItemLabel size="md">Saved Trips</MenuItemLabel>
+
+          <MenuItem key="pref" textValue="preferences" onPress={() => { RootNavigation.navigate('Preference', {}) }}>
+            <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
+            <MenuItemLabel size="md">Preferences</MenuItemLabel>
           </MenuItem>
           <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
             <Icon as={LogOut} size="md" mr="$2" color={'black'} />
@@ -408,6 +536,7 @@ const Map = ({ route, navigation }: any) => {
               </Button>)}
             </HStack>
             <Text size="sm" mb="$5">{locationData.address}</Text>
+            <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]} />
             <HStack>
               <Button py="$2" px="$4" action="negative" onPress={() => { cancelSearch() }}>
                 <ButtonText size="sm">Cancel</ButtonText>
@@ -418,7 +547,6 @@ const Map = ({ route, navigation }: any) => {
                 <ButtonIcon as={Compass} ml="$2" />
               </Button>
             </HStack>
-            <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]} />
           </Card>) : (<></>)}
         {(viewMode === VIEWMODE.preview || viewMode === VIEWMODE.navigate || viewMode === VIEWMODE.navigateEnd) ? (
           <PreviewNavigate
@@ -427,32 +555,10 @@ const Map = ({ route, navigation }: any) => {
             destinationName={locationData.name}
             camRef={this.camRef}
             onTripStart={tripStart}
-            mapRef={this.mapRef} />
+            onReroute={getPaths}
+            />
         ) : (<></>)}
-        {locationData.name ? <SavedLocationModal /> : <></>}
-        {(viewMode === VIEWMODE.downloadMap) ? (
-          <Card size="md" variant="elevated" m="$2">
-            <HStack space="4xl" justifyContent="space-between" >
-              <Heading mb="$1" size="md">
-                Download Map Region
-              </Heading>
-              <Button py="$2" px="$4" action="negative" onPress={() => { dispatch(updateViewMode(VIEWMODE.search)) }}>
-                <ButtonIcon as={CloseIcon} />
-              </Button>
-            </HStack>
-            <Text size="sm" mb="$4">Adjust the map according to the region that you want to download</Text>
-            <HStack>
-              <Button py="$2" px="$4" action="negative" onPress={async () => { await offlineManager.deletePack('region_1').then(res => { console.log(res) }).catch(err => console.log(err)) }}>
-                <ButtonText size="sm">Delete Maps</ButtonText>
-                <ButtonIcon as={Trash2Icon} ml="$2" />
-              </Button>
-              <Button py="$2" px="$4" ml="$2" onPress={() => { onDowloadRegion() }}>
-                <ButtonText size="sm">Download</ButtonText>
-                <ButtonIcon as={DownloadIcon} ml="$2" />
-              </Button>
-            </HStack>
-          </Card>
-        ) : (<></>)}
+        {locationData && locationData.name ? <SavedLocationModal /> : <></>}
       </View>
     </View>
   );
