@@ -53,7 +53,12 @@ import {
 import { goalStore, prefStore, storeProfile } from "../actions/user";
 
 import { Saga, SagaIterator } from "redux-saga";
-import { VIEWMODE, errorMessage, successMessage } from "../../constants";
+import {
+  VIEWMODE,
+  awardModeMap,
+  errorMessage,
+  successMessage,
+} from "../../constants";
 import {
   getWeather,
   hideToast,
@@ -63,6 +68,7 @@ import {
 } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
+import { ToggleAwardModal } from "../actions/modal";
 
 function* signUpSaga(payload: any): any {
   yield put(toggleSpinner());
@@ -178,14 +184,23 @@ function* getPathSaga(action: any): any {
   }
 }
 
+
+
 function* saveTripSaga(action: any): any {
   yield put(toggleSpinner());
   const response = yield saveTrip(action.payload);
   yield put(toggleSpinner());
   if (response) {
     yield call(handleToast, 'Trip Completed!', 'success');
-    // handle awards
-    // yield put(setAwards(response.payload));
+    if (response.payload && response.payload.awards) {
+      let awardData = awardModeMap[Object.keys(response.payload.awards)[0]];
+      awardData = {
+        ...awardData,
+        message:
+          response.payload.awards[Object.keys(response.payload.awards)[0]][0],
+      };
+      yield put(ToggleAwardModal({ visibility: true, data: awardData }));
+    }
   }
   if (!response || response.error) {
     yield call(handleToast, errorMessage);
@@ -247,7 +262,7 @@ function* readGoalsSaga(): any {
   yield put(toggleSpinner());
   const response = yield readGoals();
   yield put(toggleSpinner());
-  if (response.payload) {
+  if (response) {
     yield put(goalStore(response.payload));
   } else {
     yield put(showToast('Something went wrong!'));
@@ -299,12 +314,6 @@ function* watchReportIncidentSaga(): SagaIterator {
   yield takeLatest(REPORTINCIDENT, reportIncidentSaga);
 }
 
-function* getOfflineSaga(payload: any): any {
-  const response = yield readMap();
-  if (response.payload) {
-    yield put(saveOffline(response.payload));
-  }
-}
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -359,9 +368,6 @@ function* watchOfflineSaga(): SagaIterator {
   yield takeLatest(SETOFFLINE, saveOfflineSaga);
 }
 
-function* watchMapSaga(): SagaIterator {
-  yield takeLatest(GETOFFLINE, getOfflineSaga);
-}
 function* watchTripHistorySaga(): SagaIterator {
   yield takeLatest(SETTRIPHISTORY, tripHistorySaga);
 }
@@ -388,7 +394,6 @@ function* appSagas() {
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
     call(watchOfflineSaga),
-    call(watchMapSaga),
     call(watchTripHistorySaga),
     call(watchFeedbackSaga),
     call(watchCurrentTrafficSaga),

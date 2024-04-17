@@ -12,17 +12,22 @@ import {
   ModalContent,
   Icon,
   CloseIcon,
-  Image
+  Image,
+  Center,
 } from '@gluestack-ui/themed';
 import { useDispatch, useSelector } from "react-redux";
 import { ToggleAwardModal } from '../../store/actions/modal';
-
+import { walkAward } from '../../images';
 
 const AwardModal = (props: any) => {
   const dispatch = useDispatch();
 
   let showModal = useSelector((state: any) => {
     return state.modal.awardModal.visibility;
+  });
+
+  let awardData = useSelector((state: any) => {
+    return state.modal.awardModal.data;
   });
 
   return (
@@ -41,36 +46,15 @@ const AwardModal = (props: any) => {
           </ModalCloseButton>
         </ModalHeader>
         <ModalBody>
-          <Image alt="weather"
-            size="md"
-            source={{
-              uri: `${props.award.awards}@2x.png`,
-            }} />
-          <Text>{props.award.awards}</Text>
+          <Center>
+            {(awardData && awardData.image) ? (
+              <Image alt="award" size="2xl" source={walkAward} />
+            ) : (
+              <></>
+            )}
+          </Center>
+          <Text>{awardData ? awardData.message : ""}</Text>
         </ModalBody>
-        <ModalFooter>
-          <Button
-            variant="outline"
-            size="sm"
-            action="secondary"
-            mr="$3"
-            onPress={() => {
-              dispatch(ToggleAwardModal({ visibility: false }));
-            }}
-          >
-            <ButtonText>Cancel</ButtonText>
-          </Button>
-          <Button
-            size="sm"
-            action="positive"
-            borderWidth="$0"
-            onPress={() => {
-              dispatch(ToggleAwardModal({ visibility: false }));
-            }}
-          >
-            <ButtonText>Save</ButtonText>
-          </Button>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );
