@@ -62,34 +62,34 @@ const Preference = ({ navigation }: any) => {
     >
       <FormControl p="$4">
         <VStack space="xl">
-          <HStack>
-          <Heading size="2xl">Set Your Preferences</Heading>
-          <BadgeInfo onPress={() => setShowModal(true)} />
+          <HStack alignItems='center'>
+            <Heading size="2xl">Set Your Preferences</Heading>
+            <BadgeInfo onPress={() => setShowModal(true)} />
           </HStack>
           <Center>
-          <Modal
-            isOpen={showModal}
-            onClose={() => {
-              setShowModal(false)
-            }}
-            finalFocusRef={ref}
-          >
-            <ModalBackdrop />
-            <ModalContent>
-              <ModalHeader>
-                <Heading size="lg">Setting your Preference</Heading>
-                <ModalCloseButton>
-                  <Icon as={CloseIcon} />
-                </ModalCloseButton>
-              </ModalHeader>
-              <ModalBody>
-                <Text>
-                  Setting your preferred mode of transport will reflect in your route options.
-                </Text>
-              </ModalBody>
-            </ModalContent>
-          </Modal>
-        </Center>
+            <Modal
+              isOpen={showModal}
+              onClose={() => {
+                setShowModal(false)
+              }}
+              finalFocusRef={ref}
+            >
+              <ModalBackdrop />
+              <ModalContent>
+                <ModalHeader>
+                  <Heading size="lg">Setting your Preference</Heading>
+                  <ModalCloseButton>
+                    <Icon as={CloseIcon} />
+                  </ModalCloseButton>
+                </ModalHeader>
+                <ModalBody>
+                  <Text>
+                    Setting your preferred mode of transport will reflect in your route options.
+                  </Text>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+          </Center>
           <HStack space="xl" rounded="$md" my="$5" style={{ flexWrap: 'wrap' }}>
             {allPreferences.map((p) => {
               return (

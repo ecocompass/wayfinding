@@ -12,7 +12,7 @@ export const mapModeToInstruction: any = {
 
 export function process_path(response: any) {
     let returnRecc: any = [];
-    response.recommendationList.forEach((recc, index) => {
+    response.recommendationList.forEach((recc: any, index: any) => {
         if (recc.modePathList.length) {
             returnRecc.push({
                 displayModes: recc.transitions.split('-').filter(mode => mode.length),
@@ -99,7 +99,7 @@ const getPointLineDistance = (a, b, c) => {
     return Math.abs(((a[0] - b[0]) * (c[1] - a[1])) - ((b[1] - a[1]) * (c[0] - a[0]))) / getPointDistance(a, b)
 }
 
-export const getUserPositionInSegment = (pointList, userLocation) => {
+export const getUserPositionInSegment = (pointList: any, userLocation: any) => {
     let position = 0;
 
     while (position < pointList.length) {
