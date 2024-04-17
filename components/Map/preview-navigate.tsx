@@ -13,6 +13,9 @@ import {
   Text,
   Icon,
   Card,
+  Badge,
+  BadgeText,
+  BadgeIcon
 } from '@gluestack-ui/themed';
 import {
   MoveLeft,
@@ -30,6 +33,7 @@ import {
   CheckCircleIcon,
   ReplyIcon,
   Download,
+  LeafyGreenIcon,
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -399,14 +403,20 @@ export const PreviewNavigate = (props: any) => {
                         }
                       })}
                     </Text>
+                    <>
+                    {item.isLowestCarbon ? (
+                      <Badge size="md" variant="solid" borderRadius="$none" action="success" ml="$8"> 
+                        <BadgeIcon as={LeafyGreenIcon} size='lg'/>
+                    </Badge>
+                    ) : (<></>)}
                     <Text>
-                      {getTimeFromDistance(
-                        item.pathDistance,
-                        item.displayModes
-                      )}{" "}
-                      mins
-                    </Text>
-                    {/*  */}
+                    {getTimeFromDistance(
+                      item.pathDistance,
+                      item.displayModes
+                    )}{" "}
+                    mins
+                  </Text>
+                    </>
                   </HStack>
                   {item.isViewed ? (
                     <>
