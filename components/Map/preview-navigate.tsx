@@ -405,7 +405,7 @@ export const PreviewNavigate = (props: any) => {
                     </Text>
                     <>
                     {item.isLowestCarbon ? (
-                      <Badge size="md" variant="solid" borderRadius="$none" action="success" ml="$8"> 
+                      <Badge size="lg" variant="solid" borderRadius="$full" action="success" ml="$8"> 
                         <BadgeIcon as={LeafyGreenIcon} size='lg'/>
                     </Badge>
                     ) : (<></>)}
