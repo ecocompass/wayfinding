@@ -12,20 +12,23 @@ import Geolocation from "react-native-geolocation-service";
 import Mapbox from "@rnmapbox/maps";
 import { getPointAnnotation, getLineAnnotation, navPointAnnotation } from "../../services";
 import { SearchBox } from "../Search/search";
-import { MAPBOX_PUBLIC_TOKEN, VIEWMODE } from "../../constants";
+import { MAPBOX_PUBLIC_TOKEN, VIEWMODE, offlineMessage, onlineMessage } from "../../constants";
 import { useSelector, useDispatch } from 'react-redux';
 import { Card, Heading, Text, Button, ButtonText, Box, Fab, FabIcon, Menu, MenuItem, MenuIcon, MenuItemLabel, Icon, HStack, ButtonIcon, CloseIcon, StarIcon } from "@gluestack-ui/themed";
-import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical, HistoryIcon } from 'lucide-react-native';
-import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView } from "../../store/actions/setLocation";
+import { Settings, LocateFixed, GlobeIcon, MousePointer2, CircleUser, BookmarkCheck, Navigation, Compass, Car, LogOut, Bookmark, BookMarked, AlignStartVertical, HistoryIcon, MessageCircleWarningIcon } from 'lucide-react-native';
+import { getRoutes, getSaveLocationsAPI, setCenter, setLocation, setUserLocation, setSearchStatus, setZoom, updateViewMode, updateTripDetails, updateUserDirectionView, showToast, hideToast } from "../../store/actions/setLocation";
 import { logoutAction } from '../../store/actions/auth';
 import { geoCodeApi, getPath } from "../../services/network.service";
 import { ZOOMADJUST } from "../../store/actions";
 import { PreviewNavigate } from "./preview-navigate";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import SavedLocationModal from "../Modals/saved_location_modal";
-import { ToggleLocationModal } from "../../store/actions/modal";
+import { ToggleIncidentModal, ToggleLocationModal } from "../../store/actions/modal";
 import { CommonActions, useFocusEffect, useRoute } from "@react-navigation/native";
 import WeatherComponent from "../Weather/weather";
+import IncidentModal from "../Modals/incident_modal";
+import { offlineManager } from '@rnmapbox/maps';
+import NetInfo from '@react-native-community/netinfo';
 
 const simulateUserLoc = [
   [
@@ -93,72 +96,20 @@ const simulateUserLoc = [
       53.3408943
   ],
   [
-      -6.2552213,
-      53.3408024
+      -6.2552254,
+      53.3409048
   ],
   [
-      -6.255331,
-      53.3405832
+      -6.2553135,
+      53.3408192
   ],
   [
-      -6.2554823,
-      53.3402774
+      -6.2554178,
+      53.3408388
   ],
   [
-      -6.2555914,
-      53.3400833
-  ],
-  [
-      -6.2557581,
-      53.339794
-  ],
-  [
-      -6.2557724,
-      53.3397693
-  ],
-  [
-      -6.2557851,
-      53.3397473
-  ],
-  [
-      -6.2558206,
-      53.3396983
-  ],
-  [
-      -6.2560736,
-      53.3393966
-  ],
-  [
-      -6.2561554,
-      53.3394182
-  ],
-  [
-      -6.2564764,
-      53.3390212
-  ],
-  [
-      -6.2565095,
-      53.3389788
-  ],
-  [
-      -6.2565731,
-      53.3389961
-  ],
-  [
-      -6.2565907,
-      53.3389764
-  ],
-  [
-      -6.2566282,
-      53.3389863
-  ],
-  [
-      -6.2566919,
-      53.3388855
-  ],
-  [
-      -6.2567493,
-      53.3388995
+      -6.255456,
+      53.3407618
   ]
 ]
 
@@ -167,7 +118,7 @@ const simulateDistance = simulateUserLoc.length
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
 );
-
+//const simulateUserLoc: any = []
 const styles = StyleSheet.create({
   page: {
     flex: 1,
@@ -209,6 +160,7 @@ const requestLocationPermission = async () => {
 
 const Map = ({ route, navigation }: any) => {
   let camRef = null;
+  let mapRef = null;
   let userLocation = useSelector((state: any) => {
     return state.location.userLocation
   }); // Longitude, Latitude
@@ -238,6 +190,7 @@ const Map = ({ route, navigation }: any) => {
   })
 
   let [pointViewed, setPointViewed] = useState([])
+  let [downloadBounds, setDownloadBounds] = useState<any>({})
 
   let [isLocationSelected, setLocationCard] = useState(false)
   let [locationData, setLocationData] = useState<any>({})
@@ -261,8 +214,25 @@ const Map = ({ route, navigation }: any) => {
   let destinationPoint = [-6.2650513, 53.3256942];
   const [renderedPoints, setRenderedPoints] = useState<any>([])
   const [psuedoIndex, setPseudoIndex] = useState<any>(0)
-
+  const [connectionStatus, setConnectionStatus] = useState(false);
+  let flag = false;
+  const CheckConnectivity = () => {
+    NetInfo.addEventListener((state: any) => {
+      const connected = state.isConnected;
+      if (connected) {
+        dispatch(showToast(onlineMessage, "success"));
+        setTimeout(() => dispatch(hideToast()), 3000);
+      }
+      if (!connected) {
+        dispatch(showToast(offlineMessage, 'error'));
+        setTimeout(() => dispatch(hideToast()), 3000);
+      }
+      
+      setConnectionStatus(state.isConnected);
+    });
+  };
   useEffect(() => {
+    CheckConnectivity();
     if (Platform.OS === "android") {
       const result = requestLocationPermission().then((res) => {
         if (res) {
@@ -275,16 +245,52 @@ const Map = ({ route, navigation }: any) => {
   }, []);
 
   const setDefaultLocation = () => {
-    dispatch(setUserLocation([0,0]))
+    dispatch(setUserLocation([0, 0]))
   };
 
   const userLocationUpdate = (data: any) => {
     // dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
     if (viewMode === VIEWMODE.navigate) {
-        dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
-        setPseudoIndex(psuedoIndex + 1);
+      dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
+      setPseudoIndex(psuedoIndex + 1);
     }
   };
+
+  const onDownloadMap = () => {
+    dispatch(updateViewMode(VIEWMODE.downloadMap))
+  }
+
+  const onDowloadRegion = async () => {
+    const progressListener = (offlineRegion, status) => {
+      console.log("success ", offlineRegion, status)
+      if (status.state === 'complete') {
+        dispatch(showToast("Region Downloaded Successfully", "success"));
+      }
+    };
+    const errorListener = (offlineRegion, err) => console.log(offlineRegion, err);
+
+    await offlineManager.createPack({
+      name: 'region_1',
+      styleURL: 'https://api.mapbox.com/styles/v1/electro75/cluqv0agq008c01qz5w5i535j/wmts?access_token=pk.eyJ1IjoiZWxlY3Rybzc1IiwiYSI6ImNscnRlcWJ1eDAxN2QycW82cXp5MWZsbXMifQ.ZlRWWO347Yae46luSV8BCA',
+      minZoom: 14,
+      maxZoom: 20,
+      bounds: [downloadBounds.ne, downloadBounds.sw],
+
+    }, progressListener, errorListener)
+
+  }
+  // const getPack = await offlineManager.getPack('region_1');
+  //console.log('getpack',getPack)
+  const onRegionChange = (data) => {
+    if (viewMode === VIEWMODE.downloadMap) {
+      console.log(data.properties.bounds)
+      setDownloadBounds(data.properties.bounds)
+    }
+  }
+
+  const onOfflineRegionChange = async (data) => {
+    await offlineManager.getPack('region_1').then(res => { setDownloadBounds(res?.bounds) });
+  }
 
   const selectLocation = (data: any) => {
     setPointViewed(data.center);
@@ -303,7 +309,7 @@ const Map = ({ route, navigation }: any) => {
       setRenderedPoints([getPointAnnotation({ id: 'abc', coordinates: route.params.locData })])
     }
   }
-
+  //const deletePack=await offlineManager.deletePack('region_1')
   const getClickedPoint = (feature: any) => {
     if (viewMode !== VIEWMODE.navigate || viewMode !== VIEWMODE) {
       setPointViewed(feature.geometry.coordinates);
@@ -371,26 +377,27 @@ const Map = ({ route, navigation }: any) => {
 
   const tripStart = async (startLocation: any) => {
     try {
-        const response = await geoCodeApi(startLocation.join(','))
-        let tripData = {
-            start: {
-                coordinates: response.features[0].center,
-                location_name: response.features[0].text
-            },
-            end: {
-                coordinates: locationData.coordinates,
-                location_name: locationData.name
-            },
-            startTime: new Date().getTime()
-        }
-        dispatch(updateUserDirectionView());
-        dispatch(updateTripDetails(tripData))
+      const response = await geoCodeApi(startLocation.join(','))
+      let tripData = {
+        start: {
+          coordinates: response.features[0].center,
+          location_name: response.features[0].text
+        },
+        end: {
+          coordinates: locationData.coordinates,
+          location_name: locationData.name
+        },
+        startTime: new Date().getTime()
+      }
+      dispatch(updateUserDirectionView());
+      dispatch(updateTripDetails(tripData))
     } catch (err) {
-        console.log(err, 'could not fetch loation details')
+      console.log(err, 'could not fetch loation details')
     }
   }
 
   return (
+
     <View style={styles.page}>
       <View style={styles.container}>
         <Menu
@@ -404,7 +411,10 @@ const Map = ({ route, navigation }: any) => {
             )
           }}
         >
-          <MenuItem key="profile" textValue="profile" onPress={() => { RootNavigation.navigate('Profile', {}) }}>
+          {
+          viewMode !== VIEWMODE.navigate ? (
+            <>
+            <MenuItem key="profile" textValue="profile" onPress={() => { RootNavigation.navigate('Profile', {}) }}>
             <Icon as={CircleUser} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Profile</MenuItemLabel>
           </MenuItem>
@@ -419,15 +429,10 @@ const Map = ({ route, navigation }: any) => {
             <Icon as={BookmarkCheck} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Saved Locations</MenuItemLabel>
           </MenuItem>
-          <MenuItem key="trips" textValue="trips">
-            <Icon as={Car} size="md" mr="$2" color={'black'} />
-            <MenuItemLabel size="md">Your Trips</MenuItemLabel>
-          </MenuItem>
           <MenuItem key="history" textValue="triphistory" onPress={() => { RootNavigation.navigate('TripHistory', {}) }}>
           <Icon as={HistoryIcon} size="md" mr="$2" color={'black'} />
-            <MenuItemLabel size="md">Trips History</MenuItemLabel>
+            <MenuItemLabel size="md">Trips Completed</MenuItemLabel>
           </MenuItem>
-
           <MenuItem key="pref" textValue="preferences" onPress={() => { RootNavigation.navigate('Preference', {}) }}>
             <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
             <MenuItemLabel size="md">Preferences</MenuItemLabel>
@@ -436,12 +441,24 @@ const Map = ({ route, navigation }: any) => {
             <Icon as={LogOut} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Logout</MenuItemLabel>
           </MenuItem>
+            </>
+          
+          ):(
+            <MenuItem key="incident" textValue="preferences" onPress={() => { dispatch(ToggleIncidentModal({visibility: true})) }}>
+            <Icon as={MessageCircleWarningIcon} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Report Incident</MenuItemLabel>
+          </MenuItem>
+          )}
+          
+          
         </Menu>
         <Mapbox.MapView
           style={styles.map}
           onPress={getClickedPoint}
           compassEnabled={true}
           logoEnabled={false}
+          onCameraChanged={onRegionChange}
+          ref={(c) => (this.mapRef = c)}
         >
           <Mapbox.Camera
             ref={(c) => (this.camRef = c)}
@@ -449,10 +466,9 @@ const Map = ({ route, navigation }: any) => {
             centerCoordinate={centerLocation}
             animationMode={"flyTo"}
             animationDuration={1000}
-            // followUserLocation={viewMode === VIEWMODE.navigate}
+          // followUserLocation={viewMode === VIEWMODE.navigate}
           />
           {renderedPoints}
-          {/* {navPoints.length ? (navPointAnnotation(navPoints)) : <></> } */}
           <Mapbox.UserLocation onUpdate={userLocationUpdate} showsUserHeadingIndicator={isViewUserDirection}/>
           { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>

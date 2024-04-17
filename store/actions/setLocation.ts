@@ -1,10 +1,8 @@
 
 import {
     SAVE_LOCATION,
-    PREF_STORE,
     SHOWTOAST,
     HIDETOAST,
-    SETPREFERENCE,
     UPDATECENTERLOCATION,
     UPDATESEARCHSTATUS,
     UPDATEUSERLOCATION,
@@ -19,10 +17,15 @@ import {
     VIEWUSERDIRECTION,
     UPDATETRIPSTART,
     SAVETRIP,
+    SETOFFLINE,
+    GETOFFLINE,
+    SAVEOFFLINE,
     SETTRIPHISTORY,
     GETTRIPHISTORY,
     SETAWARDS,
-    SETFEEDBACK
+    SETFEEDBACK,
+    PINGCURRENTTRAFFIC,
+    REPORTINCIDENT
 } from '.';
 
 export const setUserLocation = (location: any) => {
@@ -106,6 +109,23 @@ export const getSaveLocationsAPI = () => {
     }
 }
 
+export const pingCurrentTraficAPI = (id: string) => {
+    return {
+        type: PINGCURRENTTRAFFIC,
+        payload: {
+            recommendationId: id
+        }
+    }
+}
+
+
+export const reportIncidentAPI = (data: any) => {
+    return {
+        type: REPORTINCIDENT,
+        payload: data
+    }
+}
+
 
 export const updateViewedPath = (pathId: any) => {
     return {
@@ -120,7 +140,7 @@ export const resetPaths = () => {
     }
 }
 
-export const updateTripDetails = (payload:any) => {
+export const updateTripDetails = (payload: any) => {
     return {
         type: UPDATETRIPSTART,
         payload,
@@ -140,27 +160,47 @@ export const getWeather = (payload: any) => {
     }
 }
 
+export const setOffline = (payload: any) => {
+    return {
+        type: SETOFFLINE,
+        payload: payload
+    }
+}
+
+export const getOffline = () => {
+    return {
+        type: GETOFFLINE,
+
+    }
+}
+
+export const saveOffline = (payload: string) => {
+    return {
+        type: SAVEOFFLINE,
+        payload: payload
+    }
+}
 export const setTrips = () => {
     return {
         type: SETTRIPHISTORY
     };
 };
 
-export const getTrips = (payload:any) => {
+export const getTrips = (payload: any) => {
     return {
         type: GETTRIPHISTORY,
         payload
     };
 };
-export const setAwards=(payload:any)=>{
+export const setAwards = (payload: any) => {
     return {
         type: SETAWARDS,
-        payload:payload
-    }  
+        payload: payload
+    }
 }
-export const setFeedback=(payload:any)=>{
+export const setFeedback = (payload: any) => {
     return {
         type: SETFEEDBACK,
-        payload:payload
-    }  
+        payload: payload
+    }
 }

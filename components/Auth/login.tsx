@@ -1,25 +1,23 @@
-/* eslint-disable react/react-in-jsx-scope */
-/* eslint-disable prettier/prettier */
 import { FormControl, VStack, Heading, Input, InputField, InputSlot, InputIcon, EyeIcon, EyeOffIcon, ButtonText } from "@gluestack-ui/themed";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Text } from "react-native";
-import { getToken, loginAction } from "../../store/actions/auth";
+import { loginAction } from "../../store/actions/auth";
 import { useDispatch } from "react-redux";
 import React from "react";
 
 const Auth = ({ navigation }: any) => {
-    const [showPassword, setShowPassword] = useState(false);
-    const [password, setPassword] = React.useState('');
-    const [email, setEmail] = React.useState('');
-    const dispatch=useDispatch();
-    const handleState = () => {
-      setShowPassword((showState) => {
-        return !showState;
-      });
-    };
+  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = React.useState('');
+  const [email, setEmail] = React.useState('');
+  const dispatch = useDispatch();
+  const handleState = () => {
+    setShowPassword((showState) => {
+      return !showState;
+    });
+  };
 
-    return (
-      <FormControl
+  return (
+    <FormControl
       p="$4"
       borderWidth="$1"
       borderRadius="$lg"

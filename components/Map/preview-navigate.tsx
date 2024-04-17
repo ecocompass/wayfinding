@@ -29,6 +29,7 @@ import {
   BikeIcon,
   CheckCircleIcon,
   ReplyIcon,
+  Download,
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,9 +38,11 @@ import {
   resetPaths,
   saveTripAPI,
   setCenter,
+  setOffline,
   updateUserDirectionView,
   updateViewMode,
   updateViewedPath,
+  pingCurrentTraficAPI,
 } from '../../store/actions/setLocation';
 import { VIEWMODE } from '../../constants';
 import {
@@ -53,8 +56,10 @@ import {
   processPathCleared,
 } from '../../services/path_processor';
 import { View } from 'react-native';
+import { snapshotManager } from '@rnmapbox/maps';
 import FeedbackModal from '../Modals/feedback_modal';
 import AwardModal from '../Modals/award_modal';
+import IncidentModal from '../Modals/incident_modal';
 import {
   ToggleFeedbackModal,
   ToggleRerouteModal,
@@ -62,13 +67,9 @@ import {
 import RerouteModal from '../Modals/reroute_modal';
 
 export const PreviewNavigate = (props: any) => {
-  const { onRender, onPointsRender, destinationName, camRef } = props;
+  const { onRender, onPointsRender, destinationName, camRef, mapRef } = props;
 
   let currentUserLocation = useSelector((state: any) => {
-    if (viewMode === VIEWMODE.navigate) {
-      // dispatch(setCenter(state.location.userLocation));
-      // console.log(state.location.userLocation);
-    }
     return state.location.userLocation;
   });
 
@@ -91,6 +92,7 @@ export const PreviewNavigate = (props: any) => {
     userPosition: 0,
     pathSegments: [],
     eta: "",
+    recommendationId: "",
   });
   let [hasTripEnded, setHasTripEnded] = useState(false);
   const awards = useSelector((state: any) => {
@@ -162,7 +164,7 @@ export const PreviewNavigate = (props: any) => {
       this.camRef.fitBounds(
         tempActiveSegment.pathPointList[0],
         tempActiveSegment.pathPointList[
-          tempActiveSegment.pathPointList.length - 1
+        tempActiveSegment.pathPointList.length - 1
         ],
         [120, 120],
         500
@@ -196,10 +198,13 @@ export const PreviewNavigate = (props: any) => {
           });
 
           setUserPositionAndPathSegment({
+            ...userPositionAndPath,
             pathSegments: userPositionAndPath.pathSegments,
             userPosition: positionUpdate.payload,
             eta: `${remTime} mins`,
           });
+
+          dispatch(pingCurrentTraficAPI(userPositionAndPath.recommendationId));
           break;
         case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
@@ -324,10 +329,24 @@ export const PreviewNavigate = (props: any) => {
       userPosition: tp,
       pathSegments: segments,
       eta: "",
+      recommendationId: selectedPath.recommendationId,
     });
     props.onTripStart(currentUserLocation);
   };
-
+  const downloadTrip = async (item: any) => {
+   // const getBounds =
+   // console.log("boundBaby", getBounds)
+    const uri = await snapshotManager.takeSnap({
+      writetoDisk: true,
+      //  bounds:  await mapRef.getVisibleBounds(),
+      withLogo: false,
+      centerCoordinate:await mapRef.getCenter(),
+      zoomLevel:10  ,
+      width: 100, height: 390
+    })
+    console.log("bounds", uri);
+    dispatch(setOffline(uri));
+  }
   switch (viewMode) {
     case VIEWMODE.preview:
       return (
@@ -442,6 +461,18 @@ export const PreviewNavigate = (props: any) => {
                           <ButtonText>Let's Go </ButtonText>
                           <ButtonIcon as={Play} />
                         </Button>
+                     {/*    <Button
+                          size="md"
+                          variant="solid"
+                          action="positive"
+                          width="$1/3"
+                          onPress={() => {
+                            downloadTrip(item);
+                          }}
+                        >
+                          <ButtonText>Save Trip</ButtonText>
+                          <ButtonIcon as={Download} />
+                        </Button> */}
                         <Box>
                           <Text>
                             Arrive By :{' '}
@@ -551,6 +582,7 @@ export const PreviewNavigate = (props: any) => {
             />
           </Box>
           <RerouteModal onShowIntent={onReRoute} />
+          <IncidentModal currentUserLocation={currentUserLocation} />
         </>
       );
     case VIEWMODE.navigateEnd:

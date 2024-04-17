@@ -5,7 +5,8 @@ export const VIEWMODE = {
     search: "search",
     preview: "preview",
     navigate: "navigate",
-    navigateEnd: "navigateEnd"
+    navigateEnd: "navigateEnd",
+    downloadMap: "downloadMap"
 };
 
 export const status = {
@@ -19,3 +20,7 @@ export const successMessage = 'Saved successfully!';
 export const weather_api_key = '299ef29cb04aebf9bfbcd57e4f38bb0a';
 
 export const weather_url = 'https://openweathermap.org/img/wn/'
+
+export const offlineMessage='Yikes! You are offline';
+
+export const onlineMessage='You are online!';

@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { GOAL_STORE, PREF_STORE, READGOALS, READPROFILE, SAVE_LOCATION_STORE } from "../actions";
 
 const initialState = {

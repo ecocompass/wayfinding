@@ -5,7 +5,6 @@ import {
   ModalCloseButton,
   Heading,
   ModalBody,
-  Text,
   ModalFooter,
   ButtonText,
   Button,
@@ -17,11 +16,10 @@ import {
 } from '@gluestack-ui/themed';
 import { useDispatch, useSelector } from "react-redux";
 import {
-  ToggleFeedbackModal,
-  ToggleLocationModal,
+  ToggleFeedbackModal
 } from '../../store/actions/modal';
 import { useState } from 'react';
-import { saveLocationAPI, setFeedback } from '../../store/actions/setLocation';
+import { setFeedback } from '../../store/actions/setLocation';
 
 const FeedbackModal = (props: any) => {
   const dispatch = useDispatch();

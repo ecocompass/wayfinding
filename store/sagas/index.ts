@@ -6,7 +6,6 @@ import {
   REGISTER,
   ROUTES_STORE,
   SAVE_LOCATION,
-  TOKEN_STORE,
   UPDATEVIEWMODE,
   PREF_STORE,
   SETPREFERENCE,
@@ -18,8 +17,12 @@ import {
   SETGOALS,
   READGOALS,
   SETWEATHER,
+  SETOFFLINE,
+  GETOFFLINE,
   SETTRIPHISTORY,
   SETFEEDBACK,
+  PINGCURRENTTRAFFIC,
+  REPORTINCIDENT,
 } from "../actions";
 import * as RootNavigation from '../../components/Navigation/RootNavigator';
 import {
@@ -39,20 +42,24 @@ import {
   userGoals,
   readGoals,
   fetchWeather,
+  saveMap,
+  readMap,
   getTripHistory,
   userFeedback,
+  fetchCurrentIncidents,
+  reportIncident,
 } from "../../services/network.service";
 
 import { goalStore, prefStore, storeProfile } from "../actions/user";
 
-import { SagaIterator } from "redux-saga";
+import { Saga, SagaIterator } from "redux-saga";
 import { VIEWMODE, errorMessage, successMessage } from "../../constants";
 import {
   getWeather,
   hideToast,
-  setAwards,
   showToast,
-  getTrips
+  getTrips,
+  saveOffline,
 } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
@@ -110,13 +117,15 @@ function* tokenSaga(): any {
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
     const res = yield getPreference();
-
     if (res && res.payload) {
       yield put(prefStore(res.payload));
       RootNavigation.navigate('Map', {});
     } else if (res && !res.payload) {
       yield call(handleToast, errorMessage);
       RootNavigation.navigate('Preference', {});
+    } else {
+      yield removeStorageItem('access_token_obj');
+      RootNavigation.navigate('Register', {});
     }
   } else {
     yield removeStorageItem('access_token_obj');
@@ -144,7 +153,6 @@ function* goalSaga(payload: any): any {
   yield put(toggleSpinner());
 
   if (response) {
-    // yield put({ type: GOAL_STORE, payload: response });
     RootNavigation.navigate('Map', {});
   } else {
     yield call(handleToast, errorMessage);
@@ -166,7 +174,7 @@ function* getPathSaga(action: any): any {
     ]);
   } else {
     yield put(toggleSpinner());
-    yield call(handleToast, "Something went wrong")
+    yield call(handleToast, "Something went wrong");
   }
 }
 
@@ -238,7 +246,6 @@ function* WeatherSaga(payload: any): any {
 function* readGoalsSaga(): any {
   yield put(toggleSpinner());
   const response = yield readGoals();
-  console.log("res", response);
   yield put(toggleSpinner());
   if (response.payload) {
     yield put(goalStore(response.payload));
@@ -248,15 +255,18 @@ function* readGoalsSaga(): any {
     yield put(hideToast());
   }
 }
+function* saveOfflineSaga(payload: any): any {
+  yield saveMap(payload);
+}
 function* tripHistorySaga(): any {
   yield put(toggleSpinner());
   const response = yield getTripHistory();
-  console.log("res", response)
   yield put(toggleSpinner());
   if (response.saved_locations) {
     yield put(getTrips(response.saved_locations));
+  } else {
+    handleToast(errorMessage);
   }
-  else { handleToast(errorMessage) }
 }
 
 function* feedbackSaga(payload: any): any {
@@ -270,6 +280,31 @@ function* feedbackSaga(payload: any): any {
   }
 }
 
+function* currentTrafficSaga(payload: any): any {
+  const response = yield fetchCurrentIncidents(payload);
+  if (response) {
+    console.log(response);
+  }
+}
+
+function* reportIncidentSaga(payload: any): any {
+  yield put(toggleSpinner());
+  const response = yield reportIncident(payload);
+  if (response) {
+    yield call(handleToast, "Incident successfully reported!");
+  }
+}
+
+function* watchReportIncidentSaga(): SagaIterator {
+  yield takeLatest(REPORTINCIDENT, reportIncidentSaga);
+}
+
+function* getOfflineSaga(payload: any): any {
+  const response = yield readMap();
+  if (response.payload) {
+    yield put(saveOffline(response.payload));
+  }
+}
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -319,11 +354,23 @@ function* watchProfileSaga(): SagaIterator {
 function* watchWeatherSaga(): SagaIterator {
   yield takeLatest(SETWEATHER, WeatherSaga);
 }
+
+function* watchOfflineSaga(): SagaIterator {
+  yield takeLatest(SETOFFLINE, saveOfflineSaga);
+}
+
+function* watchMapSaga(): SagaIterator {
+  yield takeLatest(GETOFFLINE, getOfflineSaga);
+}
 function* watchTripHistorySaga(): SagaIterator {
   yield takeLatest(SETTRIPHISTORY, tripHistorySaga);
 }
 function* watchFeedbackSaga(): SagaIterator {
   yield takeLatest(SETFEEDBACK, feedbackSaga);
+}
+
+function* watchCurrentTrafficSaga(): SagaIterator {
+  yield takeLatest(PINGCURRENTTRAFFIC, currentTrafficSaga);
 }
 function* appSagas() {
   yield all([
@@ -340,8 +387,12 @@ function* appSagas() {
     call(watchGoalSaga),
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
+    call(watchOfflineSaga),
+    call(watchMapSaga),
     call(watchTripHistorySaga),
     call(watchFeedbackSaga),
+    call(watchCurrentTrafficSaga),
+    call(watchReportIncidentSaga),
   ]);
 }
 
