@@ -35,7 +35,7 @@ const FeedbackModal = (props: any) => {
       trip_id: props.trip_id,
       message: tagName,
     };
-    dispatch(setFeedback(data));
+    // dispatch(setFeedback(data));
   };
 
   return (

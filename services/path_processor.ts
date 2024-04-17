@@ -71,9 +71,9 @@ export const processPathCleared = (pointList, userLocation, userPosition, isFina
         return { action: "CHANGESEGMENT" };
     }
 
-    if (pointList[userPosition], pointList[userPosition + 1]) {
+    else if (pointList[userPosition], pointList[userPosition + 1]) {
         let pathLineDist = getPointLineDistance(pointList[userPosition], pointList[userPosition + 1], userLocation);
-        if (pathLineDist > 0.001) {
+        if (pathLineDist > 0.01) {
             return { action: 'REROUTE' };
         }
 

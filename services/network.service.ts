@@ -17,6 +17,7 @@ const endpoint = {
     weather: "https://api.openweathermap.org/data/2.5/weather?",
     feedback: `${liveUrl}trips/feedback`,
 };
+
 let access_token: any = '';
 
 const getTokenString = () => {
@@ -225,6 +226,17 @@ export const getSaveLocations = async function () {
         .catch((e) => console.log(e));
 };
 
+// {
+//   "payload": {
+//       "awards": {
+//           "awards for walking": [
+//               "Achievement Unlocked: Reached walking goal of 50 km."
+//           ]
+//       },
+//       "message": "Saved Trips"
+//   }
+// }
+
 export const saveTrip = async function (data: any) {
     const token = await readToken();
     let strData = JSON.stringify(data);
@@ -239,9 +251,8 @@ export const saveTrip = async function (data: any) {
     })
         .then((response) => {
             if (response.status === status.ok) {
-                return response.json();
-            } else {
-                console.log(response.status);
+                return response.json(),
+        } else {
                 return { error: true, response: response.json() };
             }
         })
@@ -370,9 +381,10 @@ export const readProfile = async () => {
 export const readGoals = async () => {
     let token = await readToken();
     let goal = await readGoalToken();
-
-    const endpointGoal = `${endpoint.goals}?start_time=${goal.goalToken}`;
-    console.log('endpoint', endpointGoal);
+    let newDate = new Date();
+    let date = Math.floor(newDate.getTime() / 1000);
+    const endpointGoal = `${endpoint.goals}?start_time=${goal ? goal.goalToken : date
+        }`;
     return await fetch(endpointGoal, {
         method: 'GET',
         headers: {
@@ -381,7 +393,11 @@ export const readGoals = async () => {
         },
     })
         .then((response) => {
-            return response.json();
+            if (response.ok) {
+                return response.json();
+            } else {
+                return false;
+            }
         })
         .catch((err) => console.log("Error", err));
 };

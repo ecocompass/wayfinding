@@ -61,10 +61,12 @@ import FeedbackModal from '../Modals/feedback_modal';
 import AwardModal from '../Modals/award_modal';
 import IncidentModal from '../Modals/incident_modal';
 import {
+  ToggleAwardModal,
   ToggleFeedbackModal,
   ToggleRerouteModal,
 } from '../../store/actions/modal';
 import RerouteModal from '../Modals/reroute_modal';
+import { bikeAward, walkAward } from '../../images';
 
 export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef, mapRef } = props;
@@ -176,7 +178,7 @@ export const PreviewNavigate = (props: any) => {
         userPositionAndPath.userPosition,
         isFinalSegment
       );
-
+      console.log(positionUpdate.action);
       switch (positionUpdate.action) {
         case 'UPDATE':
           let isActiveEncountered = false;
@@ -203,8 +205,6 @@ export const PreviewNavigate = (props: any) => {
             userPosition: positionUpdate.payload,
             eta: `${remTime} mins`,
           });
-
-          dispatch(pingCurrentTraficAPI(userPositionAndPath.recommendationId));
           break;
         case 'CHANGESEGMENT':
           let currentActiveSegmentIndex = 0;
@@ -234,6 +234,7 @@ export const PreviewNavigate = (props: any) => {
             userPosition: 0,
             pathSegments: tempPathSegments,
           });
+          dispatch(pingCurrentTraficAPI(userPositionAndPath.recommendationId));
           break;
         case 'REROUTE':
           dispatch(ToggleRerouteModal({ visibility: true }));
@@ -333,20 +334,7 @@ export const PreviewNavigate = (props: any) => {
     });
     props.onTripStart(currentUserLocation);
   };
-  const downloadTrip = async (item: any) => {
-   // const getBounds =
-   // console.log("boundBaby", getBounds)
-    const uri = await snapshotManager.takeSnap({
-      writetoDisk: true,
-      //  bounds:  await mapRef.getVisibleBounds(),
-      withLogo: false,
-      centerCoordinate:await mapRef.getCenter(),
-      zoomLevel:10  ,
-      width: 100, height: 390
-    })
-    console.log("bounds", uri);
-    dispatch(setOffline(uri));
-  }
+  
   switch (viewMode) {
     case VIEWMODE.preview:
       return (
@@ -637,7 +625,7 @@ export const PreviewNavigate = (props: any) => {
             </Card>
           </Box>
           <FeedbackModal />
-          {/* {awards ? <AwardModal award={awards} /> : <></>} */}
+          <AwardModal />
         </>
       );
   }
