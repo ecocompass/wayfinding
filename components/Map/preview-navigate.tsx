@@ -29,6 +29,7 @@ import {
   BikeIcon,
   CheckCircleIcon,
   ReplyIcon,
+  Download,
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,6 +38,7 @@ import {
   resetPaths,
   saveTripAPI,
   setCenter,
+  setOffline,
   updateUserDirectionView,
   updateViewMode,
   updateViewedPath,
@@ -53,6 +55,7 @@ import {
   processPathCleared,
 } from '../../services/path_processor';
 import { View } from 'react-native';
+import { snapshotManager } from '@rnmapbox/maps';
 import FeedbackModal from '../Modals/feedback_modal';
 import AwardModal from '../Modals/award_modal';
 import {
@@ -62,7 +65,7 @@ import {
 import RerouteModal from '../Modals/reroute_modal';
 
 export const PreviewNavigate = (props: any) => {
-  const { onRender, onPointsRender, destinationName, camRef } = props;
+  const { onRender, onPointsRender, destinationName, camRef, mapRef } = props;
 
   let currentUserLocation = useSelector((state: any) => {
     if (viewMode === VIEWMODE.navigate) {
@@ -162,7 +165,7 @@ export const PreviewNavigate = (props: any) => {
       this.camRef.fitBounds(
         tempActiveSegment.pathPointList[0],
         tempActiveSegment.pathPointList[
-          tempActiveSegment.pathPointList.length - 1
+        tempActiveSegment.pathPointList.length - 1
         ],
         [120, 120],
         500
@@ -327,7 +330,20 @@ export const PreviewNavigate = (props: any) => {
     });
     props.onTripStart(currentUserLocation);
   };
-
+  const downloadTrip = async (item: any) => {
+   // const getBounds =
+   // console.log("boundBaby", getBounds)
+    const uri = await snapshotManager.takeSnap({
+      writetoDisk: true,
+      //  bounds:  await mapRef.getVisibleBounds(),
+      withLogo: false,
+      centerCoordinate:await mapRef.getCenter(),
+      zoomLevel:10  ,
+      width: 100, height: 390
+    })
+    console.log("bounds", uri);
+    dispatch(setOffline(uri));
+  }
   switch (viewMode) {
     case VIEWMODE.preview:
       return (
@@ -442,6 +458,18 @@ export const PreviewNavigate = (props: any) => {
                           <ButtonText>Let's Go </ButtonText>
                           <ButtonIcon as={Play} />
                         </Button>
+                     {/*    <Button
+                          size="md"
+                          variant="solid"
+                          action="positive"
+                          width="$1/3"
+                          onPress={() => {
+                            downloadTrip(item);
+                          }}
+                        >
+                          <ButtonText>Save Trip</ButtonText>
+                          <ButtonIcon as={Download} />
+                        </Button> */}
                         <Box>
                           <Text>
                             Arrive By :{' '}

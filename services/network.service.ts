@@ -115,7 +115,17 @@ export const saveToken = async (STORAGE_KEY: any) => {
         console.log('Failed to save the data to the storage');
     }
 };
-
+export const saveMap = async (payload: any) => {
+    try {
+        let map_obj = {
+            payload: payload,
+            timestamp: (new Date()).getTime(),
+        };
+        await AsyncStorage.setItem('map_obj', JSON.stringify(map_obj));
+    } catch (e) {
+        console.log('Failed to save the data to the storage');
+    }
+};
 export const readToken = async () => {
     try {
         const value = await AsyncStorage.getItem('access_token_obj');
@@ -129,6 +139,22 @@ export const readToken = async () => {
         return '';
     }
 };
+
+export const readMap = async () => {
+    try {
+        const value = await AsyncStorage.getItem('map_obj');
+        if (value) {
+            let map_obj = JSON.parse(value);
+            console.log("Mapobj",map_obj)
+            return map_obj;
+        }
+
+    } catch (e) {
+        console.log('Failed to fetch the data to the storage');
+        return '';
+    }
+};
+
 export const saveGoalToken = async (STORAGE_KEY: any) => {
     try {
         let token_obj = {

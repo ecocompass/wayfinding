@@ -17,6 +17,9 @@ import {
     VIEWUSERDIRECTION,
     UPDATETRIPSTART,
     SAVETRIP,
+    SETOFFLINE,
+    GETOFFLINE,
+    SAVEOFFLINE,
     SETTRIPHISTORY,
     GETTRIPHISTORY,
     SETAWARDS,
@@ -138,6 +141,26 @@ export const getWeather = (payload: any) => {
     }
 }
 
+export const setOffline=(payload:any)=>{
+    return{
+        type:SETOFFLINE,
+        payload:payload
+    }
+}
+
+export const getOffline=()=>{
+    return{
+        type:GETOFFLINE,
+
+    }
+}
+
+export const saveOffline = (payload: string) => {
+    return {
+        type: SAVEOFFLINE,
+        payload: payload
+    }
+}
 export const setTrips = () => {
     return {
         type: SETTRIPHISTORY

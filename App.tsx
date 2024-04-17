@@ -15,6 +15,7 @@ import Profile from "./components/Settings/profile";
 import ToastComponent from "./components/Toast/toast";
 import { SavedLocations } from "./components/Settings/saved_locations";
 import SpinnerComponent from "./components/Spinner/spinner";
+import OfflineMap from "./components/OfflineMap/offline";
 import Goals from "./components/Goals/user-goals";
 import ReadGoals from "./components/Settings/read_goals";
 import TripHistory from "./components/Settings/triphistory";

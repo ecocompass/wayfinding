@@ -17,6 +17,8 @@ import {
   SETGOALS,
   READGOALS,
   SETWEATHER,
+  SETOFFLINE,
+  GETOFFLINE,
   SETTRIPHISTORY,
   SETFEEDBACK,
 } from "../actions";
@@ -38,6 +40,8 @@ import {
   userGoals,
   readGoals,
   fetchWeather,
+  saveMap,
+  readMap,
   getTripHistory,
   userFeedback,
 } from "../../services/network.service";
@@ -50,7 +54,8 @@ import {
   getWeather,
   hideToast,
   showToast,
-  getTrips
+  getTrips,
+  saveOffline
 } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
@@ -108,13 +113,15 @@ function* tokenSaga(): any {
     let now = new Date().getTime();
     let diff = (now - token_time) / 1000 / 60;
     const res = yield getPreference();
-
     if (res && res.payload) {
       yield put(prefStore(res.payload));
       RootNavigation.navigate('Map', {});
     } else if (res && !res.payload) {
       yield call(handleToast, errorMessage);
       RootNavigation.navigate('Preference', {});
+    } else {
+      yield removeStorageItem('access_token_obj');
+      RootNavigation.navigate('Register', {});
     }
   } else {
     yield removeStorageItem('access_token_obj');
@@ -244,6 +251,9 @@ function* readGoalsSaga(): any {
     yield put(hideToast());
   }
 }
+function* saveOfflineSaga(payload:any):any{
+  yield saveMap(payload);
+}
 function* tripHistorySaga(): any {
   yield put(toggleSpinner());
   const response = yield getTripHistory();
@@ -265,6 +275,12 @@ function* feedbackSaga(payload: any): any {
   }
 }
 
+function* getOfflineSaga(payload:any):any{
+ const response= yield readMap();
+ if(response.payload){
+  yield put(saveOffline(response.payload))
+ }
+}
 function* watchSaveTrip(): SagaIterator {
   yield takeLatest(SAVETRIP, saveTripSaga);
 }
@@ -314,6 +330,14 @@ function* watchProfileSaga(): SagaIterator {
 function* watchWeatherSaga(): SagaIterator {
   yield takeLatest(SETWEATHER, WeatherSaga);
 }
+
+function* watchOfflineSaga():SagaIterator{
+  yield takeLatest(SETOFFLINE,saveOfflineSaga)
+}
+
+function* watchMapSaga():SagaIterator{
+  yield takeLatest(GETOFFLINE,getOfflineSaga)
+}
 function* watchTripHistorySaga(): SagaIterator {
   yield takeLatest(SETTRIPHISTORY, tripHistorySaga);
 }
@@ -335,6 +359,8 @@ function* appSagas() {
     call(watchGoalSaga),
     call(watchReadGoalSaga),
     call(watchWeatherSaga),
+    call(watchOfflineSaga),
+    call(watchMapSaga),
     call(watchTripHistorySaga),
     call(watchFeedbackSaga),
   ]);
