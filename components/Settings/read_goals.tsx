@@ -54,9 +54,9 @@ const ReadGoals = ({ navigation }: any) => {
   };
   const transports: any =
   {
-    public_transport: 'Public Transport',
     cycling: 'Biking',
-    walking: 'Walking'
+    walking: 'Walking',
+    public_transport: 'Public Transport'
   }
   const current: any = {
     public_transport: 30,
