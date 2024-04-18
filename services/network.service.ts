@@ -433,18 +433,16 @@ export const fetchWeather = async (payload: any) => {
 };
 
 export const fetchCurrentIncidents = async (params: any) => {
-    const token = await readToken();
+    console.log(params);
     return fetch(
-        'http://prod.ecocompass.live/api/transit/incidents?' +
-        new URLSearchParams(params),
+        `http://prod.ecocompass.live/api/transit/incidents?recommendationId=${params.payload.recommendationId}`,
         {
             method: 'GET',
-            headers: {
-                AUTHORIZATION: token,
-            },
         }
     )
         .then((response) => {
+            // return response.json();
+            console.log(response.status);
             if (response.status === status.ok) {
                 return response.json();
             } else {

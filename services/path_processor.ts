@@ -4,15 +4,21 @@ import { getTimeFromDistanceSingle } from "./time_to_dest";
 
 export const mapModeToInstruction: any = {
     "walk": 'Walk to ',
-    "bus": 'Take bus no. ',
+    "bus": 'Bus no. ',
     "luas": 'Take luas ',
     "car": 'Drive to ',
     "bike": 'Bike to ',
 };
 
+function getSum(acc, val) {
+    return acc + val
+}
+
 export function process_path(response: any) {
     let returnRecc: any = [];
     response.recommendationList.forEach((recc: any, index: any) => {
+        let reccCarbonEmission = 0;
+        let reccCalories = 0;
         if (recc.modePathList.length) {
             returnRecc.push({
                 displayModes: recc.transitions.split('-').filter(mode => mode.length),
@@ -20,13 +26,27 @@ export function process_path(response: any) {
                 pathId: index,
                 isViewed: index ? false : true,
                 pathDistance: recc.modePathList.map((mode) => {
+                    reccCarbonEmission = reccCarbonEmission + mode.carbonEmissions;
+                    reccCalories = reccCalories + mode.caloriesBurned;
                     return mode.distance;
                 }),
                 recommendationId: recc.recommendationId,
                 trafficSegment: recc.traffic,
+                totalCarbonEmission: reccCarbonEmission,
+                isLowestCarbon: false,
+                totalCaloriesBurned: reccCalories,
             });
         }
     });
+    let lowestCarbonEmmission = 1;
+    let lowestCarbonEmmissionIndex = 0;
+    returnRecc.forEach((recc, index) => {
+        if (recc.displayModes.length > 1 && recc.totalCarbonEmission < lowestCarbonEmmission) {
+            lowestCarbonEmmissionIndex = index;
+        }
+    });
+
+    returnRecc[lowestCarbonEmmissionIndex].isLowestCarbon = true;
     return returnRecc;
 }
 

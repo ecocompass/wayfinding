@@ -433,7 +433,7 @@ const Map = ({ route, navigation }: any) => {
             <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
             <MenuItemLabel size="md">Preferences</MenuItemLabel>
           </MenuItem>
-          <MenuItem key="incident" textValue="preferences" onPress={() => { dispatch(ToggleIncidentModal({visibility: true})) }}>
+          <MenuItem key="incident" textValue="preferences" onPress={() => { if (viewMode === VIEWMODE.navigate) dispatch(ToggleIncidentModal({visibility: true})) }}>
             <Icon as={MessageCircleWarningIcon} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Report Incident</MenuItemLabel>
         </MenuItem>

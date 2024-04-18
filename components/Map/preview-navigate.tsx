@@ -13,6 +13,9 @@ import {
   Text,
   Icon,
   Card,
+  Badge,
+  BadgeText,
+  BadgeIcon
 } from '@gluestack-ui/themed';
 import {
   MoveLeft,
@@ -30,6 +33,7 @@ import {
   CheckCircleIcon,
   ReplyIcon,
   Download,
+  LeafyGreenIcon,
 } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -67,6 +71,7 @@ import {
 } from '../../store/actions/modal';
 import RerouteModal from '../Modals/reroute_modal';
 import { bikeAward, walkAward } from '../../images';
+import DisplayWarningModal from '../Modals/display_incident_warning';
 
 export const PreviewNavigate = (props: any) => {
   const { onRender, onPointsRender, destinationName, camRef, mapRef } = props;
@@ -178,7 +183,6 @@ export const PreviewNavigate = (props: any) => {
         userPositionAndPath.userPosition,
         isFinalSegment
       );
-      console.log(positionUpdate.action);
       switch (positionUpdate.action) {
         case 'UPDATE':
           let isActiveEncountered = false;
@@ -333,6 +337,7 @@ export const PreviewNavigate = (props: any) => {
       recommendationId: selectedPath.recommendationId,
     });
     props.onTripStart(currentUserLocation);
+    dispatch(pingCurrentTraficAPI(selectedPath.recommendationId));
   };
   
   switch (viewMode) {
@@ -355,7 +360,7 @@ export const PreviewNavigate = (props: any) => {
             </Button>
           </HStack>
           <FlatList
-            h="$56"
+            h="$72"
             data={paths}
             renderItem={({ item }) => (
               <Pressable
@@ -399,14 +404,20 @@ export const PreviewNavigate = (props: any) => {
                         }
                       })}
                     </Text>
+                    <>
+                    {item.isLowestCarbon ? (
+                      <Badge size="lg" variant="solid" borderRadius="$full" action="success" ml="$8"> 
+                        <BadgeIcon as={LeafyGreenIcon} size='lg'/>
+                    </Badge>
+                    ) : (<></>)}
                     <Text>
-                      {getTimeFromDistance(
-                        item.pathDistance,
-                        item.displayModes
-                      )}{" "}
-                      mins
-                    </Text>
-                    {/*  */}
+                    {getTimeFromDistance(
+                      item.pathDistance,
+                      item.displayModes
+                    )}{" "}
+                    mins
+                  </Text>
+                    </>
                   </HStack>
                   {item.isViewed ? (
                     <>
@@ -432,6 +443,12 @@ export const PreviewNavigate = (props: any) => {
                           );
                         })}
                       </Box>
+                      <Box p="$2">
+                      <VStack mt="$2">
+                        <Text size='sm' color="$coolGray400">Calories Burned : {Math.round(item.totalCaloriesBurned * 100)/100 } kCal</Text>
+                        <Text size='sm' color="$coolGray400">Carbon Emissions : {Math.round(item.totalCarbonEmission * 100)/100} u</Text>
+                      </VStack>
+                      </Box>
                       <HStack
                         justifyContent="space-between"
                         margin="$2"
@@ -449,18 +466,6 @@ export const PreviewNavigate = (props: any) => {
                           <ButtonText>Let's Go </ButtonText>
                           <ButtonIcon as={Play} />
                         </Button>
-                     {/*    <Button
-                          size="md"
-                          variant="solid"
-                          action="positive"
-                          width="$1/3"
-                          onPress={() => {
-                            downloadTrip(item);
-                          }}
-                        >
-                          <ButtonText>Save Trip</ButtonText>
-                          <ButtonIcon as={Download} />
-                        </Button> */}
                         <Box>
                           <Text>
                             Arrive By :{' '}
@@ -571,6 +576,7 @@ export const PreviewNavigate = (props: any) => {
           </Box>
           <RerouteModal onShowIntent={onReRoute} />
           <IncidentModal currentUserLocation={currentUserLocation} />
+          <DisplayWarningModal onShowIntent={onReRoute} />
         </>
       );
     case VIEWMODE.navigateEnd:
