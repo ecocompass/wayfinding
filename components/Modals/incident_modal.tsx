@@ -26,7 +26,8 @@ import { ToggleIncidentModal } from '../../store/actions/modal';
 import { useEffect, useState } from 'react';
 import { reportIncidentAPI } from '../../store/actions/setLocation';
 
-const IncidentModal = () => {
+const IncidentModal = (props: any) => {
+  const currentUserLocation = props.currentUserLocation;
   const dispatch = useDispatch();
 
   const [description, setDescription] = useState<any>('');
@@ -43,6 +44,7 @@ const IncidentModal = () => {
       description,
       isJamcident,
       roadClosed: isRoadClosure,
+      coordinates: [currentUserLocation[1], currentUserLocation[0]]
     };
 
     dispatch(reportIncidentAPI(data));
@@ -59,9 +61,6 @@ const IncidentModal = () => {
       <ModalContent>
         <ModalHeader>
           <Heading size="lg">Report an Accident?</Heading>
-          <ModalCloseButton>
-            <Icon as={CloseIcon} />
-          </ModalCloseButton>
         </ModalHeader>
         <ModalBody>
           <Text>

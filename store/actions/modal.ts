@@ -1,4 +1,4 @@
-import { AWARDMODAL, FEEDBACKMODAL, INCIDENTMODAL, REROUTEMODAL, SAVEDLOCATIONMODAL } from ".";
+import { AWARDMODAL, DISPLAYWARNING, FEEDBACKMODAL, INCIDENTMODAL, REROUTEMODAL, SAVEDLOCATIONMODAL } from ".";
 
 
 export const ToggleLocationModal = (options: any) => {
@@ -25,6 +25,13 @@ export const ToggleFeedbackModal = (options: any) => {
 export const ToggleIncidentModal = (options: any) => {
     return {
         type: INCIDENTMODAL,
+        payload: options
+    }
+}
+
+export const ToggleWarning = (options: any) => {
+    return {
+        type: DISPLAYWARNING,
         payload: options
     }
 }

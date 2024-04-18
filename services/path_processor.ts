@@ -18,6 +18,7 @@ export function process_path(response: any) {
     let returnRecc: any = [];
     response.recommendationList.forEach((recc: any, index: any) => {
         let reccCarbonEmission = 0;
+        let reccCalories = 0;
         if (recc.modePathList.length) {
             returnRecc.push({
                 displayModes: recc.transitions.split('-').filter(mode => mode.length),
@@ -26,12 +27,14 @@ export function process_path(response: any) {
                 isViewed: index ? false : true,
                 pathDistance: recc.modePathList.map((mode) => {
                     reccCarbonEmission = reccCarbonEmission + mode.carbonEmissions;
+                    reccCalories = reccCalories + mode.caloriesBurned;
                     return mode.distance;
                 }),
                 recommendationId: recc.recommendationId,
                 trafficSegment: recc.traffic,
                 totalCarbonEmission: reccCarbonEmission,
                 isLowestCarbon: false,
+                totalCaloriesBurned: reccCalories,
             });
         }
     });

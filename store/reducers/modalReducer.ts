@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { AWARDMODAL, FEEDBACKMODAL, INCIDENTMODAL, REROUTEMODAL, SAVEDLOCATIONMODAL } from "../actions";
+import { AWARDMODAL, DISPLAYWARNING, FEEDBACKMODAL, INCIDENTMODAL, REROUTEMODAL, SAVEDLOCATIONMODAL } from "../actions";
 
 const initialState = {
     savedLocationModal: false,
@@ -7,6 +7,7 @@ const initialState = {
     awardModal: false,
     rerouteModal: false,
     incidentModal: false,
+    displayWarning: false,
 }
 
 export const modalReducer = (state = initialState, action: any) => {
@@ -21,6 +22,8 @@ export const modalReducer = (state = initialState, action: any) => {
             return { ...state, rerouteModal: action.payload };
         case INCIDENTMODAL:
             return { ...state, incidentModal: action.payload };
+        case DISPLAYWARNING:
+            return { ...state, displayWarning: action.payload };
         default:
             return state;
     }

@@ -68,7 +68,7 @@ import {
 } from "../actions/setLocation";
 import { toggleSpinner } from "../actions/auth";
 import { process_path } from "../../services/path_processor";
-import { ToggleAwardModal } from "../actions/modal";
+import { ToggleAwardModal, ToggleWarning } from "../actions/modal";
 
 function* signUpSaga(payload: any): any {
   yield put(toggleSpinner());
@@ -184,8 +184,6 @@ function* getPathSaga(action: any): any {
   }
 }
 
-
-
 function* saveTripSaga(action: any): any {
   yield put(toggleSpinner());
   const response = yield saveTrip(action.payload);
@@ -298,7 +296,9 @@ function* feedbackSaga(payload: any): any {
 function* currentTrafficSaga(payload: any): any {
   const response = yield fetchCurrentIncidents(payload);
   if (response) {
-    console.log(response);
+    if (response.reRoute) {
+      yield put(ToggleWarning({ visibility: true, data: response.incident }));
+    }
   }
 }
 
