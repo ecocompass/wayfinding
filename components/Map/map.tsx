@@ -30,90 +30,89 @@ import IncidentModal from "../Modals/incident_modal";
 import { offlineManager } from '@rnmapbox/maps';
 import NetInfo from '@react-native-community/netinfo';
 
-const simulateUserLoc = [
-  [
-      -6.2530686,
-      53.3414913
-  ],
-  [
-      -6.2529774,
-      53.3414625
-  ],
-  [
-      -6.2530577,
-      53.3413376
-  ],
-  [
-      -6.2531049,
-      53.3412537
-  ],
-  [
-      -6.2539325,
-      53.3414201
-  ],
-  [
-      -6.2539452,
-      53.3414438
-  ],
-  [
-      -6.2539178,
-      53.3414968
-  ],
-  [
-      -6.253902,
-      53.3415257
-  ],
-  [
-      -6.2539225,
-      53.3415304
-  ],
-  [
-      -6.2536966,
-      53.341948
-  ],
-  [
-      -6.2544412,
-      53.3421001
-  ],
-  [
-      -6.2545008,
-      53.3421098
-  ],
-  [
-      -6.2549935,
-      53.3412217
-  ],
-  [
-      -6.2550983,
-      53.3410325
-  ],
-  [
-      -6.2551116,
-      53.3410086
-  ],
-  [
-      -6.255175,
-      53.3408943
-  ],
-  [
-      -6.2552254,
-      53.3409048
-  ],
-  [
-      -6.2553135,
-      53.3408192
-  ],
-  [
-      -6.2554178,
-      53.3408388
-  ],
-  [
-      -6.255456,
-      53.3407618
-  ]
-]
+// const simulateUserLoc = [
+//   [
+//       -6.2530686,
+//       53.3414913
+//   ],
+//   [
+//       -6.2529774,
+//       53.3414625
+//   ],
+//   [
+//       -6.2530577,
+//       53.3413376
+//   ],
+//   [
+//       -6.2531049,
+//       53.3412537
+//   ],
+//   [
+//       -6.2539325,
+//       53.3414201
+//   ],
+//   [
+//       -6.2539452,
+//       53.3414438
+//   ],
+//   [
+//       -6.2539178,
+//       53.3414968
+//   ],
+//   [
+//       -6.253902,
+//       53.3415257
+//   ],
+//   [
+//       -6.2539225,
+//       53.3415304
+//   ],
+//   [
+//       -6.2536966,
+//       53.341948
+//   ],
+//   [
+//       -6.2544412,
+//       53.3421001
+//   ],
+//   [
+//       -6.2545008,
+//       53.3421098
+//   ],
+//   [
+//       -6.2549935,
+//       53.3412217
+//   ],
+//   [
+//       -6.2550983,
+//       53.3410325
+//   ],
+//   [
+//       -6.2551116,
+//       53.3410086
+//   ],
+//   [
+//       -6.255175,
+//       53.3408943
+//   ],
+//   [
+//       -6.2552254,
+//       53.3409048
+//   ],
+//   [
+//       -6.2553135,
+//       53.3408192
+//   ],
+//   [
+//       -6.2554178,
+//       53.3408388
+//   ],
+//   [
+//       -6.255456,
+//       53.3407618
+//   ]
+// ]
 
-const simulateDistance = simulateUserLoc.length
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -249,11 +248,11 @@ const Map = ({ route, navigation }: any) => {
   };
 
   const userLocationUpdate = (data: any) => {
-    // dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
-    if (viewMode === VIEWMODE.navigate) {
-      dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
-      setPseudoIndex(psuedoIndex + 1);
-    }
+    dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
+    // if (viewMode === VIEWMODE.navigate) {
+    //   dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
+    //   setPseudoIndex(psuedoIndex + 1);
+    // }
   };
 
   const onDownloadMap = () => {
@@ -411,9 +410,6 @@ const Map = ({ route, navigation }: any) => {
             )
           }}
         >
-          {
-          viewMode !== VIEWMODE.navigate ? (
-            <>
             <MenuItem key="profile" textValue="profile" onPress={() => { RootNavigation.navigate('Profile', {}) }}>
             <Icon as={CircleUser} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Profile</MenuItemLabel>
@@ -437,20 +433,14 @@ const Map = ({ route, navigation }: any) => {
             <AlignStartVertical color={'black'} style={{ marginRight: 5, height: 18, width: 18 }} />
             <MenuItemLabel size="md">Preferences</MenuItemLabel>
           </MenuItem>
+          <MenuItem key="incident" textValue="preferences" onPress={() => { dispatch(ToggleIncidentModal({visibility: true})) }}>
+            <Icon as={MessageCircleWarningIcon} size="md" mr="$2" color={'black'} />
+            <MenuItemLabel size="md">Report Incident</MenuItemLabel>
+        </MenuItem>
           <MenuItem key="logout" textValue="logout" onPress={() => { onLogout() }}>
             <Icon as={LogOut} size="md" mr="$2" color={'black'} />
             <MenuItemLabel size="md">Logout</MenuItemLabel>
           </MenuItem>
-            </>
-          
-          ):(
-            <MenuItem key="incident" textValue="preferences" onPress={() => { dispatch(ToggleIncidentModal({visibility: true})) }}>
-            <Icon as={MessageCircleWarningIcon} size="md" mr="$2" color={'black'} />
-            <MenuItemLabel size="md">Report Incident</MenuItemLabel>
-          </MenuItem>
-          )}
-          
-          
         </Menu>
         <Mapbox.MapView
           style={styles.map}
@@ -469,7 +459,10 @@ const Map = ({ route, navigation }: any) => {
           // followUserLocation={viewMode === VIEWMODE.navigate}
           />
           {renderedPoints}
-          <Mapbox.UserLocation onUpdate={userLocationUpdate} showsUserHeadingIndicator={isViewUserDirection}/>
+          <Mapbox.UserLocation 
+            onUpdate={userLocationUpdate} 
+            showsUserHeadingIndicator={isViewUserDirection}
+            minDisplacement={4}/>
           { renderedRoute.length ? (getLineAnnotation(renderedRoute)) : <></>}
         </Mapbox.MapView>
         <Box>
@@ -493,7 +486,7 @@ const Map = ({ route, navigation }: any) => {
               </Button>)}
             </HStack>
             <Text size="sm" mb="$5">{locationData.address}</Text>
-            <WeatherComponent lon={locationData.coordinates[0]} lat={locationData.coordinates[1]} />
+            <WeatherComponent />
             <HStack>
               <Button py="$2" px="$4" action="negative" onPress={() => { cancelSearch() }}>
                 <ButtonText size="sm">Cancel</ButtonText>

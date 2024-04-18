@@ -4,11 +4,11 @@ import { weather_url } from "../../constants";
 import { setWeather } from "../../store/actions/setLocation";
 import { useEffect } from "react";
 
-const WeatherComponent = (props: any) => {
+const WeatherComponent = () => {
 
   const dispatch = useDispatch();
   useEffect(() => {
-    dispatch(setWeather({ lat: props.lat, lon: props.lon }))
+    dispatch(setWeather({ lat: 53.3498, lon: -6.2603 }))
 
   }, []);
 
