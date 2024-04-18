@@ -55,8 +55,13 @@ const ReadGoals = ({ navigation }: any) => {
   const transports: any =
   {
     public_transport: 'Public Transport',
-    cycling: 'Cycling',
+    cycling: 'Biking',
     walking: 'Walking'
+  }
+  const current: any = {
+    public_transport: 30,
+    cycling: 0,
+    walking: 0
   }
 
   return (
@@ -101,7 +106,7 @@ const ReadGoals = ({ navigation }: any) => {
           <VStack space="lg" key={transports[g.type]}>
             <Heading>{transports[g.type]}</Heading>
             <HStack alignItems='center'>
-              <Progress value={g.current} w={310} h={8} bg="$lime100">
+              <Progress value={g.current * 100 / g.target} w={310} h={8} bg="$lime100">
                 <ProgressFilledTrack h={8} bg="$lime500" />
               </Progress>
               <Text size="md" ml={'$2'}>{g.target + ' km'}</Text>
