@@ -63,9 +63,9 @@ const Signup = ({ navigation }: any) => {
             </Input>
             <Text lineHeight="$xs">Email</Text>
             <Input>
-              <InputField
-                type="text"
-                value={email}
+              <InputField 
+                type="text" value={email}
+                placeholder="Email"
                 onChangeText={(event: any) => {
                   setEmail(event);
                 }}

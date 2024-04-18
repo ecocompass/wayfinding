@@ -25,48 +25,49 @@ const Auth = ({ navigation }: any) => {
       $dark-borderWidth="$1"
       $dark-borderRadius="$lg"
       $dark-borderColor="$borderDark800"
-    >
-      <VStack space='xl'>
-        <Heading>
-          Welcome
-        </Heading>
-        <VStack space='xs'>
-          <Text>
-            Email
-          </Text>
-          <Input>
-            <InputField
-              type="text" value={email}
-              onChangeText={(event: any) => {
-                setEmail(event)
-              }}
-            />
-          </Input>
+      >
+        <VStack space='xl'>
+          <Heading>
+            Welcome
+          </Heading>
+          <VStack space='xs'>
+            <Text>
+              Email
+            </Text>
+            <Input>
+              <InputField
+                type="text" value={email}
+                placeholder="Email"
+                onChangeText={(event: any) => {
+                  setEmail(event)
+                }}
+              />
+            </Input>
+          </VStack>
+          <VStack space='xs'>
+            <Text>
+              Password
+            </Text>
+            <Input>
+              <InputField id="password" testID="password"
+                type={showPassword ? 'text' : 'password'} value={password}
+                onChangeText={(event: any) => {
+                  setPassword(event);
+                }}
+              />
+              <InputSlot pr='$3' onPress={handleState}>
+                <InputIcon as={showPassword ? EyeIcon : EyeOffIcon}  color='$darkBlue500'/>
+              </InputSlot>
+            </Input>
+          </VStack>
+          <Button title="Login" testID="Login"
+            onPress={()=>{
+             dispatch(loginAction({ email: email, password: password}));
+            }}
+          >
+          </Button>
         </VStack>
-        <VStack space='xs'>
-          <Text>
-            Password
-          </Text>
-          <Input>
-            <InputField
-              type={showPassword ? 'text' : 'password'} value={password}
-              onChangeText={(event: any) => {
-                setPassword(event);
-              }}
-            />
-            <InputSlot pr='$3' onPress={handleState}>
-              <InputIcon as={showPassword ? EyeIcon : EyeOffIcon} color='$darkBlue500' />
-            </InputSlot>
-          </Input>
-        </VStack>
-        <Button title="Login"
-          onPress={() => {
-            dispatch(loginAction({ email: email, password: password }));
-          }}
-        >
-        </Button>
-      </VStack>
-    </FormControl>
-  );
-}
+      </FormControl>
+    );
+  }
 export default Auth;

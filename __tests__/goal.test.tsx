@@ -3,25 +3,25 @@ import { render, } from '@testing-library/react-native';
 
 import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
-import Preference from '../components/Preference/preference';
 import { GluestackUIProvider } from '@gluestack-ui/themed';
 import { config } from '@gluestack-ui/config';
+import Goals from '../components/Goals/user-goals';
 
 let mockStore = configureMockStore();
 const store=mockStore( [])
 
-describe('Preference Component', () => {
+describe('Goal Component', () => {
 
 
   it('renders correctly', () => {
     const { getByText } = render(
       <Provider store={store}>
         <GluestackUIProvider config={config}>
-        <Preference />
+        <Goals />
         </GluestackUIProvider>
       </Provider>
     );
 
-    expect(getByText('Set Your Preferences')).toBeTruthy();
+    expect(getByText('Set Your Weekly Goals')).toBeTruthy();
   });
 });
