@@ -80,39 +80,30 @@ import NetInfo from '@react-native-community/netinfo';
 //       53.3421098
 //   ],
 //   [
-//       -6.2549935,
-//       53.3412217
+//       -6.2545131,
+//       53.3421124
 //   ],
 //   [
-//       -6.2550983,
-//       53.3410325
+//       -6.254564,
+//       53.342123
 //   ],
 //   [
-//       -6.2551116,
-//       53.3410086
+//       -6.2546001,
+//       53.3421305
 //   ],
 //   [
-//       -6.255175,
-//       53.3408943
+//       -6.2546356,
+//       53.3421378
 //   ],
 //   [
-//       -6.2552254,
-//       53.3409048
+//       -6.2546751,
+//       53.342146
 //   ],
 //   [
-//       -6.2553135,
-//       53.3408192
-//   ],
-//   [
-//       -6.2554178,
-//       53.3408388
-//   ],
-//   [
-//       -6.255456,
-//       53.3407618
+//       -6.2550021,
+//       53.3415482
 //   ]
 // ]
-
 
 Mapbox.setAccessToken(
   MAPBOX_PUBLIC_TOKEN
@@ -248,11 +239,11 @@ const Map = ({ route, navigation }: any) => {
   };
 
   const userLocationUpdate = (data: any) => {
-    dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
-    // if (viewMode === VIEWMODE.navigate) {
-    //   dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
-    //   setPseudoIndex(psuedoIndex + 1);
-    // }
+    if (viewMode === VIEWMODE.navigate) {
+      dispatch(setUserLocation([data.coords.longitude, data.coords.latitude]))
+      // dispatch(setUserLocation(simulateUserLoc[psuedoIndex]))
+      // setPseudoIndex(psuedoIndex + 1);
+    }
   };
 
   const onDownloadMap = () => {

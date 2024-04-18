@@ -251,7 +251,7 @@ export const saveTrip = async function (data: any) {
     })
         .then((response) => {
             if (response.status === status.ok) {
-                return response.json()
+                return response.json();
             } else {
                 return { error: true, response: response.json() };
             }
@@ -457,17 +457,14 @@ export const fetchCurrentIncidents = async (params: any) => {
 
 export const reportIncident = async (data: any) => {
     const token = await readToken();
-    let body = JSON.stringify(data);
-    return fetch(
-        'http://prod.ecocompass.live/createIncident?' + new URLSearchParams(params),
-        {
-            method: 'POST',
-            headers: {
-                AUTHORIZATION: token,
-            },
-            body,
-        }
-    )
+    let body = JSON.stringify(data.payload);
+    return fetch('http://prod.ecocompass.live/createIncident', {
+        method: 'POST',
+        headers: {
+            AUTHORIZATION: token,
+        },
+        body,
+    })
         .then((response) => {
             if (response.status === status.ok) {
                 return response.json();
