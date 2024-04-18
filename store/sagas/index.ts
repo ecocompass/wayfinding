@@ -305,8 +305,10 @@ function* currentTrafficSaga(payload: any): any {
 function* reportIncidentSaga(payload: any): any {
   yield put(toggleSpinner());
   const response = yield reportIncident(payload);
+  yield put(toggleSpinner());
+  yield call(handleToast, "Incident successfully reported!", "success");
   if (response) {
-    yield call(handleToast, "Incident successfully reported!");
+    yield call(handleToast, "Incident successfully reported!", "success");
   }
 }
 

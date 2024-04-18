@@ -128,6 +128,7 @@ const IncidentModal = (props: any) => {
             onPress={() => {
               // call incident modal
               onReportIncident();
+              dispatch(ToggleIncidentModal({ visibility: false }));
             }}
           >
             <ButtonText>Report</ButtonText>
