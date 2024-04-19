@@ -14,6 +14,7 @@ function getSum(acc, val) {
     return acc + val
 }
 
+// process the routes information sent from the api
 export function process_path(response: any) {
     let returnRecc: any = [];
     response.recommendationList.forEach((recc: any, index: any) => {
@@ -50,6 +51,7 @@ export function process_path(response: any) {
     return returnRecc;
 }
 
+// convert the routes to instructions to show the user for following the path
 export function getPathInstructions(path: any, destinationName: string) {
     let instructionArr: any = [];
     path.modePathList.forEach((p: any, index) => {
@@ -82,6 +84,7 @@ export function getPathInstructions(path: any, destinationName: string) {
     return instructionArr;
 }
 
+// track user progress through the path and also detect if the user is veering off path
 export const processPathCleared = (pointList, userLocation, userPosition, isFinalSegment = false) => {
 
     if (userPosition + 1 === pointList.length) {

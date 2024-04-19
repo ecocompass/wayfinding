@@ -186,7 +186,6 @@ export const removeStorageItem = function (key: string) {
 };
 
 export const getPath = async function (coordinateObj: any) {
-    console.log(coordinateObj);
     const token = await readToken();
     return fetch(
         'http://prod.ecocompass.live/api/routes2?' +
@@ -225,17 +224,6 @@ export const getSaveLocations = async function () {
         })
         .catch((e) => console.log(e));
 };
-
-// {
-//   "payload": {
-//       "awards": {
-//           "awards for walking": [
-//               "Achievement Unlocked: Reached walking goal of 50 km."
-//           ]
-//       },
-//       "message": "Saved Trips"
-//   }
-// }
 
 export const saveTrip = async function (data: any) {
     const token = await readToken();
@@ -433,7 +421,6 @@ export const fetchWeather = async (payload: any) => {
 };
 
 export const fetchCurrentIncidents = async (params: any) => {
-    console.log(params);
     return fetch(
         `http://prod.ecocompass.live/api/transit/incidents?recommendationId=${params.payload.recommendationId}`,
         {
