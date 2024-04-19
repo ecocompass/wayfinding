@@ -93,8 +93,6 @@ export const PreviewNavigate = (props: any) => {
   });
 
   let [pathInstructions, setPathInstructions] = useState<any>([]);
-  // let [pathSegments, setPathSegments] = useState<any>([]);
-  // let [userPositionOnPath, setUserPositionOnPath] = useState<any>(0);
   let [userPositionAndPath, setUserPositionAndPathSegment] = useState<any>({
     userPosition: 0,
     pathSegments: [],
