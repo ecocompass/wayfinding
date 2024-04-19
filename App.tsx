@@ -7,7 +7,7 @@ import Signup from "./components/Auth/signup";
 import Login from "./components/Auth/login";
 import { GluestackUIProvider } from "@gluestack-ui/themed";
 import { config } from "@gluestack-ui/config";
-import { Provider} from 'react-redux';
+import { Provider } from 'react-redux';
 import store from './store';
 import Preference from "./components/Preference/preference";
 import { navigationRef } from "./components/Navigation/RootNavigator";
@@ -15,6 +15,10 @@ import Profile from "./components/Settings/profile";
 import ToastComponent from "./components/Toast/toast";
 import { SavedLocations } from "./components/Settings/saved_locations";
 import SpinnerComponent from "./components/Spinner/spinner";
+import OfflineMap from "./components/OfflineMap/offline";
+import Goals from "./components/Goals/user-goals";
+import ReadGoals from "./components/Settings/read_goals";
+import TripHistory from "./components/Settings/triphistory";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -25,15 +29,11 @@ const App = () => {
           <NavigationContainer ref={navigationRef}>
             <ToastComponent />
             <Stack.Navigator>
+
               <Stack.Screen
                 name="Register"
                 component={Signup}
                 options={{ headerShown: false }}
-              />
-              <Stack.Screen
-                options={{ headerShown: false }}
-                name="Profile"
-                component={Profile}
               />
               <Stack.Screen
                 name="Login"
@@ -42,8 +42,23 @@ const App = () => {
               />
               <Stack.Screen
                 options={{ headerShown: false }}
+                name="Profile"
+                component={Profile}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="Goals"
+                component={Goals}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
                 name="Preference"
                 component={Preference}
+              />
+              <Stack.Screen
+                options={{ headerShown: false }}
+                name="ReadGoals"
+                component={ReadGoals}
               />
               <Stack.Screen
                 options={{ headerShown: false }}
@@ -54,6 +69,11 @@ const App = () => {
                 options={{ headerShown: true }}
                 name="Saved Locations"
                 component={SavedLocations}
+              />
+              <Stack.Screen
+                options={{ headerShown: true }}
+                name="TripHistory"
+                component={TripHistory}
               />
             </Stack.Navigator>
             <SpinnerComponent />

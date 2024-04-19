@@ -1,24 +1,31 @@
 /* eslint-disable react-native/no-inline-styles */
 import {
-  Input,
   VStack,
   Heading,
-  InputField,
   FormControl,
   Button,
   ButtonText,
-  Card,
   HStack,
   Box,
+  Modal,
+  ModalContent,
+  ModalBody,
+  ModalCloseButton,
+  Icon,
+  ModalHeader,
+  CloseIcon,
+  ModalBackdrop,
+  Center,
+  Text
 } from '@gluestack-ui/themed';
 
-import { Text } from "../ui/text";
 import React from 'react';
 import { View } from 'react-native';
 import { useState } from 'react';
 import { TouchableOpacity } from 'react-native';
 import { useDispatch } from 'react-redux';
 import { prefAction } from '../../store/actions/user';
+import { BadgeInfo } from 'lucide-react-native';
 
 const Preference = ({ navigation }: any) => {
   const [allPreferences, setPreferences] = useState([
@@ -28,11 +35,15 @@ const Preference = ({ navigation }: any) => {
     { name: 'Driving', isSelected: false },
   ]);
   const dispatch = useDispatch();
-
+  const [showModal, setShowModal] = useState(false);
+  const ref = React.useRef(null);
   const togglePreference = (p) => {
     let newPreferences = allPreferences.map((ap) => {
       if (ap.name === p.name) {
         ap.isSelected = !ap.isSelected;
+      }
+      else {
+        ap.isSelected = false;
       }
       return ap;
     });
@@ -51,7 +62,34 @@ const Preference = ({ navigation }: any) => {
     >
       <FormControl p="$4">
         <VStack space="xl">
-          <Heading size="2xl">Set Your Preferences</Heading>
+          <HStack alignItems='center'>
+            <Heading size="2xl">Set Your Preferences</Heading>
+            <BadgeInfo onPress={() => setShowModal(true)} />
+          </HStack>
+          <Center>
+            <Modal
+              isOpen={showModal}
+              onClose={() => {
+                setShowModal(false)
+              }}
+              finalFocusRef={ref}
+            >
+              <ModalBackdrop />
+              <ModalContent>
+                <ModalHeader>
+                  <Heading size="lg">Setting your Preference</Heading>
+                  <ModalCloseButton>
+                    <Icon as={CloseIcon} />
+                  </ModalCloseButton>
+                </ModalHeader>
+                <ModalBody>
+                  <Text>
+                    Setting your preferred mode of transport will reflect in your route options.
+                  </Text>
+                </ModalBody>
+              </ModalContent>
+            </Modal>
+          </Center>
           <HStack space="xl" rounded="$md" my="$5" style={{ flexWrap: 'wrap' }}>
             {allPreferences.map((p) => {
               return (

@@ -1,10 +1,21 @@
-/* eslint-disable prettier/prettier */
-import { PREF_STORE, READPROFILE, SAVE_LOCATION_STORE } from "../actions";
+import { GOAL_STORE, PREF_STORE, READGOALS, READPROFILE, SAVE_LOCATION_STORE } from "../actions";
 
 const initialState = {
     savedLocations: [],
     pref: '',
-    profile: ''
+    profile: '',
+    goal: [{
+        target: 0,
+        type: "walking"
+    },
+    {
+        target: 0,
+        type: "cycling"
+    },
+    {
+        target: 0,
+        type: "public_transport"
+    }]
 };
 
 const userDetailReducer = (state = initialState, action: any) => {
@@ -14,7 +25,14 @@ const userDetailReducer = (state = initialState, action: any) => {
         case PREF_STORE:
             return { ...state, pref: action.payload };
         case READPROFILE:
-            return { ...state, profile: action.payload }
+            return { ...state, profile: action.payload };
+        case GOAL_STORE:
+            return { ...state, goal: action.payload };
+        case READPROFILE:
+            return { ...state, payload: action.payload };
+        case READGOALS:
+            return { ...state, payload: action.payload };
+
         default:
             return state;
     }

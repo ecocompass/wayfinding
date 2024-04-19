@@ -1,5 +1,5 @@
-/* eslint-disable prettier/prettier */
-import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, SETPREFERENCE, PREF_STORE, UPDATEPATHVIEWED } from "../actions";
+
+import { UPDATEUSERLOCATION, UPDATECENTERLOCATION, UPDATESEARCHSTATUS, ZOOMADJUST, PREF_STORE, UPDATEPATHVIEWED, RESETPATHS, VIEWUSERDIRECTION, UPDATETRIPSTART, UPDATETRIPEND, SETAWARDS, GETTRIPHISTORY,SAVEOFFLINE  } from "../actions";
 import { VIEWMODE } from "../../constants";
 import { UPDATEVIEWMODE, ROUTES_STORE } from "../actions";
 
@@ -9,7 +9,13 @@ const initialState = {
     isSearching: false,
     zoomLevel: 14,
     viewMode: VIEWMODE.search,
-    recommendedRoutes: {}
+    recommendedRoutes: {},
+    isViewUserDirection: false,
+    tripDetails: {},
+    weather: {},
+    offline: {},
+    tripHistory:[],
+    award:{}
 };
 
 const locationReducer = (state = initialState, action: any) => {
@@ -31,7 +37,7 @@ const locationReducer = (state = initialState, action: any) => {
         case ROUTES_STORE:
             return { ...state, recommendedRoutes: action.payload };
         case UPDATEPATHVIEWED:
-            let updatedRoutes = state.recommendedRoutes.options.map((opt) => {
+            let updatedRoutes = state.recommendedRoutes.options.map((opt:any) => {
                 return {
                     ...opt,
                     isViewed: (opt.pathId === action.payload) ? true : false,
@@ -40,6 +46,54 @@ const locationReducer = (state = initialState, action: any) => {
             return {
                 ...state, recommendedRoutes: { options: updatedRoutes },
             };
+        case RESETPATHS:
+            return {
+                ...state,
+                recommendedRoutes: {},
+                tripDetails: {},
+            };
+
+        case VIEWUSERDIRECTION:
+            return {
+                ...state,
+                isViewUserDirection: !state.isViewUserDirection,
+
+            };
+
+        case UPDATETRIPSTART:
+            let tripDetailObj = {
+                ...state.tripDetails,
+                startLocation: action.payload.start,
+                endLocation: action.payload.end,
+                startTime: action.payload.startTime,
+            }
+            return {
+                ...state,
+                tripDetails: tripDetailObj,
+            };
+        case UPDATETRIPEND:
+            let tripDetailEndObj: any = {
+                ...state.tripDetails,
+                ...action.payload,
+            };
+            return {
+                ...state,
+                tripDetails: tripDetailEndObj,
+            };
+        case SAVEOFFLINE:
+            return {
+                ...state, offline: action.payload
+            };
+        case GETTRIPHISTORY:
+            return {
+                ...state,
+                tripHistory: action.payload
+            }
+        case SETAWARDS:
+            return {
+                ...state,
+                award: action.payload
+            }
         default:
             return state;
     }

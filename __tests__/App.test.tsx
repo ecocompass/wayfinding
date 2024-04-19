@@ -1,17 +1,21 @@
-/**
- * @format
- */
+// AuthComponent.test.tsx
+import React from "react";
+import { render } from "@testing-library/react-native";
+import { Provider } from "react-redux";
+import configureMockStore from 'redux-mock-store';
+import { GluestackUIProvider } from "@gluestack-ui/themed";
+import { config } from "@gluestack-ui/config";
+import Auth from "../components/Auth/login";
 
-import 'react-native';
-import React from 'react';
-import App from '../App';
+let mockStore = configureMockStore();
+const store = mockStore([])
+describe("AppComponent", () => {
 
-// Note: import explicitly to use the types shiped with jest.
-import {it} from '@jest/globals';
+  it('should render correctly', () => {
+    const { getByPlaceholderText } = render(<Provider store={store}>   <GluestackUIProvider config={config}> <Auth/></GluestackUIProvider></Provider>);
 
-// Note: test renderer must be required after react-native.
-import renderer from 'react-test-renderer';
+    expect(getByPlaceholderText('Email')).toBeTruthy();
+  });
 
-it('renders correctly', () => {
-  renderer.create(<App />);
+
 });

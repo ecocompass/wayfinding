@@ -8,13 +8,8 @@ import {
   FormControl,
   Button,
   ButtonText,
-  Card,
-  HStack,
   FormControlHelper,
   FormControlHelperText,
-  FormControlErrorText,
-  FormControlErrorIcon,
-  FormControlError,
   AlertCircleIcon,
   Icon,
   Center,
@@ -30,7 +25,8 @@ const Signup = ({ navigation }: any) => {
   const [isEmailValid, setIsEmailValid] = useState(true);
   const [confirmPassword, setConfirmPassword] = React.useState('');
   const [isPasswordInvalid, setIsPasswordInvalid] = React.useState(false);
-  const [isConfirmPasswordInvalid, setIsConfirmPasswordInvalid] = React.useState(false);
+  const [isConfirmPasswordInvalid, setIsConfirmPasswordInvalid] =
+    React.useState(false);
   const handlePasswordChange = (event: any) => {
     setPassword(event);
     setIsPasswordInvalid(event.length < 8); // Check password length on change
@@ -39,6 +35,7 @@ const Signup = ({ navigation }: any) => {
     setConfirmPassword(event);
     setIsConfirmPasswordInvalid(password !== event); // Check password match
   };
+
   useEffect(() => {
     dispatch(getToken());
   },[]);
@@ -93,19 +90,25 @@ const Signup = ({ navigation }: any) => {
             </Input>
             {isPasswordInvalid && (
               <FormControlHelper>
-                <FormControlHelperText>Password must be at least 8 characters</FormControlHelperText>
+                <FormControlHelperText>
+                  Password must be at least 8 characters
+                </FormControlHelperText>
               </FormControlHelper>
             )}
             <Text lineHeight="$xs">Confirm Password</Text>
             <Input isInvalid={isConfirmPasswordInvalid} isRequired={true}>
-              <InputField type="password"
+              <InputField
+                type="password"
                 value={confirmPassword}
-                onChangeText={handleConfirmPasswordChange} />
+                onChangeText={handleConfirmPasswordChange}
+              />
             </Input>
             {isConfirmPasswordInvalid && (
               <FormControlHelper>
-                <Icon as={AlertCircleIcon} size="md" color='red' />
-                <FormControlHelperText color='red'>Passwords must match</FormControlHelperText>
+                <Icon as={AlertCircleIcon} size="md" color="red" />
+                <FormControlHelperText color="red">
+                  Passwords must match
+                </FormControlHelperText>
               </FormControlHelper>
             )}
           </VStack>
@@ -140,6 +143,7 @@ const Signup = ({ navigation }: any) => {
           </VStack>
         </VStack>
       </FormControl>
+
     </View>
   );
 };

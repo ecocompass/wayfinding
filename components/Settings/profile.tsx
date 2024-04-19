@@ -1,5 +1,5 @@
-import { Avatar, AvatarFallbackText, Box, Center, Divider, HStack, Icon, MailIcon, Text, VStack, EyeIcon, PhoneIcon, EyeOffIcon, Button, ButtonIcon } from "@gluestack-ui/themed";
-import { RefreshCw, View } from "lucide-react-native";
+import { Avatar, AvatarFallbackText, Box, Center, Divider, HStack, Icon, MailIcon, Text, VStack, PhoneIcon } from "@gluestack-ui/themed";
+import { View } from "lucide-react-native";
 import { useEffect, useState } from "react";
 import { StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,20 +7,14 @@ import { profileAction } from "../../store/actions/user";
 
 const Profile = () => {
     const dispatch = useDispatch()
-useEffect(()=>{
-    dispatch(profileAction());
-},[])
-    
+    useEffect(() => {
+        dispatch(profileAction());
+    }, [])
+
 
     const [passwordVisible, setPasswordVisible] = useState(false);
-    const handleIconPress = () => {
-        console.log("PRessed")
-        setPasswordVisible((state) => { return !state });
-    };
-
-    const passwordText = passwordVisible ? 'Show Password' : 'Password';
-    const profile = useSelector((state: any) => { return state.userDetails.profile})
-    const username=`${profile.first_name} ${profile.last_name}`;
+    const profile = useSelector((state: any) => { return state.userDetails.profile })
+    const username = `${profile.first_name} ${profile.last_name}`;
     const styles = StyleSheet.create({
         page: {
 
@@ -46,14 +40,6 @@ useEffect(()=>{
                     <Icon as={PhoneIcon} size="xl" />
                     <Text>+353 213193212</Text>
                 </HStack>
-{/*                 <Divider></Divider>
-                <HStack space="lg" alignItems="center">
-                    <Icon as={!passwordVisible ? EyeIcon : EyeOffIcon} size="xl" />
-                    <Text color="grey" bold={true}>{passwordText}</Text>
-                    <Button onPress={handleIconPress} variant="solid" isDisabled={false} size="md"><ButtonIcon as={RefreshCw} />
-                    </Button>
-                </HStack>
-                <Divider></Divider> */}
             </VStack>
         </View>
 
